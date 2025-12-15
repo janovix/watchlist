@@ -115,4 +115,21 @@ describe("SearchForm", () => {
 		const input = screen.getByRole("textbox");
 		expect(input).toHaveAttribute("placeholder");
 	});
+
+	it("should not call onSearch when form is submitted with empty trimmed input", async () => {
+		const onSearch = vi.fn();
+		renderWithProvider(<SearchForm onSearch={onSearch} isLoading={false} />);
+
+		const input = screen.getByRole("textbox");
+		const form = input.closest("form");
+
+		fireEvent.change(input, { target: { value: "" } });
+		if (form) {
+			fireEvent.submit(form);
+		}
+
+		// Wait a bit to ensure onSearch is not called
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		expect(onSearch).not.toHaveBeenCalled();
+	});
 });

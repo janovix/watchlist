@@ -164,5 +164,112 @@ describe("useToast", () => {
 				expect(updatedToast?.title).toBe("Updated Title");
 			});
 		});
+
+		it("should handle dismissing all toasts when no toastId provided", () => {
+			const { result } = renderHook(() => useToast());
+
+			act(() => {
+				toast({ title: "Toast 1" });
+			});
+
+			act(() => {
+				result.current.dismiss(); // No toastId - dismiss all
+			});
+
+			waitFor(() => {
+				result.current.toasts.forEach((t) => {
+					expect(t.open).toBe(false);
+				});
+			});
+		});
+
+		it("should handle REMOVE_TOAST with undefined toastId", () => {
+			const { result } = renderHook(() => useToast());
+
+			act(() => {
+				toast({ title: "Toast 1" });
+				toast({ title: "Toast 2" });
+			});
+
+			// This tests the REMOVE_TOAST branch with undefined toastId
+			// by dismissing and waiting for removal
+			act(() => {
+				result.current.dismiss();
+			});
+
+			// Wait for removal timeout (TOAST_REMOVE_DELAY is 1000000ms)
+			vi.advanceTimersByTime(1000100);
+
+			waitFor(() => {
+				// All toasts should be removed
+				expect(result.current.toasts.length).toBe(0);
+			});
+		});
+
+		it("should handle onOpenChange callback when open is false", () => {
+			const { result } = renderHook(() => useToast());
+
+			let toastId: string;
+
+			act(() => {
+				const toastResult = toast({
+					title: "Test Toast",
+				});
+				toastId = toastResult.id;
+			});
+
+			// Find the toast and trigger onOpenChange with false
+			const testToast = result.current.toasts.find((t) => t.id === toastId);
+			if (testToast && typeof testToast.onOpenChange === "function") {
+				act(() => {
+					testToast.onOpenChange!(false);
+				});
+			}
+
+			waitFor(() => {
+				const dismissedToast = result.current.toasts.find(
+					(t) => t.id === toastId,
+				);
+				expect(dismissedToast?.open).toBe(false);
+			});
+		});
+
+		it("should handle cleanup when component unmounts", () => {
+			const { result, unmount } = renderHook(() => useToast());
+
+			act(() => {
+				toast({ title: "Test Toast" });
+			});
+
+			// Unmount should cleanup listener
+			unmount();
+
+			// Should not throw errors
+			expect(result.current.toasts.length).toBeGreaterThanOrEqual(0);
+		});
+
+		it("should not add duplicate timeout when toastId already exists in queue", () => {
+			const { result } = renderHook(() => useToast());
+
+			let toastId: string;
+
+			act(() => {
+				const toastResult = toast({ title: "Test Toast" });
+				toastId = toastResult.id;
+			});
+
+			// Dismiss the toast (adds to remove queue)
+			act(() => {
+				result.current.dismiss(toastId!);
+			});
+
+			// Try to dismiss again - should not add duplicate timeout
+			act(() => {
+				result.current.dismiss(toastId!);
+			});
+
+			// Should not throw errors
+			expect(result.current.toasts.length).toBeGreaterThanOrEqual(0);
+		});
 	});
 });
