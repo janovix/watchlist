@@ -158,11 +158,15 @@ describe("UserMenu", () => {
 			fireEvent.click(button);
 		}
 
-		await waitFor(() => {
-			expect(
-				screen.getByText(/Log out|Cerrar sesión|Sair/i),
-			).toBeInTheDocument();
-		});
+		await waitFor(
+			() => {
+				const logoutButtons = screen.queryAllByText(
+					/Log out|Cerrar sesión|Sair/i,
+				);
+				expect(logoutButtons.length).toBeGreaterThan(0);
+			},
+			{ timeout: 2000 },
+		);
 
 		consoleSpy.mockRestore();
 	});

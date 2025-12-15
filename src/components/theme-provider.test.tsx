@@ -1,6 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import { ThemeProvider } from "./theme-provider";
+
+// Mock next-themes since it requires client-side environment
+vi.mock("next-themes", () => ({
+	ThemeProvider: ({ children }: { children: React.ReactNode }) => (
+		<div data-testid="theme-provider">{children}</div>
+	),
+}));
 
 describe("ThemeProvider", () => {
 	it("should render children", () => {

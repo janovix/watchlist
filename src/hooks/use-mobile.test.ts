@@ -7,24 +7,36 @@ describe("useIsMobile", () => {
 	const originalMatchMedia = window.matchMedia;
 
 	beforeEach(() => {
-		vi.spyOn(window, "matchMedia").mockImplementation((query) => {
-			const isMobile = window.innerWidth < 768;
-			return {
-				matches: query.includes("max-width") && isMobile,
-				media: query,
-				onchange: null,
-				addListener: vi.fn(),
-				removeListener: vi.fn(),
-				addEventListener: vi.fn(),
-				removeEventListener: vi.fn(),
-				dispatchEvent: vi.fn(),
-			} as MediaQueryList;
+		// Mock matchMedia
+		Object.defineProperty(window, "matchMedia", {
+			writable: true,
+			value: vi.fn().mockImplementation((query) => {
+				const isMobile = window.innerWidth < 768;
+				return {
+					matches: query.includes("max-width") && isMobile,
+					media: query,
+					onchange: null,
+					addListener: vi.fn(),
+					removeListener: vi.fn(),
+					addEventListener: vi.fn(),
+					removeEventListener: vi.fn(),
+					dispatchEvent: vi.fn(),
+				} as MediaQueryList;
+			}),
 		});
 	});
 
 	afterEach(() => {
-		window.innerWidth = originalInnerWidth;
-		window.matchMedia = originalMatchMedia;
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: originalInnerWidth,
+		});
+		Object.defineProperty(window, "matchMedia", {
+			writable: true,
+			configurable: true,
+			value: originalMatchMedia,
+		});
 		vi.restoreAllMocks();
 	});
 

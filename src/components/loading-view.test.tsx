@@ -45,15 +45,11 @@ describe("LoadingView", () => {
 
 		vi.advanceTimersByTime(2000);
 
-		await waitFor(
-			() => {
-				const timeTexts = screen.getAllByText(
-					/Time elapsed|Tiempo transcurrido/i,
-				);
-				expect(timeTexts.length).toBeGreaterThan(0);
-			},
-			{ timeout: 1000 },
+		// Time should be displayed
+		const timeTexts = screen.queryAllByText(
+			/Time elapsed|Tiempo transcurrido/i,
 		);
+		expect(timeTexts.length).toBeGreaterThan(0);
 	});
 
 	it("should display current step", async () => {
@@ -101,7 +97,9 @@ describe("LoadingView", () => {
 		vi.advanceTimersByTime(15000);
 
 		// Should show a step (could be any step)
-		const stepTexts = screen.queryAllByText(/Connecting|Conectando|Generating|Generando/i);
+		const stepTexts = screen.queryAllByText(
+			/Connecting|Conectando|Generating|Generando/i,
+		);
 		expect(stepTexts.length).toBeGreaterThan(0);
 	});
 });
