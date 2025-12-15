@@ -19,7 +19,8 @@ describe("mock-data", () => {
 	describe("generateMockResult", () => {
 		it("should generate a PEP result with a record when isPep is true", async () => {
 			// Mock Math.random: first call for delay, second for isPep check (0.3 < 0.5), third for record index
-			vi.spyOn(Math, "random")
+			const randomSpy = vi.spyOn(Math, "random");
+			randomSpy
 				.mockReturnValueOnce(0) // For delay calculation (0 * 3000 + 3000 = 3000ms)
 				.mockReturnValueOnce(0.3) // For isPep check (0.3 < 0.5, so true)
 				.mockReturnValueOnce(0.5); // For record index
@@ -36,11 +37,14 @@ describe("mock-data", () => {
 			expect(result.record).toBeDefined();
 			expect(result.record).not.toBeNull();
 			expect(result.timestamp).toBeInstanceOf(Date);
+
+			randomSpy.mockRestore();
 		});
 
 		it("should generate a non-PEP result when isPep is false", async () => {
 			// Mock Math.random: first call for delay, second for isPep check (0.7 > 0.5)
-			vi.spyOn(Math, "random")
+			const randomSpy = vi.spyOn(Math, "random");
+			randomSpy
 				.mockReturnValueOnce(0) // For delay calculation (0 * 3000 + 3000 = 3000ms)
 				.mockReturnValueOnce(0.7); // For isPep check (0.7 > 0.5, so false)
 
@@ -55,6 +59,8 @@ describe("mock-data", () => {
 			expect(result.isPep).toBe(false);
 			expect(result.record).toBeNull();
 			expect(result.timestamp).toBeInstanceOf(Date);
+
+			randomSpy.mockRestore();
 		});
 
 		it("should delay the result by 3-6 seconds", async () => {
