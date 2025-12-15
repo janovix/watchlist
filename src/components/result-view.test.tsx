@@ -167,6 +167,3 @@ describe("ResultView", () => {
 		expect(countryElements.length).toBeGreaterThan(0);
 	});
 });
-
-// Import vi
-import { vi } from "vitest";

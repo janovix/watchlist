@@ -69,11 +69,11 @@ describe("useIsMobile", () => {
 	});
 
 	it("should update when window width changes", async () => {
-		let changeCallback: (() => void) | null = null;
+		const changeCallbacks: Array<() => void> = [];
 		const mockAddEventListener = vi.fn(
 			(event: string, callback: () => void) => {
 				if (event === "change") {
-					changeCallback = callback;
+					changeCallbacks.push(callback);
 				}
 			},
 		);
@@ -115,10 +115,10 @@ describe("useIsMobile", () => {
 			value: 1024,
 		});
 
-		// Trigger the change callback that was registered
-		if (changeCallback) {
-			changeCallback();
-		}
+		// Trigger the change callbacks that were registered
+		changeCallbacks.forEach((callback) => {
+			callback();
+		});
 
 		await waitFor(
 			() => {
