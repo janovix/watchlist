@@ -10,7 +10,9 @@ describe("ThemeProvider", () => {
 			</ThemeProvider>,
 		);
 
-		expect(container.querySelector('[data-testid="child"]')).toBeInTheDocument();
+		expect(
+			container.querySelector('[data-testid="child"]'),
+		).toBeInTheDocument();
 	});
 
 	it("should pass props to NextThemesProvider", () => {

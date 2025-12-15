@@ -139,20 +139,19 @@ describe("useToast", () => {
 			const { result } = renderHook(() => useToast());
 
 			let toastId: string;
+			let updateFn: ((props: any) => void) | undefined;
 
 			act(() => {
 				const toastResult = toast({
 					title: "Original Title",
 				});
 				toastId = toastResult.id;
+				updateFn = toastResult.update;
 			});
 
 			act(() => {
-				const toastInstance = result.current.toasts.find(
-					(t) => t.id === toastId,
-				);
-				if (toastInstance) {
-					toastInstance.update({
+				if (updateFn) {
+					updateFn({
 						title: "Updated Title",
 					});
 				}

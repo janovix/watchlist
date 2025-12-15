@@ -52,7 +52,10 @@ describe("RecentSearches", () => {
 	it("should render recent searches list", () => {
 		const onSelectSearch = vi.fn();
 		renderWithProvider(
-			<RecentSearches searches={mockSearches} onSelectSearch={onSelectSearch} />,
+			<RecentSearches
+				searches={mockSearches}
+				onSelectSearch={onSelectSearch}
+			/>,
 		);
 
 		expect(screen.getByText("John Doe")).toBeInTheDocument();
@@ -62,7 +65,10 @@ describe("RecentSearches", () => {
 	it("should call onSelectSearch when a search is clicked", () => {
 		const onSelectSearch = vi.fn();
 		renderWithProvider(
-			<RecentSearches searches={mockSearches} onSelectSearch={onSelectSearch} />,
+			<RecentSearches
+				searches={mockSearches}
+				onSelectSearch={onSelectSearch}
+			/>,
 		);
 
 		const johnDoeButton = screen.getByText("John Doe").closest("button");
@@ -76,11 +82,15 @@ describe("RecentSearches", () => {
 	it("should display PEP indicator for PEP results", () => {
 		const onSelectSearch = vi.fn();
 		renderWithProvider(
-			<RecentSearches searches={mockSearches} onSelectSearch={onSelectSearch} />,
+			<RecentSearches
+				searches={mockSearches}
+				onSelectSearch={onSelectSearch}
+			/>,
 		);
 
 		// Should show "yes" or "Sí" for PEP results
-		const pepBadge = screen.getByText("John Doe")
+		const pepBadge = screen
+			.getByText("John Doe")
 			.closest("button")
 			?.querySelector(".text-destructive");
 		expect(pepBadge).toBeInTheDocument();
@@ -89,11 +99,15 @@ describe("RecentSearches", () => {
 	it("should display non-PEP indicator for non-PEP results", () => {
 		const onSelectSearch = vi.fn();
 		renderWithProvider(
-			<RecentSearches searches={mockSearches} onSelectSearch={onSelectSearch} />,
+			<RecentSearches
+				searches={mockSearches}
+				onSelectSearch={onSelectSearch}
+			/>,
 		);
 
 		// Should show "no" or "No" for non-PEP results
-		const nonPepBadge = screen.getByText("Jane Smith")
+		const nonPepBadge = screen
+			.getByText("Jane Smith")
 			.closest("button")
 			?.querySelector(".text-green-600");
 		expect(nonPepBadge).toBeInTheDocument();
@@ -110,7 +124,10 @@ describe("RecentSearches", () => {
 
 		const onSelectSearch = vi.fn();
 		renderWithProvider(
-			<RecentSearches searches={manySearches} onSelectSearch={onSelectSearch} />,
+			<RecentSearches
+				searches={manySearches}
+				onSelectSearch={onSelectSearch}
+			/>,
 		);
 
 		const buttons = screen.getAllByRole("button");
@@ -121,11 +138,15 @@ describe("RecentSearches", () => {
 	it("should display formatted timestamp", () => {
 		const onSelectSearch = vi.fn();
 		renderWithProvider(
-			<RecentSearches searches={mockSearches} onSelectSearch={onSelectSearch} />,
+			<RecentSearches
+				searches={mockSearches}
+				onSelectSearch={onSelectSearch}
+			/>,
 		);
 
 		// Timestamp should be displayed
-		const timestamp = screen.getByText("John Doe")
+		const timestamp = screen
+			.getByText("John Doe")
 			.closest("button")
 			?.querySelector(".text-xs");
 		expect(timestamp).toBeInTheDocument();

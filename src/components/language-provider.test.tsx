@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, act, fireEvent } from "@testing-library/react";
-import {
-	LanguageProvider,
-	useLanguage,
-} from "./language-provider";
+import { LanguageProvider, useLanguage } from "./language-provider";
 import { detectBrowserLanguage } from "@/lib/translations";
 
 // Test component that uses the hook
@@ -183,15 +180,15 @@ describe("LanguageProvider", () => {
 			await new Promise((resolve) => setTimeout(resolve, 100));
 		});
 
-		const translationElement = container.querySelector('[data-testid="translation"]');
+		const translationElement = container.querySelector(
+			'[data-testid="translation"]',
+		);
 		expect(translationElement).toHaveTextContent("isPep");
 	});
 
 	it("should throw error when useLanguage is used outside provider", () => {
 		// Suppress console.error for this test
-		const consoleSpy = vi
-			.spyOn(console, "error")
-			.mockImplementation(() => {});
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 		expect(() => {
 			render(<TestComponent />);

@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import {
+	render,
+	screen,
+	fireEvent,
+	waitFor,
+	cleanup,
+} from "@testing-library/react";
 import { SearchForm } from "./search-form";
 import { LanguageProvider } from "./language-provider";
 
@@ -25,7 +31,7 @@ describe("SearchForm", () => {
 
 		const input = screen.getByRole("textbox");
 		const form = input.closest("form");
-		
+
 		fireEvent.change(input, { target: { value: "John Doe" } });
 		if (form) {
 			fireEvent.submit(form);

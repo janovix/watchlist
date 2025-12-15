@@ -54,7 +54,9 @@ describe("ThemeToggle", () => {
 		renderWithProvider(<ThemeToggle />);
 
 		// Before mount, should show placeholder
-		const placeholder = document.querySelector(".h-8.w-8.rounded-lg.bg-secondary");
+		const placeholder = document.querySelector(
+			".h-8.w-8.rounded-lg.bg-secondary",
+		);
 		expect(placeholder).toBeInTheDocument();
 	});
 
@@ -135,9 +137,7 @@ describe("ThemeToggle", () => {
 		await waitFor(() => {
 			const buttons = screen.getAllByRole("button");
 			// Find the dark theme button (Moon icon)
-			const darkButton = buttons.find((btn) =>
-				btn.querySelector("svg"),
-			);
+			const darkButton = buttons.find((btn) => btn.querySelector("svg"));
 			if (darkButton) {
 				fireEvent.click(darkButton);
 			}

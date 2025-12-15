@@ -25,7 +25,9 @@ describe("UserMenu", () => {
 	it("should open menu when clicked", async () => {
 		const { container } = renderWithProvider(<UserMenu />);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
@@ -38,14 +40,18 @@ describe("UserMenu", () => {
 	it("should display user information in menu", async () => {
 		const { container } = renderWithProvider(<UserMenu />);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
 
 		await waitFor(() => {
 			expect(screen.getByText(/María García/i)).toBeInTheDocument();
-			expect(screen.getByText(/maria\.garcia@empresa\.com/i)).toBeInTheDocument();
+			expect(
+				screen.getByText(/maria\.garcia@empresa\.com/i),
+			).toBeInTheDocument();
 			expect(screen.getByText(/Compliance Officer/i)).toBeInTheDocument();
 		});
 	});
@@ -54,7 +60,9 @@ describe("UserMenu", () => {
 		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 		const { container } = renderWithProvider(<UserMenu />);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
@@ -76,7 +84,9 @@ describe("UserMenu", () => {
 			</div>,
 		);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
@@ -97,7 +107,9 @@ describe("UserMenu", () => {
 		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 		const { container } = renderWithProvider(<UserMenu />);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
@@ -116,7 +128,9 @@ describe("UserMenu", () => {
 		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 		const { container } = renderWithProvider(<UserMenu />);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
@@ -137,13 +151,17 @@ describe("UserMenu", () => {
 		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 		const { container } = renderWithProvider(<UserMenu />);
 
-		const button = container.querySelector('button[aria-label="User menu"]') as HTMLButtonElement;
+		const button = container.querySelector(
+			'button[aria-label="User menu"]',
+		) as HTMLButtonElement;
 		if (button) {
 			fireEvent.click(button);
 		}
 
 		await waitFor(() => {
-			expect(screen.getByText(/Log out|Cerrar sesión|Sair/i)).toBeInTheDocument();
+			expect(
+				screen.getByText(/Log out|Cerrar sesión|Sair/i),
+			).toBeInTheDocument();
 		});
 
 		consoleSpy.mockRestore();
