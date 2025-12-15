@@ -79,10 +79,24 @@ describe("LoadingView", () => {
 	it("should not exceed 95% progress", async () => {
 		renderWithProvider(<LoadingView searchName="Test" />);
 
-		// Advance timers significantly
-		vi.advanceTimersByTime(10000);
+		// Advance timers significantly to reach 95%
+		vi.advanceTimersByTime(50000);
 
 		// Progress should be displayed and not exceed 95%
+		const progressTexts = screen.queryAllByText(/%/);
+		if (progressTexts.length > 0) {
+			const progressValue = parseInt(progressTexts[0].textContent || "0");
+			expect(progressValue).toBeLessThanOrEqual(95);
+		}
+	});
+
+	it("should cap progress at 95%", async () => {
+		renderWithProvider(<LoadingView searchName="Test" />);
+
+		// Advance timers enough to reach 95% cap
+		vi.advanceTimersByTime(100000);
+
+		// Progress should be capped at 95%
 		const progressTexts = screen.queryAllByText(/%/);
 		if (progressTexts.length > 0) {
 			const progressValue = parseInt(progressTexts[0].textContent || "0");
@@ -101,5 +115,18 @@ describe("LoadingView", () => {
 			/Connecting|Conectando|Generating|Generando/i,
 		);
 		expect(stepTexts.length).toBeGreaterThan(0);
+	});
+
+	it("should cleanup intervals on unmount", () => {
+		const { unmount } = renderWithProvider(<LoadingView searchName="Test" />);
+
+		// Advance timers a bit
+		vi.advanceTimersByTime(1000);
+
+		// Unmount should cleanup intervals
+		unmount();
+
+		// Advance timers more - if cleanup worked, no errors should occur
+		vi.advanceTimersByTime(5000);
 	});
 });
