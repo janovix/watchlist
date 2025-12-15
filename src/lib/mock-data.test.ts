@@ -45,11 +45,11 @@ describe("mock-data", () => {
 		});
 
 		it("should generate a non-PEP result when isPep is false", async () => {
-			// Mock Math.random: first call for delay, second for isPep check (0.7 > 0.5)
+			// Mock Math.random: first call for delay, second for isPep check (< 0.5 = false)
 			const randomSpy = vi.spyOn(Math, "random");
 			randomSpy
 				.mockReturnValueOnce(0) // For delay calculation (0 * 3000 + 3000 = 3000ms)
-				.mockReturnValueOnce(0.7); // For isPep check (0.7 > 0.5, so false)
+				.mockReturnValueOnce(0.3); // For isPep check (0.3 > 0.5, so false)
 
 			const promise = generateMockResult("Jane Smith");
 			vi.advanceTimersByTime(3000);
@@ -59,11 +59,9 @@ describe("mock-data", () => {
 			expect(result).toBeDefined();
 			expect(result.id).toBeDefined();
 			expect(result.searchName).toBe("Jane Smith");
+			expect(result.isPep).toBe(false);
+			expect(result.record).toBeNull();
 			expect(result.timestamp).toBeInstanceOf(Date);
-			// Note: isPep might be true due to random, so we check structure
-			if (!result.isPep) {
-				expect(result.record).toBeNull();
-			}
 
 			randomSpy.mockRestore();
 		});
@@ -113,8 +111,8 @@ describe("mock-data", () => {
 			const randomSpy = vi.spyOn(Math, "random");
 			randomSpy
 				.mockReturnValueOnce(0) // For delay (3000ms)
-				.mockReturnValueOnce(0.3) // For isPep check (0.3 < 0.5, so true)
-				.mockReturnValueOnce(0.5); // For record index
+				.mockReturnValueOnce(0.6) // For isPep check (0.6 > 0.5, so true)
+				.mockReturnValueOnce(0.5); // For record index (0.5 * 4 = 2, floor = 2)
 
 			const promise = generateMockResult("Test");
 			vi.advanceTimersByTime(3000);
@@ -123,8 +121,10 @@ describe("mock-data", () => {
 
 			expect(result).toBeDefined();
 			expect(result.searchName).toBe("Test");
-			// Check structure - if PEP, should have record
-			if (result.isPep && result.record) {
+			expect(result.isPep).toBe(true);
+			expect(result.record).toBeDefined();
+			expect(result.record).not.toBeNull();
+			if (result.record) {
 				expect(result.record.dataset).toBeDefined();
 				expect(result.record.id).toBeDefined();
 				expect(result.record.name).toBeDefined();

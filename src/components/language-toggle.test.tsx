@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+	render,
+	screen,
+	fireEvent,
+	waitFor,
+	cleanup,
+} from "@testing-library/react";
 import { LanguageToggle } from "./language-toggle";
 import { LanguageProvider } from "./language-provider";
 
@@ -8,6 +14,9 @@ const renderWithProvider = (component: React.ReactElement) => {
 };
 
 describe("LanguageToggle", () => {
+	afterEach(() => {
+		cleanup();
+	});
 	const originalLocalStorage = global.localStorage;
 
 	beforeEach(() => {
@@ -84,10 +93,9 @@ describe("LanguageToggle", () => {
 		fireEvent.mouseDown(outside);
 
 		await waitFor(() => {
-			// Dropdown should close
-			const ptButtons = screen.queryAllByText("PT");
-			// Should have fewer PT buttons (only the main button, not dropdown)
-			expect(ptButtons.length).toBeLessThanOrEqual(1);
+			// Dropdown should close - check that dropdown container is not visible
+			const dropdown = container.querySelector(".absolute.top-full");
+			expect(dropdown).not.toBeInTheDocument();
 		});
 	});
 
@@ -138,6 +146,60 @@ describe("LanguageToggle", () => {
 			const allButtons = screen.getAllByRole("button");
 			const enButton = allButtons.find((btn) => btn.textContent === "EN");
 			expect(enButton).toBeDefined();
+		});
+	});
+
+	it("should handle language change to English", async () => {
+		const setItemSpy = vi.fn();
+		vi.spyOn(global, "localStorage", "get").mockReturnValue({
+			getItem: vi.fn(() => "es"),
+			setItem: setItemSpy,
+			removeItem: vi.fn(),
+			clear: vi.fn(),
+			key: vi.fn(),
+			length: 0,
+		} as unknown as Storage);
+
+		const { container } = renderWithProvider(<LanguageToggle />);
+
+		const buttons = screen.getAllByRole("button");
+		const toggleButton = buttons[0];
+		fireEvent.click(toggleButton);
+
+		await waitFor(() => {
+			const enButton = screen.getByText("EN");
+			fireEvent.click(enButton);
+		});
+
+		await waitFor(() => {
+			expect(setItemSpy).toHaveBeenCalledWith("language", "en");
+		});
+	});
+
+	it("should handle language change to Spanish", async () => {
+		const setItemSpy = vi.fn();
+		vi.spyOn(global, "localStorage", "get").mockReturnValue({
+			getItem: vi.fn(() => "en"),
+			setItem: setItemSpy,
+			removeItem: vi.fn(),
+			clear: vi.fn(),
+			key: vi.fn(),
+			length: 0,
+		} as unknown as Storage);
+
+		const { container } = renderWithProvider(<LanguageToggle />);
+
+		const buttons = screen.getAllByRole("button");
+		const toggleButton = buttons[0];
+		fireEvent.click(toggleButton);
+
+		await waitFor(() => {
+			const esButton = screen.getByText("ES");
+			fireEvent.click(esButton);
+		});
+
+		await waitFor(() => {
+			expect(setItemSpy).toHaveBeenCalledWith("language", "es");
 		});
 	});
 });

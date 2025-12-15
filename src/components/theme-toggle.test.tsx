@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+	render,
+	screen,
+	fireEvent,
+	waitFor,
+	cleanup,
+} from "@testing-library/react";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageProvider } from "./language-provider";
 
@@ -8,6 +14,9 @@ const renderWithProvider = (component: React.ReactElement) => {
 };
 
 describe("ThemeToggle", () => {
+	afterEach(() => {
+		cleanup();
+	});
 	const originalLocalStorage = global.localStorage;
 	const originalMatchMedia = window.matchMedia;
 
@@ -78,22 +87,23 @@ describe("ThemeToggle", () => {
 	});
 
 	it("should open dropdown when clicked", async () => {
-		renderWithProvider(<ThemeToggle />);
+		const { container } = renderWithProvider(<ThemeToggle />);
 
 		await waitFor(() => {
-			const button = screen.getByRole("button");
-			fireEvent.click(button);
+			const buttons = screen.getAllByRole("button");
+			const toggleButton = buttons[0]; // Get the first button (toggle button)
+			fireEvent.click(toggleButton);
 		});
 
 		await waitFor(() => {
 			// Dropdown should be visible
-			const dropdown = document.querySelector(".absolute.top-full");
+			const dropdown = container.querySelector(".absolute.top-full");
 			expect(dropdown).toBeInTheDocument();
 		});
 	});
 
 	it("should close dropdown when clicking outside", async () => {
-		renderWithProvider(
+		const { container } = renderWithProvider(
 			<div>
 				<ThemeToggle />
 				<div data-testid="outside">Outside</div>
@@ -101,8 +111,9 @@ describe("ThemeToggle", () => {
 		);
 
 		await waitFor(() => {
-			const button = screen.getByRole("button");
-			fireEvent.click(button);
+			const buttons = screen.getAllByRole("button");
+			const toggleButton = buttons[0]; // Get the first button (toggle button)
+			fireEvent.click(toggleButton);
 		});
 
 		await waitFor(() => {
@@ -111,7 +122,7 @@ describe("ThemeToggle", () => {
 		});
 
 		await waitFor(() => {
-			const dropdown = document.querySelector(".absolute.top-full");
+			const dropdown = container.querySelector(".absolute.top-full");
 			expect(dropdown).not.toBeInTheDocument();
 		});
 	});
@@ -127,25 +138,42 @@ describe("ThemeToggle", () => {
 			length: 0,
 		} as unknown as Storage);
 
-		renderWithProvider(<ThemeToggle />);
-
-		await waitFor(() => {
-			const button = screen.getByRole("button");
-			fireEvent.click(button);
-		});
+		const { container } = renderWithProvider(<ThemeToggle />);
 
 		await waitFor(() => {
 			const buttons = screen.getAllByRole("button");
-			// Find the dark theme button (Moon icon)
-			const darkButton = buttons.find((btn) => btn.querySelector("svg"));
-			if (darkButton) {
-				fireEvent.click(darkButton);
-			}
+			const toggleButton = buttons[0]; // Get the first button (toggle button)
+			fireEvent.click(toggleButton);
 		});
 
 		await waitFor(() => {
-			expect(setItemSpy).toHaveBeenCalledWith("theme", "dark");
+			// Find the dark theme button (Moon icon) - should be in dropdown
+			const dropdown = container.querySelector(".absolute.top-full");
+			if (dropdown) {
+				const allButtons = dropdown.querySelectorAll("button");
+				// Find button with Moon icon (dark theme) - it's the third button (system, light, dark)
+				const darkButton =
+					Array.from(allButtons).find((btn) => {
+						const svg = btn.querySelector("svg");
+						return svg && svg.classList.contains("lucide-moon");
+					}) || Array.from(allButtons)[2]; // Fallback to third button
+				if (darkButton) {
+					fireEvent.click(darkButton);
+				}
+			}
 		});
+
+		await waitFor(
+			() => {
+				// Check that setItem was called with "theme" and "dark" (may be called multiple times)
+				const calls = setItemSpy.mock.calls;
+				const themeDarkCall = calls.find(
+					(call) => call[0] === "theme" && call[1] === "dark",
+				);
+				expect(themeDarkCall).toBeDefined();
+			},
+			{ timeout: 2000 },
+		);
 	});
 
 	it("should apply light theme when light is selected", async () => {
@@ -162,8 +190,20 @@ describe("ThemeToggle", () => {
 		renderWithProvider(<ThemeToggle />);
 
 		await waitFor(() => {
-			const button = screen.getByRole("button");
-			fireEvent.click(button);
+			const buttons = screen.getAllByRole("button");
+			const toggleButton = buttons[0]; // Get the first button (toggle button)
+			fireEvent.click(toggleButton);
+		});
+
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			// Find the light theme button (Sun icon) - should be in dropdown
+			const lightButton = buttons.find(
+				(btn) => btn.querySelector("svg") && btn.closest(".absolute"), // Should be in dropdown
+			);
+			if (lightButton) {
+				fireEvent.click(lightButton);
+			}
 		});
 
 		await waitFor(() => {

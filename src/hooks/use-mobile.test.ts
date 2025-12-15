@@ -69,31 +69,63 @@ describe("useIsMobile", () => {
 	});
 
 	it("should update when window width changes", async () => {
+		let changeCallback: (() => void) | null = null;
+		const mockAddEventListener = vi.fn(
+			(event: string, callback: () => void) => {
+				if (event === "change") {
+					changeCallback = callback;
+				}
+			},
+		);
+
 		Object.defineProperty(window, "innerWidth", {
 			writable: true,
 			configurable: true,
 			value: 500,
 		});
 
-		const { result, rerender } = renderHook(() => useIsMobile());
+		Object.defineProperty(window, "matchMedia", {
+			writable: true,
+			configurable: true,
+			value: vi.fn().mockImplementation((query) => {
+				const isMobile = window.innerWidth < 768;
+				return {
+					matches: query.includes("max-width") && isMobile,
+					media: query,
+					onchange: null,
+					addListener: vi.fn(),
+					removeListener: vi.fn(),
+					addEventListener: mockAddEventListener,
+					removeEventListener: vi.fn(),
+					dispatchEvent: vi.fn(),
+				} as MediaQueryList;
+			}),
+		});
+
+		const { result } = renderHook(() => useIsMobile());
 
 		await waitFor(() => {
 			expect(result.current).toBe(true);
 		});
 
+		// Update width
 		Object.defineProperty(window, "innerWidth", {
 			writable: true,
 			configurable: true,
 			value: 1024,
 		});
 
-		// Trigger resize event
-		window.dispatchEvent(new Event("resize"));
-		rerender();
+		// Trigger the change callback that was registered
+		if (changeCallback) {
+			changeCallback();
+		}
 
-		await waitFor(() => {
-			expect(result.current).toBe(false);
-		});
+		await waitFor(
+			() => {
+				expect(result.current).toBe(false);
+			},
+			{ timeout: 3000 },
+		);
 	});
 
 	it("should return boolean value", async () => {

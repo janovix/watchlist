@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { ResultView } from "./result-view";
 import { LanguageProvider } from "./language-provider";
 import type { PEPResult } from "@/lib/mock-data";
@@ -9,6 +9,9 @@ const renderWithProvider = (component: React.ReactElement) => {
 };
 
 describe("ResultView", () => {
+	afterEach(() => {
+		cleanup();
+	});
 	const mockPepResult: PEPResult = {
 		id: "1",
 		searchName: "John Doe",
@@ -76,8 +79,11 @@ describe("ResultView", () => {
 			fireEvent.click(newSearchButton);
 			expect(onNewSearch).toHaveBeenCalled();
 		} else {
-			// If button not found, verify the component renders
-			expect(screen.getByText(/John Doe/i)).toBeInTheDocument();
+			// If button not found, verify the component renders and check all buttons
+			const johnDoeElements = screen.getAllByText(/John Doe/i);
+			expect(johnDoeElements.length).toBeGreaterThan(0);
+			// Verify at least one button exists
+			expect(buttons.length).toBeGreaterThan(0);
 		}
 	});
 
@@ -98,10 +104,12 @@ describe("ResultView", () => {
 			<ResultView result={mockPepResult} onNewSearch={onNewSearch} />,
 		);
 
-		expect(
-			screen.getByText(/Search information|Información/i),
-		).toBeInTheDocument();
-		expect(screen.getByText(/John Doe/i)).toBeInTheDocument();
+		const infoElements = screen.queryAllByText(
+			/Search information|Información/i,
+		);
+		expect(infoElements.length).toBeGreaterThan(0);
+		const johnDoeElements = screen.getAllByText(/John Doe/i);
+		expect(johnDoeElements.length).toBeGreaterThan(0);
 	});
 
 	it("should format dates correctly", () => {
