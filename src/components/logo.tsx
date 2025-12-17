@@ -3,29 +3,30 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
+// Use CSS variables from theme instead of hardcoded colors
 const IconColors = {
 	light: {
-		background: "#E9EDF9",
-		path1: "#CBD5E1",
-		path2: "#1E2938",
-		path3: "#7A22CE",
+		background: "var(--muted)",
+		path1: "var(--border)",
+		path2: "var(--foreground)",
+		path3: "var(--primary)",
 	},
 	dark: {
-		background: "#1E2938",
-		path1: "#0F1728",
-		path2: "#FFFFFF",
-		path3: "#DAB4FE",
+		background: "var(--card)",
+		path1: "var(--background)",
+		path2: "var(--foreground)",
+		path3: "var(--primary)",
 	},
 };
 
 const LogoColors = {
 	light: {
-		color1: "#1E2938",
-		color2: "#7A22CE",
+		color1: "var(--foreground)",
+		color2: "var(--primary)",
 	},
 	dark: {
-		color1: "#FFFFFF",
-		color2: "#DAB4FE",
+		color1: "var(--foreground)",
+		color2: "var(--primary)",
 	},
 };
 
