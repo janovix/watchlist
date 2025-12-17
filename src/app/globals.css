@@ -185,10 +185,10 @@ body {
 	letter-spacing: var(--tracking-normal);
 }
 
-/* Global scrollbar styles */
+/* Global invisible scrollbar styles */
 *::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
+	width: 10px;
+	height: 10px;
 }
 
 *::-webkit-scrollbar-track {
@@ -196,21 +196,35 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-	background: #cbd5e0;
-	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+*:hover::-webkit-scrollbar-thumb,
+*:active::-webkit-scrollbar-thumb {
+	opacity: 1;
+	background: rgba(0, 0, 0, 0.4);
 }
 
 *::-webkit-scrollbar-thumb:hover {
-	background: #a0aec0;
+	background: rgba(0, 0, 0, 0.6);
 }
 
 /* Dark mode scrollbar styles */
 .dark *::-webkit-scrollbar-thumb {
-	background: oklch(0.5 0.02 286);
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.dark *:hover::-webkit-scrollbar-thumb,
+.dark *:active::-webkit-scrollbar-thumb {
+	opacity: 1;
+	background: rgba(255, 255, 255, 0.5);
 }
 
 .dark *::-webkit-scrollbar-thumb:hover {
-	background: oklch(0.6 0.02 286);
+	background: rgba(255, 255, 255, 0.7);
 }
 
 @layer base {
