@@ -10,7 +10,14 @@ const meta: Meta = {
 	title: "Views/Search View",
 	parameters: {
 		layout: "fullscreen",
+		docs: {
+			description: {
+				component:
+					"The main search view of the application. Displays a hero section with title and description, the search form, and recent searches list. This is the initial state when users first visit the application.",
+			},
+		},
 	},
+	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -87,10 +94,26 @@ function SearchViewContent() {
 
 export const Default: Story = {
 	render: () => <SearchViewContent />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Search view with recent searches displayed. Users can start a new search or select from recent searches.",
+			},
+		},
+	},
 };
 
 export const WithRecentSearches: Story = {
 	render: () => <SearchViewContent />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Search view showing multiple recent searches. Demonstrates how the recent searches component appears when there are previous searches.",
+			},
+		},
+	},
 };
 
 export const EmptyState: Story = {
@@ -114,4 +137,12 @@ export const EmptyState: Story = {
 			</div>
 		</main>
 	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Search view in empty state when there are no recent searches. Shows only the hero section and search form.",
+			},
+		},
+	},
 };

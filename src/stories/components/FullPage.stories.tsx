@@ -16,7 +16,14 @@ const meta: Meta = {
 	title: "Views/Full Page",
 	parameters: {
 		layout: "fullscreen",
+		docs: {
+			description: {
+				component:
+					"Complete application page view showing all states: search, loading, and result views. Includes the header with logo and navigation controls, and demonstrates the full user flow of the PEP verification application.",
+			},
+		},
 	},
+	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -159,6 +166,14 @@ function FullPageContent() {
 
 export const SearchState: Story = {
 	render: () => <FullPageContent />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Full page in search state - the initial view when users first visit the application. Shows header, hero section, search form, and recent searches.",
+			},
+		},
+	},
 };
 
 export const LoadingState: Story = {
@@ -188,6 +203,14 @@ export const LoadingState: Story = {
 				</div>
 			</main>
 		);
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Full page in loading state - displayed while a PEP search is being processed. Shows header and loading view with animated indicators.",
+			},
+		},
 	},
 };
 
@@ -251,6 +274,14 @@ export const ResultStatePEP: Story = {
 			</main>
 		);
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Full page showing a PEP result - when the searched person is found in PEP lists. Displays header and detailed result view with record information.",
+			},
+		},
+	},
 };
 
 export const ResultStateNotPEP: Story = {
@@ -301,5 +332,13 @@ export const ResultStateNotPEP: Story = {
 				</div>
 			</main>
 		);
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Full page showing a non-PEP result - when the searched person is not found in any PEP lists. Displays header and success result view.",
+			},
+		},
 	},
 };

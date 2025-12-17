@@ -10,7 +10,14 @@ const meta: Meta = {
 	title: "Views/Header",
 	parameters: {
 		layout: "fullscreen",
+		docs: {
+			description: {
+				component:
+					"The application header containing the logo, language toggle, theme toggle, and user menu. Sticky header that stays at the top while scrolling. Includes backdrop blur effect and border styling.",
+			},
+		},
 	},
+	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -43,6 +50,14 @@ export const Default: Story = {
 			</div>
 		</header>
 	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Default header with logo and navigation controls. Theme-aware and adapts to system preferences.",
+			},
+		},
+	},
 };
 
 export const LightTheme: Story = {
@@ -64,6 +79,14 @@ export const LightTheme: Story = {
 			</header>
 		</div>
 	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Header in light theme mode. Logo and components are styled for light backgrounds.",
+			},
+		},
+	},
 	decorators: [
 		(Story) => (
 			<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
@@ -94,6 +117,14 @@ export const DarkTheme: Story = {
 			</header>
 		</div>
 	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Header in dark theme mode. Logo and components are styled for dark backgrounds.",
+			},
+		},
+	},
 	decorators: [
 		(Story) => (
 			<ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

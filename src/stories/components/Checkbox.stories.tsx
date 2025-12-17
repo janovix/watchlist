@@ -5,6 +5,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 const meta: Meta<typeof Checkbox> = {
 	title: "UI/Checkbox",
 	component: Checkbox,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"A checkbox input component built on Radix UI. Supports controlled and uncontrolled states, and can be used standalone or with a label.",
+			},
+		},
+	},
+	tags: ["autodocs"],
 };
 
 export default meta;
@@ -15,11 +24,25 @@ export const Unchecked: Story = {
 	args: {
 		checked: false,
 	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Checkbox in unchecked state.",
+			},
+		},
+	},
 };
 
 export const Checked: Story = {
 	args: {
 		checked: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Checkbox in checked state.",
+			},
+		},
 	},
 };
 
@@ -35,5 +58,13 @@ export const Controlled: Story = {
 				<span>{checked ? "Checked" : "Unchecked"}</span>
 			</label>
 		);
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Controlled checkbox example with state management. Click to toggle between checked and unchecked states.",
+			},
+		},
 	},
 };

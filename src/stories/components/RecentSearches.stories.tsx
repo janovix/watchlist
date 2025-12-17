@@ -7,6 +7,15 @@ import type { PEPResult } from "@/lib/mock-data";
 const meta: Meta<typeof RecentSearches> = {
 	title: "Components/RecentSearches",
 	component: RecentSearches,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"Displays a list of recent PEP searches. Shows up to 5 recent searches with their status (PEP/Not PEP), timestamp, and allows users to quickly select a previous search. Renders nothing when there are no recent searches.",
+			},
+		},
+	},
+	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -71,12 +80,28 @@ export const Default: Story = {
 		searches: mockSearches,
 		onSelectSearch: (result) => console.log("Selected:", result),
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Recent searches list with multiple entries showing both PEP and non-PEP results.",
+			},
+		},
+	},
 };
 
 export const Empty: Story = {
 	args: {
 		searches: [],
 		onSelectSearch: (result) => console.log("Selected:", result),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Empty state - component renders nothing when there are no recent searches.",
+			},
+		},
 	},
 };
 
@@ -110,5 +135,13 @@ export const ManySearches: Story = {
 			},
 		],
 		onSelectSearch: (result) => console.log("Selected:", result),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Component displays up to 5 recent searches, showing the most recent ones first.",
+			},
+		},
 	},
 };

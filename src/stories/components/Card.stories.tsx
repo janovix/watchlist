@@ -12,6 +12,15 @@ import { Button } from "@/components/ui/button";
 const meta: Meta<typeof Card> = {
 	title: "UI/Card",
 	component: Card,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"A flexible card component with header, content, and footer sections. Used for displaying grouped content with optional title, description, and action buttons.",
+			},
+		},
+	},
+	tags: ["autodocs"],
 };
 
 export default meta;
@@ -36,4 +45,12 @@ export const Default: Story = {
 			</CardFooter>
 		</Card>
 	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Complete card example with header, content, and footer sections including action buttons.",
+			},
+		},
+	},
 };
