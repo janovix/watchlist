@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { LoadingView } from "@/components/loading-view";
 import { LanguageProvider } from "@/components/language-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const meta: Meta<typeof LoadingView> = {
 	title: "Components/LoadingView",
 	component: LoadingView,
 	decorators: [
 		(Story) => (
-			<LanguageProvider>
-				<Story />
-			</LanguageProvider>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<LanguageProvider>
+					<Story />
+				</LanguageProvider>
+			</ThemeProvider>
 		),
 	],
 };

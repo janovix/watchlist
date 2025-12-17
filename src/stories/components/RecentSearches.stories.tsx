@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { RecentSearches } from "@/components/recent-searches";
 import { LanguageProvider } from "@/components/language-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import type { PEPResult } from "@/lib/mock-data";
 
 const meta: Meta<typeof RecentSearches> = {
@@ -8,9 +9,11 @@ const meta: Meta<typeof RecentSearches> = {
 	component: RecentSearches,
 	decorators: [
 		(Story) => (
-			<LanguageProvider>
-				<Story />
-			</LanguageProvider>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<LanguageProvider>
+					<Story />
+				</LanguageProvider>
+			</ThemeProvider>
 		),
 	],
 };

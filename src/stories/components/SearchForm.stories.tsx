@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { SearchForm } from "@/components/search-form";
 import { LanguageProvider } from "@/components/language-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const meta: Meta<typeof SearchForm> = {
 	title: "Components/SearchForm",
 	component: SearchForm,
 	decorators: [
 		(Story) => (
-			<LanguageProvider>
-				<Story />
-			</LanguageProvider>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<LanguageProvider>
+					<Story />
+				</LanguageProvider>
+			</ThemeProvider>
 		),
 	],
 };
