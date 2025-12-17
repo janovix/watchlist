@@ -103,83 +103,8 @@ function FullPageContent() {
 
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
-			{/* Header */}
-			<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-				<div className="container mx-auto px-4 py-4">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-3">
-							<Logo variant="logo" width={102} height={16} />
-						</div>
-						<div className="flex items-center gap-2">
-							<LanguageToggle />
-							<ThemeToggle />
-							<UserMenu />
-						</div>
-					</div>
-				</div>
-			</header>
-
-			{/* Main Content */}
-			<div className="flex-1 flex items-center py-10">
-				<div className="container mx-auto px-4 w-full">
-					{viewState === "search" && (
-						<div className="space-y-12">
-							<div className="text-center space-y-4 max-w-2xl mx-auto">
-								<h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-									{t("heroTitle")}
-								</h2>
-								<p className="text-muted-foreground text-lg">
-									{t("heroDescription")}
-								</p>
-							</div>
-							<SearchForm onSearch={handleSearch} isLoading={false} />
-							{recentSearches.length > 0 && (
-								<div className="max-w-2xl mx-auto">
-									<RecentSearches
-										searches={recentSearches}
-										onSelectSearch={handleSelectSearch}
-									/>
-								</div>
-							)}
-						</div>
-					)}
-
-					{viewState === "loading" && (
-						<div className="py-12">
-							<LoadingView searchName={searchName} />
-						</div>
-					)}
-
-					{viewState === "result" && currentResult && (
-						<div className="py-4">
-							<ResultView
-								result={currentResult}
-								onNewSearch={handleNewSearch}
-							/>
-						</div>
-					)}
-				</div>
-			</div>
-		</main>
-	);
-}
-
-export const SearchState: Story = {
-	render: () => <FullPageContent />,
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Full page in search state - the initial view when users first visit the application. Shows header, hero section, search form, and recent searches.",
-			},
-		},
-	},
-};
-
-export const LoadingState: Story = {
-	render: () => {
-		return (
-			<main className="min-h-screen bg-background flex flex-col">
+			{/* Header - Only shown for result view */}
+			{viewState === "result" && (
 				<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
 					<div className="container mx-auto px-4 py-4">
 						<div className="flex items-center justify-between">
@@ -194,11 +119,82 @@ export const LoadingState: Story = {
 						</div>
 					</div>
 				</header>
+			)}
+
+			{/* Main Content */}
+			{viewState === "search" ? (
+				<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
+					<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
+						{/* Logo */}
+						<div className="mb-8">
+							<Logo variant="logo" width={120} height={19} />
+						</div>
+
+						{/* Search Form */}
+						<div className="w-full mb-6">
+							<SearchForm onSearch={handleSearch} isLoading={false} />
+						</div>
+
+						{/* Language/Theme Toggle */}
+						<div className="flex items-center gap-2 mb-8">
+							<LanguageToggle />
+							<ThemeToggle />
+						</div>
+
+						{/* Recent Searches */}
+						{recentSearches.length > 0 && (
+							<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
+								<RecentSearches
+									searches={recentSearches}
+									onSelectSearch={handleSelectSearch}
+								/>
+							</div>
+						)}
+					</div>
+				</div>
+			) : viewState === "loading" ? (
+				<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
+					<div className="w-full max-w-2xl mx-auto">
+						<LoadingView searchName={searchName} />
+					</div>
+				</div>
+			) : (
 				<div className="flex-1 flex items-center py-10">
 					<div className="container mx-auto px-4 w-full">
-						<div className="py-12">
-							<LoadingView searchName="Juan Pérez García" />
-						</div>
+						{currentResult && (
+							<div className="py-4">
+								<ResultView
+									result={currentResult}
+									onNewSearch={handleNewSearch}
+								/>
+							</div>
+						)}
+					</div>
+				</div>
+			)}
+		</main>
+	);
+}
+
+export const SearchState: Story = {
+	render: () => <FullPageContent />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Full page in search state - the initial view when users first visit the application. Minimalist search engine design with centered logo, search bar, language/theme toggles, and recent searches. No header.",
+			},
+		},
+	},
+};
+
+export const LoadingState: Story = {
+	render: () => {
+		return (
+			<main className="min-h-screen bg-background flex flex-col">
+				<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
+					<div className="w-full max-w-2xl mx-auto">
+						<LoadingView searchName="Juan Pérez García" />
 					</div>
 				</div>
 			</main>
@@ -208,7 +204,7 @@ export const LoadingState: Story = {
 		docs: {
 			description: {
 				story:
-					"Full page in loading state - displayed while a PEP search is being processed. Shows header and loading view with animated indicators.",
+					"Full page in loading state - displayed while a PEP search is being processed. No header, centered loading view with animated indicators.",
 			},
 		},
 	},

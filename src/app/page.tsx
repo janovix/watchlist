@@ -99,83 +99,73 @@ function HomeContent() {
 
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
-			{/* Header */}
-			<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-				<div className="container mx-auto px-4 py-4">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-3">
-							<Logo variant="logo" width={102} height={16} />
+			{/* Header - Only shown for result view */}
+			{viewState === "result" && (
+				<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+					<div className="container mx-auto px-4 py-4">
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-3">
+								<Logo variant="logo" width={102} height={16} />
+							</div>
+							<div className="flex items-center gap-2">
+								<LanguageToggle />
+								<ThemeToggle />
+								<UserMenu />
+							</div>
 						</div>
-						<div className="flex items-center gap-2">
+					</div>
+				</header>
+			)}
+
+			{/* Main Content */}
+			{viewState === "search" ? (
+				<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
+					<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
+						{/* Logo */}
+						<div className="mb-8">
+							<Logo variant="logo" width={120} height={19} />
+						</div>
+
+						{/* Search Form */}
+						<div className="w-full mb-6">
+							<SearchForm onSearch={handleSearch} isLoading={false} />
+						</div>
+
+						{/* Language/Theme Toggle - Right aligned but centered */}
+						<div className="flex items-center gap-2 mb-8">
 							<LanguageToggle />
 							<ThemeToggle />
-							<UserMenu />
+						</div>
+
+						{/* Recent Searches - Centered with scroll support */}
+						<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
+							<RecentSearches
+								searches={recentSearches}
+								onSelectSearch={handleSelectSearch}
+							/>
 						</div>
 					</div>
 				</div>
-			</header>
-
-			{/* Main Content */}
-			<div className="flex-1 flex items-center py-10">
-				<div className="container mx-auto px-4 w-full">
-					{viewState === "search" && (
-						<div className="space-y-12">
-							{/* Hero */}
-							<div className="text-center space-y-4 max-w-2xl mx-auto">
-								<h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-									{t("heroTitle")}
-								</h2>
-								<p className="text-muted-foreground text-lg">
-									{t("heroDescription")}
-								</p>
-							</div>
-
-							{/* Search Form */}
-							<SearchForm onSearch={handleSearch} isLoading={false} />
-
-							{/* Recent Searches */}
-							<div className="max-w-2xl mx-auto">
-								<RecentSearches
-									searches={recentSearches}
-									onSelectSearch={handleSelectSearch}
+			) : viewState === "loading" ? (
+				<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
+					<div className="w-full max-w-2xl mx-auto">
+						<LoadingView searchName={searchName} />
+					</div>
+				</div>
+			) : (
+				<div className="flex-1 flex items-center py-10">
+					<div className="container mx-auto px-4 w-full">
+						{currentResult && (
+							<div className="py-4">
+								<ResultView
+									result={currentResult}
+									onNewSearch={handleNewSearch}
 								/>
 							</div>
-
-							<div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-								{[
-									{
-										label: t("isPep"),
-										desc: t("yes"),
-										color: "text-destructive",
-										bg: "bg-destructive/10",
-									},
-									{
-										label: t("isNotPep"),
-										desc: t("no"),
-										color: "text-green-600 dark:text-green-400",
-										bg: "bg-green-500/10",
-									},
-								].map((item) => null)}
-							</div>
-						</div>
-					)}
-
-					{viewState === "loading" && (
-						<div className="py-12">
-							<LoadingView searchName={searchName} />
-						</div>
-					)}
-
-					{viewState === "result" && currentResult && (
-						<div className="py-4">
-							<ResultView
-								result={currentResult}
-								onNewSearch={handleNewSearch}
-							/>
-						</div>
-					)}
+						)}
+					</div>
 				</div>
-			</div>
+			)}
 		</main>
 	);
 }
