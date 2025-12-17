@@ -1,3 +1,15 @@
+# 1.0.0-rc.1 (2025-12-17)
+
+
+### Features
+
+* Add documentation descriptions to storybook components ([42cc2a8](https://github.com/janovix/watchlist/commit/42cc2a85e4a4a1e3b6c72d94826c94be2d30a817))
+* Add Logo component and theme provider ([382a935](https://github.com/janovix/watchlist/commit/382a9357ea71291329d5279c27f6d4d0a10efd04))
+* Add many dependencies for UI components and utilities ([a16fc98](https://github.com/janovix/watchlist/commit/a16fc9820d907202cf7dec5e310a441d7d21e1ba))
+* Add storybook stories for new views and components ([0b714fb](https://github.com/janovix/watchlist/commit/0b714fbfd7c7aa9d2baccfb1d2a6d81ac20b70b6))
+* Improve theme handling in Logo component ([3df6c8c](https://github.com/janovix/watchlist/commit/3df6c8ce442c7296724bbcde7e5068ffdf6734f4))
+* Specify pnpm as package manager ([3f79a5f](https://github.com/janovix/watchlist/commit/3f79a5f01d828f44a1dfa7cc7b251570991ae294))
+
 # 1.0.0 (2025-12-14)
 
 
@@ -10,9 +22,7 @@
 ### Features
 
 * Add core functionality ([1cfb1d8](https://github.com/algtools/next-template/commit/1cfb1d8bb6bd41aa3e7d2808b143d41c56d183dd))
-* add TodoApp component with local storage support and UI enhancements ([dd9a9e6](https://github.com/algtools/next-template/commit/dd9a9e68c5bccca24531aa595efd47143bc59ba4))
 * integrate storybook ([72c57c8](https://github.com/algtools/next-template/commit/72c57c8bc2114ba1bfa9e993f479edf5198ec87c))
-* Integrate SWR for data fetching and update TodoApp ([ee15a61](https://github.com/algtools/next-template/commit/ee15a6143cea5dacef562c97ee6ed7cd8f7241e6))
 
 # [1.0.0-rc.4](https://github.com/algtools/next-template/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2025-12-14)
 
@@ -44,9 +54,6 @@
 
 
 ### Features
-
-* add TodoApp component with local storage support and UI enhancements ([dd9a9e6](https://github.com/algtools/next-template/commit/dd9a9e68c5bccca24531aa595efd47143bc59ba4))
-* Integrate SWR for data fetching and update TodoApp ([ee15a61](https://github.com/algtools/next-template/commit/ee15a6143cea5dacef562c97ee6ed7cd8f7241e6))
 
 # Changelog
 
