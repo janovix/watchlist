@@ -1,16 +1,28 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ResultView } from "@/components/result-view";
 import { LanguageProvider } from "@/components/language-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import type { PEPResult } from "@/lib/mock-data";
 
 const meta: Meta<typeof ResultView> = {
 	title: "Components/ResultView",
 	component: ResultView,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"Displays the results of a PEP verification search. Shows whether the searched person is a PEP or not, along with detailed record information if they are found in PEP lists. Includes search metadata and a button to start a new search.",
+			},
+		},
+	},
+	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
-			<LanguageProvider>
-				<Story />
-			</LanguageProvider>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<LanguageProvider>
+					<Story />
+				</LanguageProvider>
+			</ThemeProvider>
 		),
 	],
 };
@@ -50,11 +62,27 @@ export const IsPep: Story = {
 		result: pepResult,
 		onNewSearch: () => console.log("New search clicked"),
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Result view when the searched person is found in PEP lists. Shows detailed record information including dataset, aliases, birth date, countries, and timestamps.",
+			},
+		},
+	},
 };
 
 export const IsNotPep: Story = {
 	args: {
 		result: nonPepResult,
 		onNewSearch: () => console.log("New search clicked"),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Result view when the searched person is not found in any PEP lists. Shows a success message and search metadata.",
+			},
+		},
 	},
 };
