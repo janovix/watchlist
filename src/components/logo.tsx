@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
 const IconColors = {
@@ -150,8 +151,22 @@ function Logo({
 	height?: number;
 	forceTheme?: "light" | "dark";
 }) {
-	const { resolvedTheme } = useTheme();
-	const theme = forceTheme || (resolvedTheme as keyof typeof IconColors);
+	const { resolvedTheme, systemTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	// Determine theme: forceTheme > resolvedTheme > systemTheme > light (fallback)
+	const theme =
+		forceTheme ||
+		(mounted && resolvedTheme
+			? (resolvedTheme as keyof typeof IconColors)
+			: systemTheme
+				? (systemTheme as keyof typeof IconColors)
+				: "light");
+
 	return (
 		<div className={className}>
 			{variant === "logo" && (
