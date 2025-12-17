@@ -185,21 +185,21 @@ body {
 	letter-spacing: var(--tracking-normal);
 }
 
-.scrollbar-minimal::-webkit-scrollbar {
+*::-webkit-scrollbar {
 	width: 8px;
 	height: 8px;
 }
 
-.scrollbar-minimal::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
 	background: transparent;
 }
 
-.scrollbar-minimal::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
 	background: #cbd5e0;
 	border-radius: 4px;
 }
 
-.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+*::-webkit-scrollbar-thumb:hover {
 	background: #a0aec0;
 }
 
