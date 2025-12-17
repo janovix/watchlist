@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield } from "lucide-react";
 import { SearchForm } from "@/components/search-form";
 import { LoadingView } from "@/components/loading-view";
 import { ResultView } from "@/components/result-view";
@@ -9,6 +8,7 @@ import { RecentSearches } from "@/components/recent-searches";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { UserMenu } from "@/components/user-menu";
+import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult, generateMockResult } from "@/lib/mock-data";
 
@@ -90,7 +90,7 @@ function HomeContent() {
 		return (
 			<main className="min-h-screen bg-background flex items-center justify-center">
 				<div className="flex items-center gap-3">
-					<Shield className="h-8 w-8 text-primary animate-pulse" />
+					<Logo variant="icon" width={32} height={32} />
 					<span className="text-muted-foreground">{t("loading")}</span>
 				</div>
 			</main>
@@ -104,18 +104,7 @@ function HomeContent() {
 				<div className="container mx-auto px-4 py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20">
-								<Shield className="h-5 w-5 text-primary" />
-							</div>
-							<div className="flex flex-col">
-								<h1 className="text-lg font-semibold text-foreground font-mono">
-									<span className="text-primary">is</span>
-									<span>Pep</span>
-								</h1>
-								<span className="text-xs text-muted-foreground">
-									{t("byJanovix")}
-								</span>
-							</div>
+							<Logo variant="logo" width={102} height={16} />
 						</div>
 						<div className="flex items-center gap-2">
 							<LanguageToggle />

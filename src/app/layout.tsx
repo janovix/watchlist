@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -23,7 +24,9 @@ export default function RootLayout({
 	return (
 		<html lang="es" suppressHydrationWarning>
 			<body className="font-sans antialiased">
-				{children}
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					{children}
+				</ThemeProvider>
 				<Analytics />
 			</body>
 		</html>
