@@ -159,19 +159,24 @@ function Logo({
 	}, []);
 
 	// Determine theme: forceTheme > resolvedTheme > systemTheme > light (fallback)
-	const theme =
-		forceTheme ||
-		(mounted && resolvedTheme
-			? (resolvedTheme as keyof typeof IconColors)
-			: systemTheme
-				? (systemTheme as keyof typeof IconColors)
-				: "light");
+	// This will reactively update when resolvedTheme or systemTheme changes from useTheme()
+	const theme: keyof typeof IconColors = (() => {
+		if (forceTheme) return forceTheme;
+		if (mounted && resolvedTheme) {
+			return resolvedTheme as keyof typeof IconColors;
+		}
+		if (systemTheme) {
+			return systemTheme as keyof typeof IconColors;
+		}
+		return "light";
+	})();
 
 	return (
 		<div className={className}>
 			{variant === "logo" && (
 				<LogoPath
-					theme={theme as keyof typeof IconColors}
+					key={`logo-${theme}`}
+					theme={theme}
 					width={width}
 					height={height}
 					className={imgClassName}
@@ -179,7 +184,8 @@ function Logo({
 			)}
 			{variant === "icon" && (
 				<IconPath
-					theme={theme as keyof typeof IconColors}
+					key={`icon-${theme}`}
+					theme={theme}
 					width={width}
 					height={height}
 					className={imgClassName}
