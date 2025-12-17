@@ -185,32 +185,22 @@ body {
 	letter-spacing: var(--tracking-normal);
 }
 
-/* Global minimal scrollbar styles */
-*::-webkit-scrollbar {
+.scrollbar-minimal::-webkit-scrollbar {
 	width: 8px;
 	height: 8px;
 }
 
-*::-webkit-scrollbar-track {
+.scrollbar-minimal::-webkit-scrollbar-track {
 	background: transparent;
 }
 
-*::-webkit-scrollbar-thumb {
+.scrollbar-minimal::-webkit-scrollbar-thumb {
 	background: #cbd5e0;
 	border-radius: 4px;
 }
 
-*::-webkit-scrollbar-thumb:hover {
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
 	background: #a0aec0;
-}
-
-/* Dark mode scrollbar styles */
-.dark *::-webkit-scrollbar-thumb {
-	background: oklch(0.5 0.02 286);
-}
-
-.dark *::-webkit-scrollbar-thumb:hover {
-	background: oklch(0.6 0.02 286);
 }
 
 @layer base {
