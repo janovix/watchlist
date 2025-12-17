@@ -99,8 +99,8 @@ function HomeContent() {
 
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
-			{/* Header - Only shown for result view */}
-			{viewState === "result" && (
+			{/* Header - Shown for both search and result views */}
+			{(viewState === "search" || viewState === "result") && (
 				<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
 					<div className="container mx-auto px-4 py-4">
 						<div className="flex items-center justify-between">
@@ -110,18 +110,11 @@ function HomeContent() {
 							<div className="flex items-center gap-2">
 								<LanguageToggle />
 								<ThemeToggle />
-								<UserMenu />
+								{viewState === "result" && <UserMenu />}
 							</div>
 						</div>
 					</div>
 				</header>
-			)}
-
-			{/* Top Bar - Avatar on top right for search view */}
-			{viewState === "search" && (
-				<div className="absolute top-0 right-0 p-4 z-10">
-					<UserMenu />
-				</div>
 			)}
 
 			{/* Main Content */}
