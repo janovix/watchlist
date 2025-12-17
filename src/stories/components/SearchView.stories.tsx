@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { Logo } from "@/components/logo";
 import { generateMockResult, type PEPResult } from "@/lib/mock-data";
 import { useState, useEffect } from "react";
@@ -16,7 +17,7 @@ const meta: Meta = {
 		docs: {
 			description: {
 				component:
-					"The main search view of the application. Minimalist search engine design with centered logo, search bar, and recent searches. No header - clean and focused on search.",
+					"The main search view of the application. Minimalist search engine design with centered logo and Watchlist title, search bar, language/theme toggles, recent searches, and user menu avatar in top right. Clean and focused on search.",
 			},
 		},
 	},
@@ -61,12 +62,19 @@ function SearchViewContent() {
 	};
 
 	return (
-		<main className="min-h-screen bg-background flex flex-col">
+		<main className="min-h-screen bg-background flex flex-col relative">
+			{/* Top Bar - Avatar on top right */}
+			<div className="absolute top-0 right-0 p-4 z-10">
+				<UserMenu />
+			</div>
+
 			<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
 				<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-					{/* Logo */}
-					<div className="mb-8">
+					{/* Logo with Title */}
+					<div className="mb-8 flex items-center gap-2">
 						<Logo variant="logo" width={120} height={19} />
+						<span className="h-1 w-1 rounded-full bg-muted-foreground" />
+						<h1 className="text-xl font-semibold text-foreground">Watchlist</h1>
 					</div>
 
 					{/* Search Form */}
@@ -101,7 +109,7 @@ export const Default: Story = {
 		docs: {
 			description: {
 				story:
-					"Search view with recent searches displayed. Users can start a new search or select from recent searches.",
+					"Search view with recent searches displayed. Shows logo with Watchlist title, search bar, language/theme toggles, recent searches, and user menu avatar in top right. Users can start a new search or select from recent searches.",
 			},
 		},
 	},
@@ -113,7 +121,7 @@ export const WithRecentSearches: Story = {
 		docs: {
 			description: {
 				story:
-					"Search view showing multiple recent searches. Demonstrates how the recent searches component appears when there are previous searches.",
+					"Search view showing multiple recent searches. Demonstrates how the recent searches component appears when there are previous searches. Includes logo with Watchlist title and user menu avatar in top right.",
 			},
 		},
 	},
@@ -121,12 +129,19 @@ export const WithRecentSearches: Story = {
 
 export const EmptyState: Story = {
 	render: () => (
-		<main className="min-h-screen bg-background flex flex-col">
+		<main className="min-h-screen bg-background flex flex-col relative">
+			{/* Top Bar - Avatar on top right */}
+			<div className="absolute top-0 right-0 p-4 z-10">
+				<UserMenu />
+			</div>
+
 			<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
 				<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-					{/* Logo */}
-					<div className="mb-8">
+					{/* Logo with Title */}
+					<div className="mb-8 flex items-center gap-2">
 						<Logo variant="logo" width={120} height={19} />
+						<span className="h-1 w-1 rounded-full bg-muted-foreground" />
+						<h1 className="text-xl font-semibold text-foreground">Watchlist</h1>
 					</div>
 
 					{/* Search Form */}
@@ -147,7 +162,7 @@ export const EmptyState: Story = {
 		docs: {
 			description: {
 				story:
-					"Search view in empty state when there are no recent searches. Shows only the logo, search form, and language/theme toggles.",
+					"Search view in empty state when there are no recent searches. Shows logo with Watchlist title, search form, language/theme toggles, and user menu avatar in top right.",
 			},
 		},
 	},

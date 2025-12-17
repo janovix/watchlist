@@ -102,7 +102,14 @@ function FullPageContent() {
 	}
 
 	return (
-		<main className="min-h-screen bg-background flex flex-col">
+		<main className="min-h-screen bg-background flex flex-col relative">
+			{/* Top Bar - Avatar on top right for search view */}
+			{viewState === "search" && (
+				<div className="absolute top-0 right-0 p-4 z-10">
+					<UserMenu />
+				</div>
+			)}
+
 			{/* Header - Only shown for result view */}
 			{viewState === "result" && (
 				<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
@@ -125,9 +132,13 @@ function FullPageContent() {
 			{viewState === "search" ? (
 				<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
 					<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-						{/* Logo */}
-						<div className="mb-8">
+						{/* Logo with Title */}
+						<div className="mb-8 flex items-center gap-2">
 							<Logo variant="logo" width={120} height={19} />
+							<span className="h-1 w-1 rounded-full bg-muted-foreground" />
+							<h1 className="text-xl font-semibold text-foreground">
+								Watchlist
+							</h1>
 						</div>
 
 						{/* Search Form */}
@@ -182,7 +193,7 @@ export const SearchState: Story = {
 		docs: {
 			description: {
 				story:
-					"Full page in search state - the initial view when users first visit the application. Minimalist search engine design with centered logo, search bar, language/theme toggles, and recent searches. No header.",
+					"Full page in search state - the initial view when users first visit the application. Minimalist search engine design with centered logo and Watchlist title, search bar, language/theme toggles, recent searches, and user menu avatar in top right.",
 			},
 		},
 	},
