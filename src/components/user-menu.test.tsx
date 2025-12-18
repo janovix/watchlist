@@ -27,35 +27,31 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock auth session store
-vi.mock("@/lib/auth", async () => {
-	const actual = await vi.importActual("@/lib/auth");
-	return {
-		...actual,
-		useAuthSession: () => ({
-			data: {
-				user: {
-					id: "user-1",
-					name: "María García",
-					email: "maria.garcia@empresa.com",
-					image: null,
-					emailVerified: true,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				},
-				session: {
-					id: "session-1",
-					userId: "user-1",
-					token: "token-123",
-					expiresAt: new Date(),
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				},
+vi.mock("@/lib/auth/useAuthSession", () => ({
+	useAuthSession: () => ({
+		data: {
+			user: {
+				id: "user-1",
+				name: "María García",
+				email: "maria.garcia@empresa.com",
+				image: null,
+				emailVerified: true,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			},
-			error: null,
-			isPending: false,
-		}),
-	};
-});
+			session: {
+				id: "session-1",
+				userId: "user-1",
+				token: "token-123",
+				expiresAt: new Date(),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		},
+		error: null,
+		isPending: false,
+	}),
+}));
 
 // Mock actions
 vi.mock("@/lib/auth/actions", () => ({

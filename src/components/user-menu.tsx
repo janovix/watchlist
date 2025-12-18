@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Settings, HelpCircle, Bell, LogOut } from "lucide-react";
 import { useLanguage } from "./language-provider";
-import { useAuthSession } from "@/lib/auth";
+import { useAuthSession } from "@/lib/auth/useAuthSession";
 import { logout } from "@/lib/auth/actions";
 
 function getInitials(name: string): string {

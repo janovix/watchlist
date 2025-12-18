@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuthSession } from "@/lib/auth";
-import { getAuthBaseURL } from "@/lib/auth/authCoreConfig";
+import { useAuthSession } from "@/lib/auth/useAuthSession";
+import { getAuthCoreBaseUrl } from "@/lib/auth/config";
 
 interface SessionGuardProps {
 	children: React.ReactNode;
@@ -30,7 +30,7 @@ export function SessionGuard({
 			// Build auth URL with redirect_to param
 			if (typeof window !== "undefined") {
 				try {
-					const authBaseURL = getAuthBaseURL();
+					const authBaseURL = getAuthCoreBaseUrl();
 					const currentUrl = encodeURIComponent(window.location.href);
 					// Better Auth typically uses /sign-in endpoint
 					const authUrl = `${authBaseURL}/sign-in?redirect_to=${currentUrl}`;

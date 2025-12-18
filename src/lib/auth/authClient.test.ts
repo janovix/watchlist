@@ -8,14 +8,14 @@ vi.mock("better-auth/client", () => ({
 	})),
 }));
 
-vi.mock("./authCoreConfig", () => ({
+vi.mock("./config", () => ({
 	getAuthCoreBaseUrl: vi.fn(() => "https://auth.example.com"),
-	getAuthBaseURL: vi.fn(() => "https://auth.example.com"),
+	getAuthAppUrl: vi.fn(() => "https://app.example.com"),
 }));
 
 import { createAuthClient } from "better-auth/client";
 import { authClient } from "./authClient";
-import { getAuthCoreBaseUrl } from "./authCoreConfig";
+import { getAuthCoreBaseUrl } from "./config";
 
 describe("authClient", () => {
 	it("should create auth client with correct configuration", () => {

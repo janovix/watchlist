@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getAuthCoreBaseUrl, getAuthAppUrl } from "./authCoreConfig";
+import { getAuthCoreBaseUrl, getAuthAppUrl } from "./config";
 import type { Session } from "./types";
 
 /**

@@ -2,7 +2,7 @@
 
 import { authClient } from "./authClient";
 import { clearSession } from "./sessionStore";
-import { getAuthAppUrl } from "./authCoreConfig";
+import { getAuthAppUrl } from "./config";
 
 export async function logout(): Promise<void> {
 	try {
