@@ -1,5 +1,53 @@
 import { fetchJson, ApiError } from "./http";
 
+/**
+ * Watchlist target from the API
+ */
+export interface WatchlistTarget {
+	id: string;
+	schema: string | null;
+	name: string | null;
+	aliases: string[] | null;
+	birthDate: string | null;
+	countries: string[] | null;
+	addresses: string[] | null;
+	identifiers: string[] | null;
+	sanctions: string[] | null;
+	phones: string[] | null;
+	emails: string[] | null;
+	programIds: string[] | null;
+	dataset: string | null;
+	firstSeen: string | null;
+	lastSeen: string | null;
+	lastChange: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
+ * PEP search request body
+ */
+export interface PepSearchRequest {
+	query: string;
+}
+
+/**
+ * PEP search response from API
+ */
+export interface PepSearchApiResponse {
+	success: boolean;
+	result: {
+		target: WatchlistTarget;
+		pepStatus: boolean;
+		pepDetails: string;
+		matchConfidence: "exact" | "possible";
+	};
+}
+
+/**
+ * Legacy PepRecord interface for backward compatibility
+ * Maps from WatchlistTarget to the existing format
+ */
 export interface PepRecord {
 	dataset: string; // e.g., OFAC, UN, EU
 	id: string;
@@ -12,13 +60,14 @@ export interface PepRecord {
 	lastSeen: string | null;
 }
 
-export interface PepSearchRequest {
-	name: string;
-}
-
+/**
+ * Transformed response for backward compatibility
+ */
 export interface PepSearchResponse {
 	isPep: boolean;
 	record: PepRecord | null;
+	matchConfidence?: "exact" | "possible";
+	pepDetails?: string;
 }
 
 /**
@@ -34,26 +83,59 @@ function getWatchlistApiBaseUrl(): string {
 }
 
 /**
- * Search for a PEP (Politically Exposed Person) by name.
+ * Maps WatchlistTarget to legacy PepRecord format
+ */
+function mapTargetToPepRecord(target: WatchlistTarget): PepRecord {
+	return {
+		dataset: target.dataset || "UNKNOWN",
+		id: target.id,
+		name: target.name || "Unknown",
+		aliases: target.aliases || [],
+		birthDate: target.birthDate,
+		countries: target.countries || [],
+		firstSeen: target.firstSeen,
+		lastChange: target.lastChange,
+		lastSeen: target.lastSeen,
+	};
+}
+
+/**
+ * Search for a PEP (Politically Exposed Person) by query.
  *
- * @param name - The name to search for
+ * @param query - The search query (name or other identifying information)
  * @returns Promise resolving to the search result
  * @throws ApiError if the request fails
  */
-export async function searchPep(name: string): Promise<PepSearchResponse> {
+export async function searchPep(query: string): Promise<PepSearchResponse> {
 	const baseUrl = getWatchlistApiBaseUrl();
 	const url = `${baseUrl}/pep/search`;
 
 	try {
-		const { json } = await fetchJson<PepSearchResponse>(url, {
+		const { json } = await fetchJson<PepSearchApiResponse>(url, {
 			method: "POST",
 			headers: {
 				"content-type": "application/json",
 			},
-			body: JSON.stringify({ name }),
+			body: JSON.stringify({ query }),
 		});
 
-		return json;
+		// Check if API response indicates success
+		if (!json.success) {
+			throw new ApiError("API returned unsuccessful response", {
+				status: 500,
+				body: json,
+			});
+		}
+
+		const { result } = json;
+
+		// Transform API response to legacy format
+		return {
+			isPep: result.pepStatus,
+			record: result.pepStatus ? mapTargetToPepRecord(result.target) : null,
+			matchConfidence: result.matchConfidence,
+			pepDetails: result.pepDetails,
+		};
 	} catch (error) {
 		if (error instanceof ApiError) {
 			throw error;
