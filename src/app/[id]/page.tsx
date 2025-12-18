@@ -5,7 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import { LoadingView } from "@/components/loading-view";
 import { ResultView } from "@/components/result-view";
 import { Header } from "@/components/header";
-import { Navbar } from "@/components/navbar";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
@@ -124,8 +123,7 @@ function QueryContent() {
 		return (
 			<main className="min-h-screen bg-background flex flex-col">
 				<Header />
-				<Navbar />
-				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-145px)] py-10 px-4">
+				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-81px)] py-10 px-4">
 					<div className="text-center">
 						<h2 className="text-2xl font-semibold text-foreground mb-2">
 							Query Not Found
@@ -148,11 +146,10 @@ function QueryContent() {
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
 			<Header />
-			<Navbar />
 
 			{/* Main Content */}
 			{viewState === "loading" ? (
-				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-145px)] py-10 px-4">
+				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-81px)] py-10 px-4">
 					<div className="w-full max-w-2xl mx-auto">
 						<LoadingView searchName={searchName} />
 					</div>

@@ -37,18 +37,23 @@ export function Header({ onSearch, isLoading = false }: HeaderProps) {
 		<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
 			<div className="container mx-auto px-4 py-3">
 				<div className="flex items-center gap-4">
-					{/* Logo */}
-					<div className="flex-shrink-0">
+					{/* Left side: Logo + Watchlist */}
+					<div className="flex items-center gap-3 flex-shrink-0">
 						<Logo variant="icon" width={32} height={32} />
+						<span className="text-sm font-medium text-foreground">
+							Watchlist
+						</span>
 					</div>
 
-					{/* Search Input */}
-					<div className="flex-1 max-w-2xl">
-						<SearchForm onSearch={handleSearch} isLoading={isLoading} />
+					{/* Search Input - Centered with equal spacing */}
+					<div className="flex-1 flex justify-center">
+						<div className="w-full max-w-2xl">
+							<SearchForm onSearch={handleSearch} isLoading={isLoading} />
+						</div>
 					</div>
 
-					{/* Right side controls */}
-					<div className="flex items-center gap-2 flex-shrink-0">
+					{/* Right side controls - matching left side width for centering */}
+					<div className="flex items-center gap-2 flex-shrink-0 w-[140px] justify-end">
 						<LanguageToggle />
 						<ThemeToggle />
 						<UserMenu />

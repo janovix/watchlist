@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
-import { Navbar } from "@/components/navbar";
 import { RecentSearches } from "@/components/recent-searches";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
@@ -80,10 +79,9 @@ function HomeContent() {
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
 			<Header onSearch={handleSearch} isLoading={false} />
-			<Navbar />
 
 			{/* Main Content */}
-			<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-145px)] py-8 px-4">
+			<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-81px)] py-8 px-4">
 				<div className="w-full max-w-2xl mx-auto">
 					{/* Recent Searches - Centered with scroll support */}
 					<div className="w-full overflow-y-auto max-h-[60vh]">
