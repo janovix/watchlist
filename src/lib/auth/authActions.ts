@@ -158,7 +158,7 @@ export async function signOut() {
 			// Continue with logout even if API call fails
 			clearSession();
 			if (typeof window !== "undefined") {
-				window.location.href = `${getAuthAppUrl()}/login`;
+				window.location.href = getAuthAppUrl();
 			}
 			return { error: result.error };
 		}
@@ -166,9 +166,9 @@ export async function signOut() {
 		// Clear the session from the store
 		clearSession();
 
-		// Redirect to auth app login
+		// Redirect to auth app
 		if (typeof window !== "undefined") {
-			window.location.href = `${getAuthAppUrl()}/login`;
+			window.location.href = getAuthAppUrl();
 		}
 
 		return { data: null };
@@ -178,7 +178,7 @@ export async function signOut() {
 		// Continue with logout even if API call fails
 		clearSession();
 		if (typeof window !== "undefined") {
-			window.location.href = `${getAuthAppUrl()}/login`;
+			window.location.href = getAuthAppUrl();
 		}
 		return { error: err };
 	} finally {

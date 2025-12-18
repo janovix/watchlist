@@ -18,6 +18,6 @@ export async function logout(): Promise<void> {
 	// Clear local session state
 	clearSession();
 
-	// Redirect to auth app login
-	window.location.href = `${getAuthAppUrl()}/login`;
+	// Redirect to auth app
+	window.location.href = getAuthAppUrl();
 }

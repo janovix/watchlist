@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { User, Settings, HelpCircle, Bell, LogOut } from "lucide-react";
 import { useLanguage } from "./language-provider";
 import { useAuthSession } from "@/lib/auth";
@@ -17,7 +16,6 @@ function getInitials(name: string): string {
 }
 
 export function UserMenu() {
-	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const { t } = useLanguage();
@@ -34,9 +32,9 @@ export function UserMenu() {
 	}, []);
 
 	const handleSignOut = async () => {
-		await signOut();
 		setIsOpen(false);
-		router.push("/");
+		await signOut();
+		// signOut() handles redirect to NEXT_PUBLIC_AUTH_APP_URL
 	};
 
 	const menuItems = [
