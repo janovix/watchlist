@@ -64,7 +64,7 @@ describe("ThemeToggle", () => {
 
 		// Before mount, should show placeholder
 		const placeholder = document.querySelector(
-			".h-8.w-8.rounded-lg.bg-secondary",
+			".h-7.w-7.sm\\:h-8.sm\\:w-8.rounded-lg.bg-secondary, .h-8.w-8.rounded-lg.bg-secondary",
 		);
 		expect(placeholder).toBeInTheDocument();
 	});
