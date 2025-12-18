@@ -12,12 +12,14 @@ const mockAddPage = vi.fn();
 const mockGetNumberOfPages = vi.fn(() => 1);
 const mockSetPage = vi.fn();
 
+let mockPageHeight = 297;
+
 vi.mock("jspdf", () => {
 	class MockJsPDF {
 		internal = {
 			pageSize: {
 				getWidth: () => 210,
-				getHeight: () => 297,
+				getHeight: () => mockPageHeight,
 			},
 		};
 		setFontSize = mockSetFontSize;
@@ -97,6 +99,9 @@ describe("exportResultToPdf", () => {
 		mockAddPage.mockClear();
 		mockGetNumberOfPages.mockClear();
 		mockSetPage.mockClear();
+		mockPageHeight = 297; // Reset to default
+		// Restore any Date prototype spies
+		vi.restoreAllMocks();
 	});
 
 	it("should create a PDF document for PEP result", () => {
@@ -164,5 +169,45 @@ describe("exportResultToPdf", () => {
 		const saveCall = mockSave.mock.calls[0]?.[0];
 		// Check that special characters are replaced with underscores in filename
 		expect(saveCall).toMatch(/pep_result_John_Doe.*\.pdf/);
+	});
+
+	it("should handle invalid date strings gracefully", () => {
+		const resultWithInvalidDates: PEPResult = {
+			...mockPepResult,
+			record: {
+				...mockPepResult.record!,
+				birthDate: "invalid-date-string",
+				firstSeen: "not-a-date",
+				lastChange: "also-invalid",
+				lastSeen: "bad-date-format",
+			},
+		};
+
+		expect(() => {
+			exportResultToPdf(resultWithInvalidDates, mockTranslations, "en-US");
+		}).not.toThrow();
+		expect(mockSave).toHaveBeenCalled();
+	});
+
+	it("should add a new page when content exceeds page height", () => {
+		// Set a small page height to trigger page break
+		mockPageHeight = 100;
+		mockGetNumberOfPages.mockReturnValue(2);
+
+		// Create a result with many items to push content down
+		const resultWithManyItems: PEPResult = {
+			...mockPepResult,
+			record: {
+				...mockPepResult.record!,
+				aliases: Array(20).fill("Very Long Alias Name That Takes Space"),
+				countries: Array(15).fill("XX"),
+			},
+		};
+
+		exportResultToPdf(resultWithManyItems, mockTranslations, "en-US");
+
+		// Should have called addPage when content exceeds page height
+		expect(mockAddPage).toHaveBeenCalled();
+		expect(mockSave).toHaveBeenCalled();
 	});
 });
