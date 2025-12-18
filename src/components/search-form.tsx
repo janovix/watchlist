@@ -28,6 +28,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 			<div className="relative">
 				<User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
 				<Input
+					id="pep-search-input"
 					type="text"
 					placeholder={t("searchPlaceholder")}
 					value={name}

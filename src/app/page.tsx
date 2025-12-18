@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { SearchForm } from "@/components/search-form";
+import { Header } from "@/components/header";
+import { Navbar } from "@/components/navbar";
 import { RecentSearches } from "@/components/recent-searches";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { LanguageToggle } from "@/components/language-toggle";
-import { UserMenu } from "@/components/user-menu";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
@@ -15,6 +13,7 @@ function HomeContent() {
 	const router = useRouter();
 	const [recentSearches, setRecentSearches] = useState<PEPResult[]>([]);
 	const [mounted, setMounted] = useState(false);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const { t } = useLanguage();
 
 	useEffect(() => {
@@ -57,6 +56,16 @@ function HomeContent() {
 		router.push(`/${queryId}`);
 	};
 
+	const handleStartSearch = () => {
+		// Focus the search input in the header
+		const searchInput = document.getElementById(
+			"pep-search-input",
+		) as HTMLInputElement;
+		if (searchInput) {
+			searchInput.focus();
+		}
+	};
+
 	if (!mounted) {
 		return (
 			<main className="min-h-screen bg-background flex items-center justify-center">
@@ -70,35 +79,18 @@ function HomeContent() {
 
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
-			{/* Avatar only - Top right for search view */}
-			<div className="fixed top-4 right-4 z-10">
-				<UserMenu />
-			</div>
+			<Header onSearch={handleSearch} isLoading={false} />
+			<Navbar />
 
 			{/* Main Content */}
-			<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
-				<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-					{/* Logo with Title */}
-					<div className="mb-8 flex items-center gap-2">
-						<Logo variant="logo" width={120} height={19} />
-						<span className="h-1 w-1 rounded-full bg-muted-foreground" />
-						<h1 className="text-xl font-semibold text-foreground">Watchlist</h1>
-					</div>
-
-					{/* Search Form */}
-					<div className="w-full mb-6">
-						<SearchForm onSearch={handleSearch} isLoading={false} />
-					</div>
-
-					{/* Language/Theme Toggle - Right aligned but centered */}
-					<div className="flex items-center gap-2 mb-8">
-						<LanguageToggle />
-						<ThemeToggle />
-					</div>
-
+			<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-145px)] py-8 px-4">
+				<div className="w-full max-w-2xl mx-auto">
 					{/* Recent Searches - Centered with scroll support */}
-					<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
-						<RecentSearches searches={recentSearches} />
+					<div className="w-full overflow-y-auto max-h-[60vh]">
+						<RecentSearches
+							searches={recentSearches}
+							onStartSearch={handleStartSearch}
+						/>
 					</div>
 				</div>
 			</div>

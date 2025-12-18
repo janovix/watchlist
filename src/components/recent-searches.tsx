@@ -1,20 +1,60 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, ChevronRight, AlertCircle, CheckCircle } from "lucide-react";
+import {
+	Clock,
+	ChevronRight,
+	AlertCircle,
+	CheckCircle,
+	Search,
+} from "lucide-react";
 import type { PEPResult } from "@/lib/mock-data";
 import { useLanguage } from "@/components/language-provider";
 import { getLocaleForLanguage } from "@/lib/translations";
+import { Button } from "@/components/ui/button";
 
 interface RecentSearchesProps {
 	searches: PEPResult[];
+	onStartSearch?: () => void;
 }
 
-export function RecentSearches({ searches }: RecentSearchesProps) {
+export function RecentSearches({
+	searches,
+	onStartSearch,
+}: RecentSearchesProps) {
 	const { t, language } = useLanguage();
 
 	if (searches.length === 0) {
-		return null;
+		return (
+			<div className="bg-card border border-border rounded-lg overflow-hidden">
+				<div className="px-6 py-4 border-b border-border">
+					<h3 className="text-base font-medium text-muted-foreground flex items-center gap-2">
+						<Clock className="h-4 w-4" />
+						{t("recentSearches")}
+					</h3>
+				</div>
+				<div className="p-8 flex flex-col items-center justify-center text-center">
+					<div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+						<Search className="h-8 w-8 text-primary" />
+					</div>
+					<h4 className="text-lg font-semibold text-foreground mb-2">
+						{t("noRecentSearches")}
+					</h4>
+					<p className="text-sm text-muted-foreground mb-6 max-w-md">
+						{t("noRecentSearchesDescription")}
+					</p>
+					{onStartSearch && (
+						<Button
+							onClick={onStartSearch}
+							className="bg-primary hover:bg-primary/90 text-primary-foreground"
+						>
+							<Search className="h-4 w-4 mr-2" />
+							{t("startFirstSearch")}
+						</Button>
+					)}
+				</div>
+			</div>
+		);
 	}
 
 	return (
