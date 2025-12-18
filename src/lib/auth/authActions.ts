@@ -146,58 +146,27 @@ export async function signUp(params: SignUpParams) {
 
 /**
  * Sign out the current user
- * Calls Better Auth API, clears local session state, and redirects to auth app
- * Uses direct fetch to prevent better-auth from doing automatic redirects
+ * Calls Better Auth API, clears local session state, and redirects to auth app login
  */
 export async function signOut() {
 	try {
 		setSessionPending(true);
-
-		// Use direct fetch instead of authClient.signOut() to prevent automatic redirects
-		// Better-auth's signOut() may redirect automatically, so we handle redirects ourselves
-		const baseUrl = getAuthCoreBaseUrl();
-		const response = await fetch(`${baseUrl}/api/auth/sign-out`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			credentials: "include",
-			redirect: "manual", // Prevent automatic redirect following
-		});
-
-		// Clear the session from the store regardless of API response
-		clearSession();
-
-		// Redirect to auth app (not auth core base URL)
-		if (typeof window !== "undefined") {
-			window.location.href = getAuthAppUrl();
-		}
-
-		// Check if there was an error, but still proceed with logout
-		if (!response.ok && response.status !== 302 && response.status !== 303) {
-			const errorData = (await response.json().catch(() => ({}))) as {
-				message?: string;
-			};
-			const error = new Error(
-				errorData.message || `Sign out failed: ${response.statusText}`,
-			);
-			setSessionError(error);
-			return { error };
-		}
-
-		return { data: null };
-	} catch (error) {
-		const err = error instanceof Error ? error : new Error("Sign out failed");
-		setSessionError(err);
-		// Continue with logout even if API call fails
-		clearSession();
-		if (typeof window !== "undefined") {
-			window.location.href = getAuthAppUrl();
-		}
-		return { error: err };
+		await authClient.signOut();
+	} catch {
+		// Continue even if API call fails
 	} finally {
 		setSessionPending(false);
 	}
+
+	// Clear the session from the store
+	clearSession();
+
+	// Redirect to auth app login
+	if (typeof window !== "undefined") {
+		window.location.href = `${getAuthAppUrl()}/login`;
+	}
+
+	return { data: null };
 }
 
 /**
