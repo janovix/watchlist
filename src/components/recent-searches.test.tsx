@@ -40,10 +40,27 @@ describe("RecentSearches", () => {
 		},
 	];
 
-	it("should render nothing when searches array is empty", () => {
-		const { container } = renderWithProvider(<RecentSearches searches={[]} />);
+	it("should render call-to-action when searches array is empty", () => {
+		const handleStartSearch = vi.fn();
+		renderWithProvider(
+			<RecentSearches searches={[]} onStartSearch={handleStartSearch} />,
+		);
 
-		expect(container.firstChild).toBeNull();
+		// Should show the call-to-action message
+		expect(screen.getByText(/no recent searches/i)).toBeInTheDocument();
+		expect(
+			screen.getByText(/start your first/i) ||
+				screen.getByText(/realiza tu primera/i) ||
+				screen.getByText(/comece sua primeira/i),
+		).toBeInTheDocument();
+
+		// Should have a button to start search
+		const button = screen.getByRole("button");
+		expect(button).toBeInTheDocument();
+
+		// Clicking the button should call onStartSearch
+		fireEvent.click(button);
+		expect(handleStartSearch).toHaveBeenCalledTimes(1);
 	});
 
 	it("should render recent searches list", () => {
