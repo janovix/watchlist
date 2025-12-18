@@ -51,6 +51,7 @@ export const translations = {
 		queryDate: "Data da consulta:",
 		queryId: "ID da consulta:",
 		newSearch: "Realizar outra pesquisa",
+		exportPdf: "Exportar para PDF",
 		noData: "Sem dados",
 		na: "N/A",
 
@@ -129,6 +130,7 @@ export const translations = {
 		queryDate: "Fecha de consulta:",
 		queryId: "ID de consulta:",
 		newSearch: "Realizar otra búsqueda",
+		exportPdf: "Exportar a PDF",
 		noData: "Sin datos",
 		na: "N/A",
 
@@ -207,6 +209,7 @@ export const translations = {
 		queryDate: "Query date:",
 		queryId: "Query ID:",
 		newSearch: "Perform another search",
+		exportPdf: "Export to PDF",
 		noData: "No data",
 		na: "N/A",
 
