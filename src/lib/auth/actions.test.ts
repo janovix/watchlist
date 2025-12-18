@@ -7,11 +7,15 @@ vi.mock("./sessionStore", () => ({
 	clearSession: () => mockClearSession(),
 }));
 
-// Mock authClient
+// Mock authClient - capture options and invoke onSuccess callback
 const mockSignOut = vi.fn();
 vi.mock("./authClient", () => ({
 	authClient: {
-		signOut: () => mockSignOut(),
+		signOut: (options?: { fetchOptions?: { onSuccess?: () => void } }) => {
+			return mockSignOut(options).then(() => {
+				options?.fetchOptions?.onSuccess?.();
+			});
+		},
 	},
 }));
 
@@ -33,12 +37,18 @@ describe("logout", () => {
 		});
 	});
 
-	it("should call authClient.signOut, clear session, and redirect on success", async () => {
+	it("should call authClient.signOut with onSuccess, clear session, and redirect", async () => {
 		mockSignOut.mockResolvedValue(undefined);
 
 		await logout();
 
-		expect(mockSignOut).toHaveBeenCalled();
+		expect(mockSignOut).toHaveBeenCalledWith(
+			expect.objectContaining({
+				fetchOptions: expect.objectContaining({
+					onSuccess: expect.any(Function),
+				}),
+			}),
+		);
 		expect(mockClearSession).toHaveBeenCalled();
 		expect(window.location.href).toBe("https://auth.example.com/login");
 	});
