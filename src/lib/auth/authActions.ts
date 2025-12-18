@@ -146,12 +146,23 @@ export async function signUp(params: SignUpParams) {
 
 /**
  * Sign out the current user
- * Calls Better Auth API, clears local session state, and redirects to auth app login
+ * Calls Better Auth API with redirect: "manual" to prevent automatic redirects,
+ * clears local session state, and redirects to auth app login
  */
 export async function signOut() {
 	try {
 		setSessionPending(true);
-		await authClient.signOut();
+		// Use direct fetch with redirect: "manual" to prevent Better Auth from
+		// automatically redirecting to auth-svc. We handle the redirect ourselves.
+		const baseUrl = getAuthCoreBaseUrl();
+		await fetch(`${baseUrl}/api/auth/sign-out`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			redirect: "manual", // CRITICAL: Prevent automatic redirect
+		});
 	} catch {
 		// Continue even if API call fails
 	} finally {
@@ -161,7 +172,7 @@ export async function signOut() {
 	// Clear the session from the store
 	clearSession();
 
-	// Redirect to auth app login
+	// Redirect to auth app login (NOT auth-svc)
 	if (typeof window !== "undefined") {
 		window.location.href = `${getAuthAppUrl()}/login`;
 	}
