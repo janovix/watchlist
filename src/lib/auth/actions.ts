@@ -1,12 +1,21 @@
 "use client";
 
-import { authClient } from "./authClient";
 import { clearSession } from "./sessionStore";
-import { getAuthAppUrl } from "./config";
+import { getAuthAppUrl, getAuthCoreBaseUrl } from "./config";
 
 export async function logout(): Promise<void> {
 	try {
-		await authClient.signOut();
+		// Use direct fetch with redirect: "manual" to prevent Better Auth
+		// from automatically redirecting to /sign-in before we can redirect
+		const baseUrl = getAuthCoreBaseUrl();
+		await fetch(`${baseUrl}/api/auth/sign-out`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			redirect: "manual", // CRITICAL: Prevent automatic redirect
+		});
 	} catch {
 		// Continue even if API call fails
 	}
