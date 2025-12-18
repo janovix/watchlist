@@ -1,3 +1,11 @@
+# [1.0.0-rc.11](https://github.com/janovix/watchlist/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2025-12-18)
+
+
+### Features
+
+* Add PDF export functionality for search results ([b8be8e0](https://github.com/janovix/watchlist/commit/b8be8e0d432fe54ecadc48ece9fd044a059e4c64))
+* Add tests for pep API and UI components ([5f53c73](https://github.com/janovix/watchlist/commit/5f53c733cffc2ffd5f0f2a2a93a408eb03ceb838))
+
 # [1.0.0-rc.10](https://github.com/janovix/watchlist/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2025-12-18)
 
 
