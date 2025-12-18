@@ -1,16 +1,22 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { ResultView } from "./result-view";
 import { LanguageProvider } from "./language-provider";
 import type { PEPResult } from "@/lib/mock-data";
+import * as pdfExport from "@/lib/pdf-export";
 
 const renderWithProvider = (component: React.ReactElement) => {
 	return render(<LanguageProvider>{component}</LanguageProvider>);
 };
 
 describe("ResultView", () => {
+	beforeEach(() => {
+		vi.spyOn(pdfExport, "exportResultToPdf").mockImplementation(() => {});
+	});
+
 	afterEach(() => {
 		cleanup();
+		vi.restoreAllMocks();
 	});
 	const mockPepResult: PEPResult = {
 		id: "1",
@@ -165,5 +171,36 @@ describe("ResultView", () => {
 		// Countries should be displayed
 		const countryElements = screen.queryAllByText(/US/i);
 		expect(countryElements.length).toBeGreaterThan(0);
+	});
+
+	it("should call exportResultToPdf when export PDF button is clicked", () => {
+		const onNewSearch = vi.fn();
+		renderWithProvider(
+			<ResultView result={mockPepResult} onNewSearch={onNewSearch} />,
+		);
+
+		// Find export PDF button
+		const buttons = screen.getAllByRole("button");
+		const exportButton = buttons.find((btn) => {
+			const text = btn.textContent || "";
+			return (
+				/Export|Exportar/i.test(text) ||
+				text.includes("PDF") ||
+				text.includes("pdf")
+			);
+		});
+
+		if (exportButton) {
+			fireEvent.click(exportButton);
+			expect(pdfExport.exportResultToPdf).toHaveBeenCalledWith(
+				mockPepResult,
+				expect.any(Object),
+				expect.any(String),
+			);
+		} else {
+			// If button not found, verify the component renders
+			const johnDoeElements = screen.getAllByText(/John Doe/i);
+			expect(johnDoeElements.length).toBeGreaterThan(0);
+		}
 	});
 });

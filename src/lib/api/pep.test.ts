@@ -235,5 +235,60 @@ describe("pep API", () => {
 
 			await expect(searchPep("Test")).rejects.toThrow(ApiError);
 		});
+
+		it("should use default values when target fields are null", async () => {
+			const { fetchJson } = await import("./http");
+			const mockApiResponse = {
+				success: true,
+				result: {
+					target: {
+						id: "TARGET-001",
+						schema: null,
+						name: null,
+						aliases: null,
+						birthDate: null,
+						countries: null,
+						addresses: null,
+						identifiers: null,
+						sanctions: null,
+						phones: null,
+						emails: null,
+						programIds: null,
+						dataset: null,
+						firstSeen: null,
+						lastSeen: null,
+						lastChange: null,
+						createdAt: "2024-01-01T00:00:00Z",
+						updatedAt: "2024-01-01T00:00:00Z",
+					},
+					pepStatus: true,
+					pepDetails: "PEP match",
+					matchConfidence: "exact" as const,
+				},
+			};
+
+			vi.mocked(fetchJson).mockResolvedValue({
+				status: 200,
+				json: mockApiResponse,
+			});
+
+			const result = await searchPep("Test");
+
+			expect(result.isPep).toBe(true);
+			expect(result.record).not.toBeNull();
+			expect(result.record?.dataset).toBe("UNKNOWN");
+			expect(result.record?.name).toBe("Unknown");
+			expect(result.record?.aliases).toEqual([]);
+			expect(result.record?.countries).toEqual([]);
+		});
+
+		it("should handle non-Error exceptions", async () => {
+			const { fetchJson } = await import("./http");
+
+			vi.mocked(fetchJson).mockRejectedValue("String error");
+
+			await expect(searchPep("Test")).rejects.toThrow(ApiError);
+			await expect(searchPep("Test")).rejects.toThrow("Unknown error");
+		});
 	});
 });
