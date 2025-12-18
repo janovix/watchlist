@@ -1,3 +1,10 @@
+# [1.0.0-rc.10](https://github.com/janovix/watchlist/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** remove SessionGuard to match aml middleware-only approach ([c2335cb](https://github.com/janovix/watchlist/commit/c2335cb0132cd2b390b8692d1042eae66c635453))
+
 # [1.0.0-rc.9](https://github.com/janovix/watchlist/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2025-12-18)
 
 
