@@ -77,7 +77,7 @@ export function ThemeToggle() {
 	};
 
 	if (!mounted) {
-		return <div className="h-8 w-8 rounded-lg bg-secondary" />;
+		return <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-secondary" />;
 	}
 
 	const CurrentIcon = themeIcons[theme];
@@ -88,10 +88,10 @@ export function ThemeToggle() {
 			<Button
 				variant="ghost"
 				size="icon"
-				className="h-8 w-8 rounded-lg bg-secondary text-foreground"
+				className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-secondary text-foreground"
 				onClick={() => setIsOpen(!isOpen)}
 			>
-				<CurrentIcon className="h-4 w-4" />
+				<CurrentIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
 			</Button>
 
 			{isOpen && (

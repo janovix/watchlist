@@ -92,12 +92,15 @@ export const Default: Story = {
 export const Empty: Story = {
 	args: {
 		searches: [],
+		onStartSearch: () => {
+			console.log("Start search clicked");
+		},
 	},
 	parameters: {
 		docs: {
 			description: {
 				story:
-					"Empty state - component renders nothing when there are no recent searches.",
+					"Empty state - component shows a call-to-action inviting the user to make their first search when there are no recent searches.",
 			},
 		},
 	},
