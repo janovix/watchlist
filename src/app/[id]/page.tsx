@@ -9,6 +9,7 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
+import { SessionGuard } from "@/components/session-guard";
 import { type PEPResult, generateMockResult } from "@/lib/mock-data";
 
 type ViewState = "loading" | "result" | "not-found";
@@ -113,7 +114,47 @@ function QueryContent() {
 
 	if (viewState === "not-found") {
 		return (
+			<SessionGuard requireAuth={true}>
+				<main className="min-h-screen bg-background flex flex-col">
+					<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+						<div className="container mx-auto px-4 py-4">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-3">
+									<Logo variant="logo" width={102} height={16} />
+								</div>
+								<div className="flex items-center gap-2">
+									<LanguageToggle />
+									<ThemeToggle />
+									<UserMenu />
+								</div>
+							</div>
+						</div>
+					</header>
+					<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
+						<div className="text-center">
+							<h2 className="text-2xl font-semibold text-foreground mb-2">
+								Query Not Found
+							</h2>
+							<p className="text-muted-foreground mb-4">
+								The query you're looking for doesn't exist or has expired.
+							</p>
+							<button
+								onClick={handleNewSearch}
+								className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+							>
+								{t("newSearch")}
+							</button>
+						</div>
+					</div>
+				</main>
+			</SessionGuard>
+		);
+	}
+
+	return (
+		<SessionGuard requireAuth={true}>
 			<main className="min-h-screen bg-background flex flex-col">
+				{/* Header */}
 				<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
 					<div className="container mx-auto px-4 py-4">
 						<div className="flex items-center justify-between">
@@ -128,66 +169,30 @@ function QueryContent() {
 						</div>
 					</div>
 				</header>
-				<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
-					<div className="text-center">
-						<h2 className="text-2xl font-semibold text-foreground mb-2">
-							Query Not Found
-						</h2>
-						<p className="text-muted-foreground mb-4">
-							The query you're looking for doesn't exist or has expired.
-						</p>
-						<button
-							onClick={handleNewSearch}
-							className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-						>
-							{t("newSearch")}
-						</button>
+
+				{/* Main Content */}
+				{viewState === "loading" ? (
+					<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
+						<div className="w-full max-w-2xl mx-auto">
+							<LoadingView searchName={searchName} />
+						</div>
 					</div>
-				</div>
+				) : (
+					<div className="flex-1 flex items-center py-10">
+						<div className="container mx-auto px-4 w-full">
+							{currentResult && (
+								<div className="py-4">
+									<ResultView
+										result={currentResult}
+										onNewSearch={handleNewSearch}
+									/>
+								</div>
+							)}
+						</div>
+					</div>
+				)}
 			</main>
-		);
-	}
-
-	return (
-		<main className="min-h-screen bg-background flex flex-col">
-			{/* Header */}
-			<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-				<div className="container mx-auto px-4 py-4">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-3">
-							<Logo variant="logo" width={102} height={16} />
-						</div>
-						<div className="flex items-center gap-2">
-							<LanguageToggle />
-							<ThemeToggle />
-							<UserMenu />
-						</div>
-					</div>
-				</div>
-			</header>
-
-			{/* Main Content */}
-			{viewState === "loading" ? (
-				<div className="flex-1 flex items-center justify-center min-h-screen py-10 px-4">
-					<div className="w-full max-w-2xl mx-auto">
-						<LoadingView searchName={searchName} />
-					</div>
-				</div>
-			) : (
-				<div className="flex-1 flex items-center py-10">
-					<div className="container mx-auto px-4 w-full">
-						{currentResult && (
-							<div className="py-4">
-								<ResultView
-									result={currentResult}
-									onNewSearch={handleNewSearch}
-								/>
-							</div>
-						)}
-					</div>
-				</div>
-			)}
-		</main>
+		</SessionGuard>
 	);
 }
 
