@@ -17,7 +17,12 @@ export type {
 export { authClient } from "./authClient";
 
 // Config
-export { getAuthBaseURL, getAppURL } from "./authCoreConfig";
+export {
+	getAuthCoreBaseUrl,
+	getAuthAppUrl,
+	getAuthBaseURL,
+	getAppURL,
+} from "./authCoreConfig";
 
 // Session Store
 export {
@@ -37,6 +42,9 @@ export {
 	resetPassword,
 	refreshSession,
 } from "./authActions";
+
+// Simple logout action (client-side)
+export { logout } from "./actions";
 
 // Server-side
 export { getServerSession } from "./getServerSession";

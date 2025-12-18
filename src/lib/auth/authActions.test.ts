@@ -16,6 +16,8 @@ vi.mock("./authClient", () => ({
 }));
 
 vi.mock("./authCoreConfig", () => ({
+	getAuthCoreBaseUrl: vi.fn(),
+	getAuthAppUrl: vi.fn(),
 	getAuthBaseURL: vi.fn(),
 	getAppURL: vi.fn(),
 }));
@@ -45,7 +47,12 @@ import {
 	setSessionError,
 	setSessionPending,
 } from "./sessionStore";
-import { getAuthBaseURL, getAppURL } from "./authCoreConfig";
+import {
+	getAuthCoreBaseUrl,
+	getAuthAppUrl,
+	getAuthBaseURL,
+	getAppURL,
+} from "./authCoreConfig";
 
 describe("authActions", () => {
 	const mockSession: Session = {
@@ -70,6 +77,8 @@ describe("authActions", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(getAuthCoreBaseUrl).mockReturnValue("https://auth.example.com");
+		vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
 		vi.mocked(getAuthBaseURL).mockReturnValue("https://auth.example.com");
 		vi.mocked(getAppURL).mockReturnValue("https://app.example.com");
 	});
@@ -271,6 +280,16 @@ describe("authActions", () => {
 	});
 
 	describe("signOut", () => {
+		beforeEach(() => {
+			// Mock window.location.href
+			Object.defineProperty(window, "location", {
+				value: {
+					href: "",
+				},
+				writable: true,
+			});
+		});
+
 		it("should sign out successfully", async () => {
 			vi.mocked(authClient.signOut).mockResolvedValue({
 				data: null,
@@ -282,9 +301,18 @@ describe("authActions", () => {
 			expect(result.data).toBeNull();
 			expect(authClient.signOut).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
+			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 
 		it("should handle sign out error", async () => {
+			// Mock window.location.href
+			Object.defineProperty(window, "location", {
+				value: {
+					href: "",
+				},
+				writable: true,
+			});
+
 			const error = { message: "Sign out failed" };
 			vi.mocked(authClient.signOut).mockResolvedValue({
 				data: null,
@@ -295,6 +323,8 @@ describe("authActions", () => {
 
 			expect(result.error).toEqual(error);
 			expect(setSessionError).toHaveBeenCalled();
+			// Should still redirect even on error
+			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 	});
 
@@ -545,6 +575,14 @@ describe("authActions", () => {
 		});
 
 		it("should handle exceptions during signOut", async () => {
+			// Mock window.location.href
+			Object.defineProperty(window, "location", {
+				value: {
+					href: "",
+				},
+				writable: true,
+			});
+
 			vi.mocked(authClient.signOut).mockRejectedValue(
 				new Error("Network error"),
 			);
@@ -553,6 +591,9 @@ describe("authActions", () => {
 
 			expect(result.error).toBeDefined();
 			expect(setSessionError).toHaveBeenCalled();
+			expect(clearSession).toHaveBeenCalled();
+			// Should still redirect even on exception
+			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 
 		it("should handle fetch errors during forgotPassword", async () => {

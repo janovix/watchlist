@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { getAuthCoreBaseUrl, getAuthAppUrl } from "./authCoreConfig";
 import type { Session } from "./types";
 
 /**
@@ -10,28 +11,22 @@ export async function getServerSession(): Promise<Session> {
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.toString();
 
-	// Early return if no session token cookie is present
+	// Check for session cookie existence
 	if (!cookieHeader.includes("better-auth.session_token")) {
 		return null;
 	}
 
-	const baseURL = process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL;
-	if (!baseURL) {
-		console.error("NEXT_PUBLIC_AUTH_CORE_BASE_URL is not set");
-		return null;
-	}
-
 	try {
-		const response = await fetch(`${baseURL}/api/auth/get-session`, {
-			headers: {
-				Cookie: cookieHeader,
-				Origin:
-					process.env.NEXT_PUBLIC_AUTH_APP_URL ||
-					process.env.NEXT_PUBLIC_VERCEL_URL ||
-					"",
+		const response = await fetch(
+			`${getAuthCoreBaseUrl()}/api/auth/get-session`,
+			{
+				headers: {
+					Cookie: cookieHeader,
+					Origin: getAuthAppUrl(),
+				},
+				cache: "no-store",
 			},
-			cache: "no-store", // Always fetch fresh session data
-		});
+		);
 
 		if (!response.ok) {
 			return null;

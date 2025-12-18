@@ -1,5 +1,5 @@
 import { authClient } from "./authClient";
-import { getAuthBaseURL, getAppURL } from "./authCoreConfig";
+import { getAuthCoreBaseUrl, getAuthAppUrl } from "./authCoreConfig";
 import {
 	setSession,
 	clearSession,
@@ -146,6 +146,7 @@ export async function signUp(params: SignUpParams) {
 
 /**
  * Sign out the current user
+ * Calls Better Auth API, clears local session state, and redirects to auth app
  */
 export async function signOut() {
 	try {
@@ -154,15 +155,31 @@ export async function signOut() {
 		const result = await authClient.signOut();
 		if (result.error) {
 			setSessionError(new Error(result.error.message || "Sign out failed"));
+			// Continue with logout even if API call fails
+			clearSession();
+			if (typeof window !== "undefined") {
+				window.location.href = `${getAuthAppUrl()}/login`;
+			}
 			return { error: result.error };
 		}
 
 		// Clear the session from the store
 		clearSession();
+
+		// Redirect to auth app login
+		if (typeof window !== "undefined") {
+			window.location.href = `${getAuthAppUrl()}/login`;
+		}
+
 		return { data: null };
 	} catch (error) {
 		const err = error instanceof Error ? error : new Error("Sign out failed");
 		setSessionError(err);
+		// Continue with logout even if API call fails
+		clearSession();
+		if (typeof window !== "undefined") {
+			window.location.href = `${getAuthAppUrl()}/login`;
+		}
 		return { error: err };
 	} finally {
 		setSessionPending(false);
@@ -177,8 +194,8 @@ export async function forgotPassword(params: ForgotPasswordParams) {
 	try {
 		setSessionPending(true);
 
-		const baseUrl = getAuthBaseURL();
-		const redirectTo = params.redirectTo || `${getAppURL()}/recover/reset`;
+		const baseUrl = getAuthCoreBaseUrl();
+		const redirectTo = params.redirectTo || `${getAuthAppUrl()}/recover/reset`;
 
 		const response = await fetch(`${baseUrl}/api/auth/forget-password`, {
 			method: "POST",
@@ -222,7 +239,7 @@ export async function resetPassword(params: ResetPasswordParams) {
 	try {
 		setSessionPending(true);
 
-		const baseUrl = getAuthBaseURL();
+		const baseUrl = getAuthCoreBaseUrl();
 
 		const response = await fetch(`${baseUrl}/api/auth/reset-password`, {
 			method: "POST",
