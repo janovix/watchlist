@@ -186,9 +186,8 @@ describe("getServerSession", () => {
 		expect(result?.user.image).toBeNull();
 	});
 
-	it("should use NEXT_PUBLIC_VERCEL_URL when NEXT_PUBLIC_AUTH_APP_URL is not set", async () => {
+	it("should use fallback when NEXT_PUBLIC_AUTH_APP_URL is not set", async () => {
 		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
-		process.env.NEXT_PUBLIC_VERCEL_URL = "https://vercel.example.com";
 
 		const mockCookieStore = {
 			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
@@ -218,12 +217,10 @@ describe("getServerSession", () => {
 			expect.any(String),
 			expect.objectContaining({
 				headers: expect.objectContaining({
-					Origin: "https://vercel.example.com",
+					Origin: "https://auth.example.workers.dev",
 				}),
 			}),
 		);
-
-		delete process.env.NEXT_PUBLIC_VERCEL_URL;
 	});
 
 	it("should handle Date objects in response (not just ISO strings)", async () => {
