@@ -9,10 +9,12 @@ vi.mock("@nanostores/react", () => ({
 
 const mockSetSession = vi.fn();
 const mockSessionStoreGet = vi.fn();
+const mockSessionStoreSet = vi.fn();
 
 vi.mock("./sessionStore", () => ({
 	sessionStore: {
 		get: () => mockSessionStoreGet(),
+		set: (...args: any[]) => mockSessionStoreSet(...args),
 	},
 	setSession: (...args: any[]) => mockSetSession(...args),
 }));
@@ -157,7 +159,11 @@ describe("SessionHydrator", () => {
 			</SessionHydrator>,
 		);
 
-		expect(mockSetSession).toHaveBeenCalledWith(mockSession);
+		expect(mockSessionStoreSet).toHaveBeenCalledWith({
+			data: mockSession,
+			error: null,
+			isPending: false,
+		});
 	});
 
 	it("should render children", () => {
@@ -199,7 +205,7 @@ describe("SessionHydrator", () => {
 			</SessionHydrator>,
 		);
 
-		expect(mockSetSession).toHaveBeenCalledTimes(1);
+		expect(mockSessionStoreSet).toHaveBeenCalledTimes(1);
 
 		// Rerender with different session
 		rerender(
@@ -208,7 +214,7 @@ describe("SessionHydrator", () => {
 			</SessionHydrator>,
 		);
 
-		// Should still only be called once
-		expect(mockSetSession).toHaveBeenCalledTimes(1);
+		// Should still only be called once (useRef prevents re-hydration)
+		expect(mockSessionStoreSet).toHaveBeenCalledTimes(1);
 	});
 });

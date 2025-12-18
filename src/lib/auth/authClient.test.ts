@@ -9,12 +9,13 @@ vi.mock("better-auth/client", () => ({
 }));
 
 vi.mock("./authCoreConfig", () => ({
+	getAuthCoreBaseUrl: vi.fn(() => "https://auth.example.com"),
 	getAuthBaseURL: vi.fn(() => "https://auth.example.com"),
 }));
 
 import { createAuthClient } from "better-auth/client";
 import { authClient } from "./authClient";
-import { getAuthBaseURL } from "./authCoreConfig";
+import { getAuthCoreBaseUrl } from "./authCoreConfig";
 
 describe("authClient", () => {
 	it("should create auth client with correct configuration", () => {
@@ -24,7 +25,7 @@ describe("authClient", () => {
 				credentials: "include",
 			},
 		});
-		expect(getAuthBaseURL).toHaveBeenCalled();
+		expect(getAuthCoreBaseUrl).toHaveBeenCalled();
 		// Verify authClient is defined (it's the result of createAuthClient)
 		expect(authClient).toBeDefined();
 	});

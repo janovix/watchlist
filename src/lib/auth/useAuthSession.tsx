@@ -1,8 +1,8 @@
 "use client";
 
 import { useStore } from "@nanostores/react";
-import { useEffect, useRef } from "react";
-import { sessionStore, setSession } from "./sessionStore";
+import { useRef } from "react";
+import { sessionStore } from "./sessionStore";
 import type { Session } from "./types";
 
 /**
@@ -27,6 +27,7 @@ type SessionHydratorProps = {
  * Hydrates the client-side session store with server-fetched session data
  * This prevents UI flicker by ensuring the client store matches the server state
  * on initial render
+ * Uses useRef pattern to hydrate only once on client to avoid hydration mismatch
  */
 export function SessionHydrator({
 	serverSession,
@@ -34,13 +35,14 @@ export function SessionHydrator({
 }: SessionHydratorProps) {
 	const hydrated = useRef(false);
 
-	useEffect(() => {
-		// Only hydrate once on mount
-		if (!hydrated.current && typeof window !== "undefined") {
-			setSession(serverSession);
-			hydrated.current = true;
-		}
-	}, [serverSession]);
+	if (!hydrated.current && typeof window !== "undefined") {
+		sessionStore.set({
+			data: serverSession,
+			error: null,
+			isPending: false,
+		});
+		hydrated.current = true;
+	}
 
 	return <>{children}</>;
 }
