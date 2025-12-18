@@ -78,7 +78,6 @@ const mockSearches: PEPResult[] = [
 export const Default: Story = {
 	args: {
 		searches: mockSearches,
-		onSelectSearch: (result) => console.log("Selected:", result),
 	},
 	parameters: {
 		docs: {
@@ -93,7 +92,6 @@ export const Default: Story = {
 export const Empty: Story = {
 	args: {
 		searches: [],
-		onSelectSearch: (result) => console.log("Selected:", result),
 	},
 	parameters: {
 		docs: {
@@ -134,7 +132,6 @@ export const ManySearches: Story = {
 				},
 			},
 		],
-		onSelectSearch: (result) => console.log("Selected:", result),
 	},
 	parameters: {
 		docs: {

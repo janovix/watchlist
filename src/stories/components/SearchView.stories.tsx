@@ -100,10 +100,7 @@ function SearchViewContent() {
 					{/* Recent Searches */}
 					{recentSearches.length > 0 && (
 						<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
-							<RecentSearches
-								searches={recentSearches}
-								onSelectSearch={handleSelectSearch}
-							/>
+							<RecentSearches searches={recentSearches} />
 						</div>
 					)}
 				</div>

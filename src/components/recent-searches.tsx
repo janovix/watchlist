@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Clock, ChevronRight, AlertCircle, CheckCircle } from "lucide-react";
 import type { PEPResult } from "@/lib/mock-data";
 import { useLanguage } from "@/components/language-provider";
@@ -7,13 +8,9 @@ import { getLocaleForLanguage } from "@/lib/translations";
 
 interface RecentSearchesProps {
 	searches: PEPResult[];
-	onSelectSearch: (result: PEPResult) => void;
 }
 
-export function RecentSearches({
-	searches,
-	onSelectSearch,
-}: RecentSearchesProps) {
+export function RecentSearches({ searches }: RecentSearchesProps) {
 	const { t, language } = useLanguage();
 
 	if (searches.length === 0) {
@@ -33,9 +30,9 @@ export function RecentSearches({
 					const isPep = search.isPep;
 
 					return (
-						<button
+						<Link
 							key={search.id}
-							onClick={() => onSelectSearch(search)}
+							href={`/${search.id}`}
 							className="w-full flex items-center gap-3 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-left group"
 						>
 							<div
@@ -77,7 +74,7 @@ export function RecentSearches({
 								{isPep ? t("yes") : t("no")}
 							</span>
 							<ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-						</button>
+						</Link>
 					);
 				})}
 			</div>
