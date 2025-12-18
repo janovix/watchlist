@@ -281,7 +281,6 @@ describe("authActions", () => {
 
 	describe("signOut", () => {
 		beforeEach(() => {
-			global.fetch = vi.fn();
 			// Mock window.location.href
 			Object.defineProperty(window, "location", {
 				value: {
@@ -291,60 +290,33 @@ describe("authActions", () => {
 			});
 		});
 
-		it("should sign out successfully", async () => {
-			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
-				"https://auth-svc.example.com",
-			);
+		it("should sign out successfully using authClient.signOut", async () => {
 			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
-			vi.mocked(global.fetch).mockResolvedValue({
-				ok: true,
-				status: 200,
-			} as Response);
+			vi.mocked(authClient.signOut).mockResolvedValue({
+				data: null,
+				error: null,
+			});
 
 			const result = await signOut();
 
 			expect(result.data).toBeNull();
-			expect(global.fetch).toHaveBeenCalledWith(
-				"https://auth-svc.example.com/api/auth/sign-out",
-				expect.objectContaining({
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					credentials: "include",
-					redirect: "manual",
-				}),
-			);
+			expect(authClient.signOut).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
-			expect(window.location.href).toBe("https://app.example.com");
+			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 
-		it("should handle sign out error", async () => {
-			// Mock window.location.href
-			Object.defineProperty(window, "location", {
-				value: {
-					href: "",
-				},
-				writable: true,
-			});
-
-			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
-				"https://auth-svc.example.com",
-			);
+		it("should clear session and redirect even if signOut fails", async () => {
 			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
-			vi.mocked(global.fetch).mockResolvedValue({
-				ok: false,
-				status: 500,
-				statusText: "Internal Server Error",
-				json: async () => ({ message: "Sign out failed" }),
-			} as Response);
+			vi.mocked(authClient.signOut).mockRejectedValue(
+				new Error("Network error"),
+			);
 
 			const result = await signOut();
 
-			expect(result.error).toBeInstanceOf(Error);
-			expect(result.error?.message).toContain("Sign out failed");
-			expect(setSessionError).toHaveBeenCalled();
-			// Should still redirect even on error
+			expect(result.data).toBeNull();
+			expect(authClient.signOut).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
-			expect(window.location.href).toBe("https://app.example.com");
+			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 	});
 
@@ -603,19 +575,18 @@ describe("authActions", () => {
 				writable: true,
 			});
 
-			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
-				"https://auth-svc.example.com",
-			);
 			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
-			vi.mocked(global.fetch).mockRejectedValue(new Error("Network error"));
+			vi.mocked(authClient.signOut).mockRejectedValue(
+				new Error("Network error"),
+			);
 
 			const result = await signOut();
 
-			expect(result.error).toBeDefined();
-			expect(setSessionError).toHaveBeenCalled();
+			expect(result.data).toBeNull();
+			expect(authClient.signOut).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
 			// Should still redirect even on exception
-			expect(window.location.href).toBe("https://app.example.com");
+			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 
 		it("should handle fetch errors during forgotPassword", async () => {
