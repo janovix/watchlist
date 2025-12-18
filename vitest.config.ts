@@ -21,6 +21,9 @@ export default defineConfig({
 				"src/components/ui/**",
 				// Next.js App Router entrypoints/route wiring (typically thin wrappers)
 				"src/app/**",
+				// Type-only files and barrel exports
+				"**/index.ts",
+				"**/types.ts",
 			],
 			thresholds: {
 				lines: 90,
