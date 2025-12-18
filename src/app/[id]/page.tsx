@@ -9,7 +9,8 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
-import { type PEPResult, generateMockResult } from "@/lib/mock-data";
+import { type PEPResult } from "@/lib/mock-data";
+import { searchPep } from "@/lib/api/pep";
 
 type ViewState = "loading" | "result" | "not-found";
 
@@ -70,9 +71,18 @@ function QueryContent() {
 		// If not found, check for pending search
 		const pendingName = loadPendingSearch();
 		if (pendingName) {
-			// Continue processing the pending search with the query ID
-			generateMockResult(pendingName, queryId)
-				.then((result) => {
+			// Call the actual PEP search API
+			searchPep(pendingName)
+				.then((apiResult) => {
+					// Transform API response to PEPResult format
+					const result: PEPResult = {
+						id: queryId,
+						searchName: pendingName,
+						isPep: apiResult.isPep,
+						timestamp: new Date(),
+						record: apiResult.record,
+					};
+
 					setCurrentResult(result);
 					setViewState("result");
 
@@ -98,7 +108,7 @@ function QueryContent() {
 					sessionStorage.removeItem(`pep-pending-${queryId}`);
 				})
 				.catch((e) => {
-					console.log("[v0] Error generating result:", e);
+					console.log("[v0] Error searching PEP:", e);
 					setViewState("not-found");
 				});
 		} else {
