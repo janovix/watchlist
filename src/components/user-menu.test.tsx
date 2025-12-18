@@ -9,11 +9,69 @@ import {
 import { UserMenu } from "./user-menu";
 import { LanguageProvider } from "./language-provider";
 
+// Mock next/navigation
+const mockPush = vi.fn();
+const mockRouter = {
+	push: mockPush,
+	replace: vi.fn(),
+	prefetch: vi.fn(),
+	back: vi.fn(),
+	forward: vi.fn(),
+	refresh: vi.fn(),
+};
+
+vi.mock("next/navigation", () => ({
+	useRouter: () => mockRouter,
+	usePathname: () => "/",
+	useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock auth session store
+vi.mock("@/lib/auth", async () => {
+	const actual = await vi.importActual("@/lib/auth");
+	return {
+		...actual,
+		useAuthSession: () => ({
+			data: {
+				user: {
+					id: "user-1",
+					name: "María García",
+					email: "maria.garcia@empresa.com",
+					image: null,
+					emailVerified: true,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				session: {
+					id: "session-1",
+					userId: "user-1",
+					token: "token-123",
+					expiresAt: new Date(),
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			},
+			error: null,
+			isPending: false,
+		}),
+	};
+});
+
+// Mock authActions
+vi.mock("@/lib/auth/authActions", () => ({
+	signOut: vi.fn().mockResolvedValue({ data: null }),
+}));
+
 const renderWithProvider = (component: React.ReactElement) => {
 	return render(<LanguageProvider>{component}</LanguageProvider>);
 };
 
 describe("UserMenu", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mockPush.mockClear();
+	});
+
 	afterEach(() => {
 		cleanup();
 	});
@@ -64,8 +122,6 @@ describe("UserMenu", () => {
 				/maria\.garcia@empresa\.com/i,
 			);
 			expect(emailElements.length).toBeGreaterThan(0);
-			const roleElements = screen.queryAllByText(/Compliance Officer/i);
-			expect(roleElements.length).toBeGreaterThan(0);
 		});
 	});
 
@@ -270,7 +326,7 @@ describe("UserMenu", () => {
 	});
 
 	it("should call logout action when clicked", async () => {
-		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+		const { signOut } = await import("@/lib/auth/authActions");
 		const { container } = renderWithProvider(<UserMenu />);
 
 		const button = container.querySelector(
@@ -295,10 +351,8 @@ describe("UserMenu", () => {
 		});
 
 		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith("Logout clicked");
+			expect(signOut).toHaveBeenCalled();
 		});
-
-		consoleSpy.mockRestore();
 	});
 
 	it("should display avatar when available", async () => {
