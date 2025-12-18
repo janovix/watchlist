@@ -1,3 +1,10 @@
+# [1.0.0-rc.8](https://github.com/janovix/watchlist/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** use onSuccess callback in signOut to control redirect ([679a6bf](https://github.com/janovix/watchlist/commit/679a6bf7c8a137944f1a4eaf8161f4da286277f8))
+
 # [1.0.0-rc.7](https://github.com/janovix/watchlist/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2025-12-18)
 
 
