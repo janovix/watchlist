@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { User, Settings, HelpCircle, Bell, LogOut } from "lucide-react";
 import { useLanguage } from "./language-provider";
 import { useAuthSession } from "@/lib/auth";
-import { signOut } from "@/lib/auth/authActions";
+import { logout } from "@/lib/auth/actions";
 
 function getInitials(name: string): string {
 	return name
@@ -33,8 +33,8 @@ export function UserMenu() {
 
 	const handleSignOut = async () => {
 		setIsOpen(false);
-		await signOut();
-		// signOut() handles redirect to NEXT_PUBLIC_AUTH_APP_URL
+		await logout();
+		// logout() handles redirect to NEXT_PUBLIC_AUTH_APP_URL/login
 	};
 
 	const menuItems = [
