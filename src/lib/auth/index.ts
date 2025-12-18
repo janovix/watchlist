@@ -46,8 +46,8 @@ export {
 // Simple logout action (client-side)
 export { logout } from "./actions";
 
-// Server-side
-export { getServerSession } from "./getServerSession";
-
 // Client-side hooks and components
 export { useAuthSession, SessionHydrator } from "./useAuthSession";
+
+// Note: getServerSession is server-only and should be imported directly:
+// import { getServerSession } from "@/lib/auth/getServerSession";
