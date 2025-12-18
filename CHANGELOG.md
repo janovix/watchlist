@@ -1,3 +1,11 @@
+# [1.0.0-rc.5](https://github.com/janovix/watchlist/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** align logout with aml - same function and better-auth v1.4.5 ([be6dbff](https://github.com/janovix/watchlist/commit/be6dbffcf80c17992347ab181e6a203b728fd13d))
+* **auth:** use direct fetch with redirect manual to prevent auto-redirect ([32baefe](https://github.com/janovix/watchlist/commit/32baefe047664fe8477f6b694d8cd9b30412186e))
+
 # [1.0.0-rc.4](https://github.com/janovix/watchlist/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2025-12-18)
 
 
