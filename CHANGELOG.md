@@ -1,3 +1,10 @@
+# [1.0.0-rc.7](https://github.com/janovix/watchlist/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** use authClient.signOut instead of manual fetch ([9147edf](https://github.com/janovix/watchlist/commit/9147edf886754b4f7570882929aad8321a12fda9))
+
 # [1.0.0-rc.6](https://github.com/janovix/watchlist/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2025-12-18)
 
 
