@@ -21,6 +21,10 @@ export const translations = {
 
 		// Recent Searches
 		recentSearches: "Pesquisas recentes",
+		noRecentSearches: "Nenhuma pesquisa recente",
+		noRecentSearchesDescription:
+			"Comece sua primeira verificação PEP para ver suas pesquisas aqui.",
+		startFirstSearch: "Fazer primeira pesquisa",
 
 		// Loading View
 		verifyingIdentity: "Verificando identidade",
@@ -99,6 +103,10 @@ export const translations = {
 
 		// Recent Searches
 		recentSearches: "Búsquedas recientes",
+		noRecentSearches: "No hay búsquedas recientes",
+		noRecentSearchesDescription:
+			"Realiza tu primera verificación PEP para ver tus búsquedas aquí.",
+		startFirstSearch: "Realizar primera búsqueda",
 
 		// Loading View
 		verifyingIdentity: "Verificando identidad",
@@ -178,6 +186,10 @@ export const translations = {
 
 		// Recent Searches
 		recentSearches: "Recent searches",
+		noRecentSearches: "No recent searches",
+		noRecentSearchesDescription:
+			"Start your first PEP verification to see your searches here.",
+		startFirstSearch: "Start first search",
 
 		// Loading View
 		verifyingIdentity: "Verifying identity",

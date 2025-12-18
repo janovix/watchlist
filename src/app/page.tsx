@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Header } from "@/components/header";
 import { SearchForm } from "@/components/search-form";
 import { RecentSearches } from "@/components/recent-searches";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { LanguageToggle } from "@/components/language-toggle";
-import { UserMenu } from "@/components/user-menu";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
@@ -57,6 +55,16 @@ function HomeContent() {
 		router.push(`/${queryId}`);
 	};
 
+	const handleStartSearch = () => {
+		// Focus the search input on the page
+		const searchInput = document.getElementById(
+			"pep-search-input",
+		) as HTMLInputElement;
+		if (searchInput) {
+			searchInput.focus();
+		}
+	};
+
 	if (!mounted) {
 		return (
 			<main className="min-h-screen bg-background flex items-center justify-center">
@@ -70,35 +78,22 @@ function HomeContent() {
 
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
-			{/* Avatar only - Top right for search view */}
-			<div className="fixed top-4 right-4 z-10">
-				<UserMenu />
-			</div>
+			<Header />
 
 			{/* Main Content */}
-			<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
-				<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-					{/* Logo with Title */}
-					<div className="mb-8 flex items-center gap-2">
-						<Logo variant="logo" width={120} height={19} />
-						<span className="h-1 w-1 rounded-full bg-muted-foreground" />
-						<h1 className="text-xl font-semibold text-foreground">Watchlist</h1>
-					</div>
-
-					{/* Search Form */}
-					<div className="w-full mb-6">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] py-6 sm:py-8 px-4">
+				<div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 sm:gap-8">
+					{/* Search Input - Centered */}
+					<div className="w-full">
 						<SearchForm onSearch={handleSearch} isLoading={false} />
 					</div>
 
-					{/* Language/Theme Toggle - Right aligned but centered */}
-					<div className="flex items-center gap-2 mb-8">
-						<LanguageToggle />
-						<ThemeToggle />
-					</div>
-
 					{/* Recent Searches - Centered with scroll support */}
-					<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
-						<RecentSearches searches={recentSearches} />
+					<div className="w-full overflow-y-auto max-h-[50vh] sm:max-h-[60vh]">
+						<RecentSearches
+							searches={recentSearches}
+							onStartSearch={handleStartSearch}
+						/>
 					</div>
 				</div>
 			</div>
