@@ -1,3 +1,12 @@
+# [1.0.0-rc.2](https://github.com/janovix/watchlist/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2025-12-18)
+
+
+### Features
+
+* Add auth module tests and utilities ([26a8143](https://github.com/janovix/watchlist/commit/26a8143596378ca18831500db6b573ce9041f393))
+* Add session guard and integrate auth ([0a4d060](https://github.com/janovix/watchlist/commit/0a4d0606a5e1dae8b8aaea22aaa52065b9098453))
+* Implement Better Auth integration ([ff96a3e](https://github.com/janovix/watchlist/commit/ff96a3e698deaf1cd85a0ac9aa346d348eaa5b4e))
+
 # 1.0.0-rc.1 (2025-12-17)
 
 
