@@ -281,6 +281,7 @@ describe("authActions", () => {
 
 	describe("signOut", () => {
 		beforeEach(() => {
+			global.fetch = vi.fn();
 			// Mock window.location.href
 			Object.defineProperty(window, "location", {
 				value: {
@@ -290,32 +291,46 @@ describe("authActions", () => {
 			});
 		});
 
-		it("should sign out successfully using authClient.signOut", async () => {
+		it("should sign out successfully using direct fetch with redirect manual", async () => {
+			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
+				"https://auth-svc.example.com",
+			);
 			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
-			vi.mocked(authClient.signOut).mockResolvedValue({
-				data: null,
-				error: null,
-			});
+			vi.mocked(global.fetch).mockResolvedValue({
+				ok: true,
+				status: 200,
+			} as Response);
 
 			const result = await signOut();
 
 			expect(result.data).toBeNull();
-			expect(authClient.signOut).toHaveBeenCalled();
+			expect(global.fetch).toHaveBeenCalledWith(
+				"https://auth-svc.example.com/api/auth/sign-out",
+				expect.objectContaining({
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					redirect: "manual",
+				}),
+			);
 			expect(clearSession).toHaveBeenCalled();
+			// Should redirect to auth APP (not auth-svc)
 			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 
 		it("should clear session and redirect even if signOut fails", async () => {
-			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
-			vi.mocked(authClient.signOut).mockRejectedValue(
-				new Error("Network error"),
+			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
+				"https://auth-svc.example.com",
 			);
+			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
+			vi.mocked(global.fetch).mockRejectedValue(new Error("Network error"));
 
 			const result = await signOut();
 
 			expect(result.data).toBeNull();
-			expect(authClient.signOut).toHaveBeenCalled();
+			expect(global.fetch).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
+			// Should still redirect to auth APP even on error
 			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 	});
@@ -575,17 +590,18 @@ describe("authActions", () => {
 				writable: true,
 			});
 
-			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
-			vi.mocked(authClient.signOut).mockRejectedValue(
-				new Error("Network error"),
+			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
+				"https://auth-svc.example.com",
 			);
+			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
+			vi.mocked(global.fetch).mockRejectedValue(new Error("Network error"));
 
 			const result = await signOut();
 
 			expect(result.data).toBeNull();
-			expect(authClient.signOut).toHaveBeenCalled();
+			expect(global.fetch).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
-			// Should still redirect even on exception
+			// Should still redirect to auth APP even on exception
 			expect(window.location.href).toBe("https://app.example.com/login");
 		});
 
