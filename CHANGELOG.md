@@ -1,3 +1,10 @@
+# [1.0.0-rc.6](https://github.com/janovix/watchlist/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** use direct fetch with redirect manual on logout ([1db7304](https://github.com/janovix/watchlist/commit/1db7304325770cdf8167071d37fa713951f81325))
+
 # [1.0.0-rc.5](https://github.com/janovix/watchlist/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2025-12-18)
 
 
