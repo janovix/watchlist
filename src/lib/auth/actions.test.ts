@@ -17,7 +17,7 @@ vi.mock("./authClient", () => ({
 
 // Mock authCoreConfig
 const mockGetAuthAppUrl = vi.fn(() => "https://auth.example.com");
-vi.mock("./authCoreConfig", () => ({
+vi.mock("./config", () => ({
 	getAuthAppUrl: () => mockGetAuthAppUrl(),
 }));
 

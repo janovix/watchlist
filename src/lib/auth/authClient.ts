@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/client";
-import { getAuthCoreBaseUrl } from "./authCoreConfig";
+import { getAuthCoreBaseUrl } from "./config";
 
 /**
  * Better Auth client instance

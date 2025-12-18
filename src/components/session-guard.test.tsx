@@ -20,13 +20,13 @@ vi.mock("next/navigation", () => ({
 
 // Mock auth session
 const mockUseAuthSession = vi.fn();
-vi.mock("@/lib/auth", () => ({
+vi.mock("@/lib/auth/useAuthSession", () => ({
 	useAuthSession: () => mockUseAuthSession(),
 }));
 
-// Mock authCoreConfig
-vi.mock("@/lib/auth/authCoreConfig", () => ({
-	getAuthBaseURL: vi.fn(() => "https://auth.example.com"),
+// Mock config
+vi.mock("@/lib/auth/config", () => ({
+	getAuthCoreBaseUrl: vi.fn(() => "https://auth.example.com"),
 }));
 
 describe("SessionGuard", () => {
@@ -129,8 +129,8 @@ describe("SessionGuard", () => {
 		const consoleErrorSpy = vi
 			.spyOn(console, "error")
 			.mockImplementation(() => {});
-		const { getAuthBaseURL } = await import("@/lib/auth/authCoreConfig");
-		vi.mocked(getAuthBaseURL).mockImplementation(() => {
+		const { getAuthCoreBaseUrl } = await import("@/lib/auth/config");
+		vi.mocked(getAuthCoreBaseUrl).mockImplementation(() => {
 			throw new Error("Config error");
 		});
 
