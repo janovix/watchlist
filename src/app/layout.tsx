@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SessionProvider } from "@/components/session-provider";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -25,7 +26,9 @@ export default function RootLayout({
 		<html lang="es" suppressHydrationWarning>
 			<body className="font-sans antialiased">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
+					<SessionProvider>
+						{children}
+					</SessionProvider>
 				</ThemeProvider>
 				<Analytics />
 			</body>

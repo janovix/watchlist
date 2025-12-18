@@ -3,14 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Settings, HelpCircle, Bell, LogOut } from "lucide-react";
 import { useLanguage } from "./language-provider";
-
-// Mock session user
-const mockUser = {
-	name: "María García",
-	email: "maria.garcia@empresa.com",
-	avatar: null, // No image, will use initials
-	role: "Compliance Officer",
-};
+import { useSession, signOut } from "@/lib/auth-client";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
 
 function getInitials(name: string): string {
 	return name
@@ -25,6 +20,7 @@ export function UserMenu() {
 	const [isOpen, setIsOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const { t } = useLanguage();
+	const { data: session, isPending } = useSession();
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -35,6 +31,29 @@ export function UserMenu() {
 		document.addEventListener("mousedown", handleClickOutside);
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
+
+	const handleLogout = async () => {
+		await signOut();
+		setIsOpen(false);
+	};
+
+	const user = session?.user;
+	const userName = user?.name || user?.email || "User";
+	const userEmail = user?.email || "";
+	const userImage = user?.image || null;
+	
+	// Mock notification count - you can replace this with actual data
+	const notificationCount = 3;
+
+	if (isPending) {
+		return (
+			<div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
+		);
+	}
+
+	if (!session?.user) {
+		return null;
+	}
 
 	const menuItems = [
 		{
@@ -63,17 +82,24 @@ export function UserMenu() {
 		<div className="relative" ref={menuRef}>
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+				className="relative flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
 				aria-label="User menu"
 			>
-				{mockUser.avatar ? (
-					<img
-						src={mockUser.avatar || "/placeholder.svg"}
-						alt={mockUser.name}
-						className="w-full h-full rounded-full object-cover"
-					/>
-				) : (
-					getInitials(mockUser.name)
+				<Avatar className="w-10 h-10">
+					{userImage && (
+						<AvatarImage src={userImage} alt={userName} />
+					)}
+					<AvatarFallback className="bg-primary text-primary-foreground">
+						{getInitials(userName)}
+					</AvatarFallback>
+				</Avatar>
+				{notificationCount > 0 && (
+					<Badge
+						variant="destructive"
+						className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs font-semibold rounded-full"
+					>
+						{notificationCount}
+					</Badge>
 				)}
 			</button>
 
@@ -82,14 +108,13 @@ export function UserMenu() {
 					{/* User info header */}
 					<div className="px-4 py-3 border-b border-border bg-muted/30">
 						<p className="font-medium text-foreground truncate">
-							{mockUser.name}
+							{userName}
 						</p>
-						<p className="text-sm text-muted-foreground truncate">
-							{mockUser.email}
-						</p>
-						<p className="text-xs text-muted-foreground mt-1">
-							{mockUser.role}
-						</p>
+						{userEmail && (
+							<p className="text-sm text-muted-foreground truncate">
+								{userEmail}
+							</p>
+						)}
 					</div>
 
 					{/* Menu items */}
@@ -112,10 +137,7 @@ export function UserMenu() {
 					{/* Logout */}
 					<div className="border-t border-border py-1">
 						<button
-							onClick={() => {
-								console.log("Logout clicked");
-								setIsOpen(false);
-							}}
+							onClick={handleLogout}
 							className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
 						>
 							<LogOut className="h-4 w-4" />
