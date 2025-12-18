@@ -301,7 +301,7 @@ describe("authActions", () => {
 			expect(result.data).toBeNull();
 			expect(authClient.signOut).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
-			expect(window.location.href).toBe("https://app.example.com/login");
+			expect(window.location.href).toBe("https://app.example.com");
 		});
 
 		it("should handle sign out error", async () => {
@@ -324,7 +324,7 @@ describe("authActions", () => {
 			expect(result.error).toEqual(error);
 			expect(setSessionError).toHaveBeenCalled();
 			// Should still redirect even on error
-			expect(window.location.href).toBe("https://app.example.com/login");
+			expect(window.location.href).toBe("https://app.example.com");
 		});
 	});
 
@@ -593,7 +593,7 @@ describe("authActions", () => {
 			expect(setSessionError).toHaveBeenCalled();
 			expect(clearSession).toHaveBeenCalled();
 			// Should still redirect even on exception
-			expect(window.location.href).toBe("https://app.example.com/login");
+			expect(window.location.href).toBe("https://app.example.com");
 		});
 
 		it("should handle fetch errors during forgotPassword", async () => {

@@ -39,7 +39,7 @@ describe("logout", () => {
 
 		expect(mockSignOut).toHaveBeenCalled();
 		expect(mockClearSession).toHaveBeenCalled();
-		expect(window.location.href).toBe("https://auth.example.com/login");
+		expect(window.location.href).toBe("https://auth.example.com");
 	});
 
 	it("should clear session and redirect even if signOut fails", async () => {
@@ -49,7 +49,7 @@ describe("logout", () => {
 
 		expect(mockSignOut).toHaveBeenCalled();
 		expect(mockClearSession).toHaveBeenCalled();
-		expect(window.location.href).toBe("https://auth.example.com/login");
+		expect(window.location.href).toBe("https://auth.example.com");
 	});
 
 	it("should clear session and redirect even if signOut returns error", async () => {
@@ -62,6 +62,6 @@ describe("logout", () => {
 
 		expect(mockSignOut).toHaveBeenCalled();
 		expect(mockClearSession).toHaveBeenCalled();
-		expect(window.location.href).toBe("https://auth.example.com/login");
+		expect(window.location.href).toBe("https://auth.example.com");
 	});
 });
