@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SessionHydrator } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth/getServerSession";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -16,16 +18,19 @@ export const metadata: Metadata = {
 	generator: "v0.app",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	// Fetch session on server for SSR hydration
+	const session = await getServerSession();
+
 	return (
 		<html lang="es" suppressHydrationWarning>
 			<body className="font-sans antialiased">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
+					<SessionHydrator serverSession={session}>{children}</SessionHydrator>
 				</ThemeProvider>
 				<Analytics />
 			</body>
