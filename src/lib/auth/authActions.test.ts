@@ -281,6 +281,7 @@ describe("authActions", () => {
 
 	describe("signOut", () => {
 		beforeEach(() => {
+			global.fetch = vi.fn();
 			// Mock window.location.href
 			Object.defineProperty(window, "location", {
 				value: {
@@ -291,15 +292,27 @@ describe("authActions", () => {
 		});
 
 		it("should sign out successfully", async () => {
-			vi.mocked(authClient.signOut).mockResolvedValue({
-				data: null,
-				error: null,
-			});
+			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
+				"https://auth-svc.example.com",
+			);
+			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
+			vi.mocked(global.fetch).mockResolvedValue({
+				ok: true,
+				status: 200,
+			} as Response);
 
 			const result = await signOut();
 
 			expect(result.data).toBeNull();
-			expect(authClient.signOut).toHaveBeenCalled();
+			expect(global.fetch).toHaveBeenCalledWith(
+				"https://auth-svc.example.com/api/auth/sign-out",
+				expect.objectContaining({
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					redirect: "manual",
+				}),
+			);
 			expect(clearSession).toHaveBeenCalled();
 			expect(window.location.href).toBe("https://app.example.com");
 		});
@@ -313,17 +326,24 @@ describe("authActions", () => {
 				writable: true,
 			});
 
-			const error = { message: "Sign out failed" };
-			vi.mocked(authClient.signOut).mockResolvedValue({
-				data: null,
-				error,
-			});
+			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
+				"https://auth-svc.example.com",
+			);
+			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
+			vi.mocked(global.fetch).mockResolvedValue({
+				ok: false,
+				status: 500,
+				statusText: "Internal Server Error",
+				json: async () => ({ message: "Sign out failed" }),
+			} as Response);
 
 			const result = await signOut();
 
-			expect(result.error).toEqual(error);
+			expect(result.error).toBeInstanceOf(Error);
+			expect(result.error?.message).toContain("Sign out failed");
 			expect(setSessionError).toHaveBeenCalled();
 			// Should still redirect even on error
+			expect(clearSession).toHaveBeenCalled();
 			expect(window.location.href).toBe("https://app.example.com");
 		});
 	});
@@ -583,9 +603,11 @@ describe("authActions", () => {
 				writable: true,
 			});
 
-			vi.mocked(authClient.signOut).mockRejectedValue(
-				new Error("Network error"),
+			vi.mocked(getAuthCoreBaseUrl).mockReturnValue(
+				"https://auth-svc.example.com",
 			);
+			vi.mocked(getAuthAppUrl).mockReturnValue("https://app.example.com");
+			vi.mocked(global.fetch).mockRejectedValue(new Error("Network error"));
 
 			const result = await signOut();
 
