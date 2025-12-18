@@ -1,3 +1,10 @@
+# [1.0.0-rc.3](https://github.com/janovix/watchlist/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** align logout logic with aml project ([20cd580](https://github.com/janovix/watchlist/commit/20cd58069621e594bed84bc10a1d66afa0e267fc))
+
 # [1.0.0-rc.2](https://github.com/janovix/watchlist/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2025-12-18)
 
 
