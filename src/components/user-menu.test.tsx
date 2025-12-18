@@ -57,9 +57,9 @@ vi.mock("@/lib/auth", async () => {
 	};
 });
 
-// Mock authActions
-vi.mock("@/lib/auth/authActions", () => ({
-	signOut: vi.fn().mockResolvedValue({ data: null }),
+// Mock actions
+vi.mock("@/lib/auth/actions", () => ({
+	logout: vi.fn().mockResolvedValue(undefined),
 }));
 
 const renderWithProvider = (component: React.ReactElement) => {
@@ -326,7 +326,7 @@ describe("UserMenu", () => {
 	});
 
 	it("should call logout action when clicked", async () => {
-		const { signOut } = await import("@/lib/auth/authActions");
+		const { logout } = await import("@/lib/auth/actions");
 		const { container } = renderWithProvider(<UserMenu />);
 
 		const button = container.querySelector(
@@ -351,7 +351,7 @@ describe("UserMenu", () => {
 		});
 
 		await waitFor(() => {
-			expect(signOut).toHaveBeenCalled();
+			expect(logout).toHaveBeenCalled();
 		});
 	});
 
