@@ -1,3 +1,10 @@
+# [1.0.0-rc.9](https://github.com/janovix/watchlist/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** remove state update before logout to match aml ([7545bde](https://github.com/janovix/watchlist/commit/7545bde3eadf68c4faacc2f2af11e23f5f842da7))
+
 # [1.0.0-rc.8](https://github.com/janovix/watchlist/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2025-12-18)
 
 
