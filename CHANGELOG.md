@@ -1,3 +1,10 @@
+# [1.0.0-rc.4](https://github.com/janovix/watchlist/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2025-12-18)
+
+
+### Bug Fixes
+
+* **auth:** use authClient.signOut and redirect to /login path ([d39ea2a](https://github.com/janovix/watchlist/commit/d39ea2a4aaff901aa4dae11357a37d3d72c64ac5))
+
 # [1.0.0-rc.3](https://github.com/janovix/watchlist/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2025-12-18)
 
 
