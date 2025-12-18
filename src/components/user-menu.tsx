@@ -81,7 +81,7 @@ export function UserMenu() {
 		<div className="relative" ref={menuRef}>
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+				className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground font-medium text-xs sm:text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
 				aria-label="User menu"
 			>
 				{avatarUrl ? (
