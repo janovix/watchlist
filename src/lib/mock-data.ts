@@ -65,7 +65,10 @@ const mockPEPRecords: PepRecord[] = [
 	},
 ];
 
-export function generateMockResult(searchName: string): Promise<PEPResult> {
+export function generateMockResult(
+	searchName: string,
+	queryId?: string,
+): Promise<PEPResult> {
 	return new Promise((resolve) => {
 		const delay = Math.random() * 3000 + 3000;
 
@@ -78,7 +81,7 @@ export function generateMockResult(searchName: string): Promise<PEPResult> {
 				const record = mockPEPRecords[randomIndex];
 
 				resolve({
-					id: crypto.randomUUID(),
+					id: queryId || crypto.randomUUID(),
 					searchName,
 					isPep: true,
 					timestamp: new Date(),
@@ -86,7 +89,7 @@ export function generateMockResult(searchName: string): Promise<PEPResult> {
 				});
 			} else {
 				resolve({
-					id: crypto.randomUUID(),
+					id: queryId || crypto.randomUUID(),
 					searchName,
 					isPep: false,
 					timestamp: new Date(),
