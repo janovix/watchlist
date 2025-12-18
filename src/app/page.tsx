@@ -9,7 +9,6 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
-import { SessionGuard } from "@/components/session-guard";
 import { type PEPResult } from "@/lib/mock-data";
 
 function HomeContent() {
@@ -70,44 +69,40 @@ function HomeContent() {
 	}
 
 	return (
-		<SessionGuard requireAuth={true}>
-			<main className="min-h-screen bg-background flex flex-col">
-				{/* Avatar only - Top right for search view */}
-				<div className="fixed top-4 right-4 z-10">
-					<UserMenu />
-				</div>
+		<main className="min-h-screen bg-background flex flex-col">
+			{/* Avatar only - Top right for search view */}
+			<div className="fixed top-4 right-4 z-10">
+				<UserMenu />
+			</div>
 
-				{/* Main Content */}
-				<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
-					<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-						{/* Logo with Title */}
-						<div className="mb-8 flex items-center gap-2">
-							<Logo variant="logo" width={120} height={19} />
-							<span className="h-1 w-1 rounded-full bg-muted-foreground" />
-							<h1 className="text-xl font-semibold text-foreground">
-								Watchlist
-							</h1>
-						</div>
+			{/* Main Content */}
+			<div className="flex-1 flex items-center justify-center min-h-screen py-8 px-4">
+				<div className="w-full max-w-2xl mx-auto flex flex-col items-center">
+					{/* Logo with Title */}
+					<div className="mb-8 flex items-center gap-2">
+						<Logo variant="logo" width={120} height={19} />
+						<span className="h-1 w-1 rounded-full bg-muted-foreground" />
+						<h1 className="text-xl font-semibold text-foreground">Watchlist</h1>
+					</div>
 
-						{/* Search Form */}
-						<div className="w-full mb-6">
-							<SearchForm onSearch={handleSearch} isLoading={false} />
-						</div>
+					{/* Search Form */}
+					<div className="w-full mb-6">
+						<SearchForm onSearch={handleSearch} isLoading={false} />
+					</div>
 
-						{/* Language/Theme Toggle - Right aligned but centered */}
-						<div className="flex items-center gap-2 mb-8">
-							<LanguageToggle />
-							<ThemeToggle />
-						</div>
+					{/* Language/Theme Toggle - Right aligned but centered */}
+					<div className="flex items-center gap-2 mb-8">
+						<LanguageToggle />
+						<ThemeToggle />
+					</div>
 
-						{/* Recent Searches - Centered with scroll support */}
-						<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
-							<RecentSearches searches={recentSearches} />
-						</div>
+					{/* Recent Searches - Centered with scroll support */}
+					<div className="w-full max-w-2xl overflow-y-auto max-h-[40vh]">
+						<RecentSearches searches={recentSearches} />
 					</div>
 				</div>
-			</main>
-		</SessionGuard>
+			</div>
+		</main>
 	);
 }
 
