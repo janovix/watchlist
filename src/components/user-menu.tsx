@@ -32,9 +32,9 @@ export function UserMenu() {
 	}, []);
 
 	const handleSignOut = async () => {
-		setIsOpen(false);
+		// Don't update state before logout - we're redirecting anyway
+		// and state updates could interfere with the async flow
 		await logout();
-		// logout() handles redirect to NEXT_PUBLIC_AUTH_APP_URL/login
 	};
 
 	const menuItems = [
