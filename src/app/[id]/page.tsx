@@ -123,7 +123,7 @@ function QueryContent() {
 		return (
 			<main className="min-h-screen bg-background flex flex-col">
 				<Header />
-				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-81px)] py-10 px-4">
+				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] py-10 px-4">
 					<div className="text-center">
 						<h2 className="text-2xl font-semibold text-foreground mb-2">
 							Query Not Found
@@ -149,7 +149,7 @@ function QueryContent() {
 
 			{/* Main Content */}
 			{viewState === "loading" ? (
-				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-81px)] py-10 px-4">
+				<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] py-10 px-4">
 					<div className="w-full max-w-2xl mx-auto">
 						<LoadingView searchName={searchName} />
 					</div>

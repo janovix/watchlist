@@ -26,7 +26,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 	return (
 		<form onSubmit={handleSubmit} className="w-full">
 			<div className="relative">
-				<User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+				<User className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground pointer-events-none" />
 				<Input
 					id="pep-search-input"
 					type="text"
@@ -34,16 +34,16 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 					value={name}
 					onChange={(e) => setName(e.target.value)}
 					disabled={isLoading}
-					className="pl-12 pr-14 h-14 text-lg bg-background border-border rounded-full shadow-sm focus:border-primary focus:ring-primary focus:ring-2"
+					className="pl-10 sm:pl-12 pr-12 sm:pr-14 h-12 sm:h-14 text-base sm:text-lg bg-background border-border rounded-full shadow-sm focus:border-primary focus:ring-primary focus:ring-2"
 				/>
 				<Button
 					type="submit"
 					disabled={!name.trim() || isLoading}
 					size="icon"
-					className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-primary hover:bg-primary/90"
+					className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-primary hover:bg-primary/90"
 					aria-label={t("searchButton")}
 				>
-					<Search className="h-5 w-5" />
+					<Search className="h-4 w-4 sm:h-5 sm:w-5" />
 				</Button>
 			</div>
 		</form>

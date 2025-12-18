@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
+import { SearchForm } from "@/components/search-form";
 import { RecentSearches } from "@/components/recent-searches";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
@@ -12,7 +13,6 @@ function HomeContent() {
 	const router = useRouter();
 	const [recentSearches, setRecentSearches] = useState<PEPResult[]>([]);
 	const [mounted, setMounted] = useState(false);
-	const searchInputRef = useRef<HTMLInputElement>(null);
 	const { t } = useLanguage();
 
 	useEffect(() => {
@@ -56,7 +56,7 @@ function HomeContent() {
 	};
 
 	const handleStartSearch = () => {
-		// Focus the search input in the header
+		// Focus the search input on the page
 		const searchInput = document.getElementById(
 			"pep-search-input",
 		) as HTMLInputElement;
@@ -78,13 +78,18 @@ function HomeContent() {
 
 	return (
 		<main className="min-h-screen bg-background flex flex-col">
-			<Header onSearch={handleSearch} isLoading={false} />
+			<Header />
 
 			{/* Main Content */}
-			<div className="flex-1 flex items-center justify-center min-h-[calc(100vh-81px)] py-8 px-4">
-				<div className="w-full max-w-2xl mx-auto">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] py-6 sm:py-8 px-4">
+				<div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 sm:gap-8">
+					{/* Search Input - Centered */}
+					<div className="w-full">
+						<SearchForm onSearch={handleSearch} isLoading={false} />
+					</div>
+
 					{/* Recent Searches - Centered with scroll support */}
-					<div className="w-full overflow-y-auto max-h-[60vh]">
+					<div className="w-full overflow-y-auto max-h-[50vh] sm:max-h-[60vh]">
 						<RecentSearches
 							searches={recentSearches}
 							onStartSearch={handleStartSearch}
