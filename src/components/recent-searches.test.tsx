@@ -41,9 +41,7 @@ describe("RecentSearches", () => {
 	];
 
 	it("should render nothing when searches array is empty", () => {
-		const { container } = renderWithProvider(
-			<RecentSearches searches={[]} />,
-		);
+		const { container } = renderWithProvider(<RecentSearches searches={[]} />);
 
 		expect(container.firstChild).toBeNull();
 	});

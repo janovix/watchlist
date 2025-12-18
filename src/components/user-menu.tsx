@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { User, Settings, HelpCircle, Bell, LogOut } from "lucide-react";
 import { useLanguage } from "./language-provider";
-
-// Mock session user
-const mockUser = {
-	name: "María García",
-	email: "maria.garcia@empresa.com",
-	avatar: null, // No image, will use initials
-	role: "Compliance Officer",
-};
+import { useAuthSession } from "@/lib/auth";
+import { signOut } from "@/lib/auth/authActions";
 
 function getInitials(name: string): string {
 	return name
@@ -22,9 +17,11 @@ function getInitials(name: string): string {
 }
 
 export function UserMenu() {
+	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const { t } = useLanguage();
+	const { data: session } = useAuthSession();
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -36,28 +33,51 @@ export function UserMenu() {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
+	const handleSignOut = async () => {
+		await signOut();
+		setIsOpen(false);
+		router.push("/");
+	};
+
 	const menuItems = [
 		{
 			icon: User,
 			label: t("profile"),
-			action: () => console.log("Profile clicked"),
+			action: () => {
+				console.log("Profile clicked");
+				setIsOpen(false);
+			},
 		},
 		{
 			icon: Settings,
 			label: t("settings"),
-			action: () => console.log("Settings clicked"),
+			action: () => {
+				console.log("Settings clicked");
+				setIsOpen(false);
+			},
 		},
 		{
 			icon: Bell,
 			label: t("notifications"),
-			action: () => console.log("Notifications clicked"),
+			action: () => {
+				console.log("Notifications clicked");
+				setIsOpen(false);
+			},
 		},
 		{
 			icon: HelpCircle,
 			label: t("help"),
-			action: () => console.log("Help clicked"),
+			action: () => {
+				console.log("Help clicked");
+				setIsOpen(false);
+			},
 		},
 	];
+
+	const user = session?.user;
+	const displayName = user?.name || "User";
+	const displayEmail = user?.email || "";
+	const avatarUrl = user?.image;
 
 	return (
 		<div className="relative" ref={menuRef}>
@@ -66,14 +86,14 @@ export function UserMenu() {
 				className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
 				aria-label="User menu"
 			>
-				{mockUser.avatar ? (
+				{avatarUrl ? (
 					<img
-						src={mockUser.avatar || "/placeholder.svg"}
-						alt={mockUser.name}
+						src={avatarUrl}
+						alt={displayName}
 						className="w-full h-full rounded-full object-cover"
 					/>
 				) : (
-					getInitials(mockUser.name)
+					getInitials(displayName)
 				)}
 			</button>
 
@@ -82,14 +102,13 @@ export function UserMenu() {
 					{/* User info header */}
 					<div className="px-4 py-3 border-b border-border bg-muted/30">
 						<p className="font-medium text-foreground truncate">
-							{mockUser.name}
+							{displayName}
 						</p>
-						<p className="text-sm text-muted-foreground truncate">
-							{mockUser.email}
-						</p>
-						<p className="text-xs text-muted-foreground mt-1">
-							{mockUser.role}
-						</p>
+						{displayEmail && (
+							<p className="text-sm text-muted-foreground truncate">
+								{displayEmail}
+							</p>
+						)}
 					</div>
 
 					{/* Menu items */}
@@ -97,10 +116,7 @@ export function UserMenu() {
 						{menuItems.map((item, index) => (
 							<button
 								key={index}
-								onClick={() => {
-									item.action();
-									setIsOpen(false);
-								}}
+								onClick={item.action}
 								className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
 							>
 								<item.icon className="h-4 w-4 text-muted-foreground" />
@@ -112,10 +128,7 @@ export function UserMenu() {
 					{/* Logout */}
 					<div className="border-t border-border py-1">
 						<button
-							onClick={() => {
-								console.log("Logout clicked");
-								setIsOpen(false);
-							}}
+							onClick={handleSignOut}
 							className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
 						>
 							<LogOut className="h-4 w-4" />
