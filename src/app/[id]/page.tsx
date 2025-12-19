@@ -9,6 +9,7 @@ import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
 import { searchPep } from "@/lib/api/pep";
+import { useJwt } from "@/hooks/useJwt";
 
 type ViewState = "loading" | "result" | "not-found";
 
@@ -20,6 +21,7 @@ function QueryContent() {
 	const [currentResult, setCurrentResult] = useState<PEPResult | null>(null);
 	const [searchName, setSearchName] = useState("");
 	const { t } = useLanguage();
+	const { jwt } = useJwt();
 
 	useEffect(() => {
 		// Try to load from sessionStorage first
@@ -70,7 +72,7 @@ function QueryContent() {
 		const pendingName = loadPendingSearch();
 		if (pendingName) {
 			// Call the actual PEP search API
-			searchPep(pendingName)
+			searchPep(pendingName, { jwt: jwt ?? undefined })
 				.then((apiResult) => {
 					// Transform API response to PEPResult format
 					const result: PEPResult = {
@@ -113,7 +115,7 @@ function QueryContent() {
 			// No pending search and no result found - 404
 			setViewState("not-found");
 		}
-	}, [queryId]);
+	}, [queryId, jwt]);
 
 	const handleNewSearch = () => {
 		router.push("/");

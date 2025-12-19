@@ -94,4 +94,53 @@ describe("api/http fetchJson", () => {
 			expect(err.body).toBe("oops");
 		}
 	});
+
+	it("should include Authorization header when jwt is provided", async () => {
+		const mockJwt = "test-jwt-token";
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				return new Response(JSON.stringify({ success: true }), {
+					status: 200,
+					headers: { "content-type": "application/json" },
+				});
+			}),
+		);
+
+		await fetchJson("https://example.com", { jwt: mockJwt });
+
+		const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+		const options = fetchCall[1] as RequestInit;
+		const headers = options.headers as Headers | Record<string, string>;
+
+		if (headers instanceof Headers) {
+			expect(headers.get("Authorization")).toBe(`Bearer ${mockJwt}`);
+		} else {
+			expect(headers.Authorization).toBe(`Bearer ${mockJwt}`);
+		}
+	});
+
+	it("should not include Authorization header when jwt is not provided", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				return new Response(JSON.stringify({ success: true }), {
+					status: 200,
+					headers: { "content-type": "application/json" },
+				});
+			}),
+		);
+
+		await fetchJson("https://example.com");
+
+		const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+		const options = fetchCall[1] as RequestInit;
+		const headers = options.headers as Headers | Record<string, string>;
+
+		if (headers instanceof Headers) {
+			expect(headers.get("Authorization")).toBeNull();
+		} else {
+			expect(headers).not.toHaveProperty("Authorization");
+		}
+	});
 });
