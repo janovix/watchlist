@@ -1,6 +1,6 @@
 export const getAuthCoreBaseUrl = (): string => {
 	return (
-		process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL ||
+		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ||
 		"https://auth-svc.example.workers.dev"
 	);
 };

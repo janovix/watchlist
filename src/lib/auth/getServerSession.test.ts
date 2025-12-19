@@ -31,12 +31,12 @@ describe("getServerSession", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL = "https://auth.example.com";
+		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL = "https://auth.example.com";
 		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://app.example.com";
 	});
 
 	afterEach(() => {
-		delete process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL;
+		delete process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
 	});
 
@@ -51,8 +51,8 @@ describe("getServerSession", () => {
 		expect(result).toBeNull();
 	});
 
-	it("should return null if NEXT_PUBLIC_AUTH_CORE_BASE_URL is not set", async () => {
-		delete process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL;
+	it("should return null if NEXT_PUBLIC_AUTH_SERVICE_URL is not set", async () => {
+		delete process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 		const mockCookieStore = {
 			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
 		};
