@@ -1,3 +1,10 @@
+# [1.0.0-rc.13](https://github.com/janovix/watchlist/compare/v1.0.0-rc.12...v1.0.0-rc.13) (2025-12-19)
+
+
+### Bug Fixes
+
+* **middleware:** validate session with auth service ([db1891a](https://github.com/janovix/watchlist/commit/db1891ad714d5fb4cafb91eb3d34ae05f0058e5e))
+
 # [1.0.0-rc.12](https://github.com/janovix/watchlist/compare/v1.0.0-rc.11...v1.0.0-rc.12) (2025-12-19)
 
 
