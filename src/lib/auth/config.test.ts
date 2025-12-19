@@ -28,13 +28,13 @@ describe("config", () => {
 
 	describe("getAuthAppUrl", () => {
 		it("should return env value when set", async () => {
-			process.env.AUTH_SERVICE_URL = "https://custom-app.com";
+			process.env.NEXT_PUBLIC_AUTH_SERVICE_URL = "https://custom-app.com";
 			const { getAuthAppUrl } = await import("./config");
 			expect(getAuthAppUrl()).toBe("https://custom-app.com");
 		});
 
 		it("should return default when env not set", async () => {
-			delete process.env.AUTH_SERVICE_URL;
+			delete process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 			const { getAuthAppUrl } = await import("./config");
 			expect(getAuthAppUrl()).toBe("https://auth.example.workers.dev");
 		});
