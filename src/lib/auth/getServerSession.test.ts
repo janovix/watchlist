@@ -32,12 +32,12 @@ describe("getServerSession", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL = "https://auth.example.com";
-		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://app.example.com";
+		process.env.AUTH_SERVICE_URL = "https://app.example.com";
 	});
 
 	afterEach(() => {
 		delete process.env.NEXT_PUBLIC_AUTH_CORE_BASE_URL;
-		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
+		delete process.env.AUTH_SERVICE_URL;
 	});
 
 	it("should return null if no session token cookie is present", async () => {
@@ -186,8 +186,8 @@ describe("getServerSession", () => {
 		expect(result?.user.image).toBeNull();
 	});
 
-	it("should use fallback when NEXT_PUBLIC_AUTH_APP_URL is not set", async () => {
-		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
+	it("should use fallback when AUTH_SERVICE_URL is not set", async () => {
+		delete process.env.AUTH_SERVICE_URL;
 
 		const mockCookieStore = {
 			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),

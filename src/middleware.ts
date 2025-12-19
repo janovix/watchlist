@@ -3,7 +3,7 @@ import { getSessionCookie } from "better-auth/cookies";
 
 const getAuthAppUrl = () => {
 	return (
-		process.env.NEXT_PUBLIC_AUTH_APP_URL || "https://auth.example.workers.dev"
+		process.env.AUTH_SERVICE_URL || "https://auth.example.workers.dev"
 	);
 };
 
