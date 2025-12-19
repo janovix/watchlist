@@ -22,7 +22,7 @@ describe("middleware", () => {
 
 	it("should redirect to auth app when no session cookie", () => {
 		mockGetSessionCookie.mockReturnValue(null);
-		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://auth.example.com";
+		process.env.AUTH_SERVICE_URL = "https://auth.example.com";
 
 		const request = new NextRequest("https://example.com/dashboard");
 		const response = middleware(request);
@@ -39,7 +39,7 @@ describe("middleware", () => {
 
 	it("should use fallback auth URL when env var is not set", () => {
 		mockGetSessionCookie.mockReturnValue(null);
-		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
+		delete process.env.AUTH_SERVICE_URL;
 
 		const request = new NextRequest("https://example.com/page");
 		const response = middleware(request);
@@ -62,7 +62,7 @@ describe("middleware", () => {
 
 	it("should encode return URL properly", () => {
 		mockGetSessionCookie.mockReturnValue(null);
-		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://auth.example.com";
+		process.env.AUTH_SERVICE_URL = "https://auth.example.com";
 
 		const request = new NextRequest(
 			"https://example.com/page?query=test&other=value",
