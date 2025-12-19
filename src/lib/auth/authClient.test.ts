@@ -24,6 +24,11 @@ describe("authClient", () => {
 			fetchOptions: {
 				credentials: "include",
 			},
+			plugins: expect.arrayContaining([
+				expect.objectContaining({
+					id: "better-auth-client",
+				}),
+			]),
 		});
 		expect(getAuthCoreBaseUrl).toHaveBeenCalled();
 		// Verify authClient is defined (it's the result of createAuthClient)
