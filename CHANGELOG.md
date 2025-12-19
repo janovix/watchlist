@@ -1,3 +1,15 @@
+# [1.0.0-rc.12](https://github.com/janovix/watchlist/compare/v1.0.0-rc.11...v1.0.0-rc.12) (2025-12-19)
+
+
+### Bug Fixes
+
+* **auth:** prevent duplicate search requests by waiting for JWT to load ([7a6caeb](https://github.com/janovix/watchlist/commit/7a6caeba5bf77f8e5c3a4fda718b7556f87ed9a3))
+
+
+### Features
+
+* **auth:** add JWT authentication support for watchlist-svc API calls ([c5bcc0e](https://github.com/janovix/watchlist/commit/c5bcc0ede52b256c5c97ffbbe047462a28d5f3d9))
+
 # [1.0.0-rc.11](https://github.com/janovix/watchlist/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2025-12-18)
 
 
