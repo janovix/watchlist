@@ -21,9 +21,14 @@ function QueryContent() {
 	const [currentResult, setCurrentResult] = useState<PEPResult | null>(null);
 	const [searchName, setSearchName] = useState("");
 	const { t } = useLanguage();
-	const { jwt } = useJwt();
+	const { jwt, isLoading: jwtLoading } = useJwt();
 
 	useEffect(() => {
+		// Wait for JWT to finish loading before making API calls
+		if (jwtLoading) {
+			return;
+		}
+
 		// Try to load from sessionStorage first
 		const loadFromStorage = () => {
 			try {
@@ -71,7 +76,7 @@ function QueryContent() {
 		// If not found, check for pending search
 		const pendingName = loadPendingSearch();
 		if (pendingName) {
-			// Call the actual PEP search API
+			// Call the actual PEP search API (only when JWT is loaded)
 			searchPep(pendingName, { jwt: jwt ?? undefined })
 				.then((apiResult) => {
 					// Transform API response to PEPResult format
@@ -115,7 +120,7 @@ function QueryContent() {
 			// No pending search and no result found - 404
 			setViewState("not-found");
 		}
-	}, [queryId, jwt]);
+	}, [queryId, jwt, jwtLoading]);
 
 	const handleNewSearch = () => {
 		router.push("/");
