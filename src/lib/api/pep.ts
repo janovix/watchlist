@@ -100,13 +100,28 @@ function mapTargetToPepRecord(target: WatchlistTarget): PepRecord {
 }
 
 /**
+ * Options for PEP search
+ */
+export interface SearchPepOptions {
+	/**
+	 * JWT token to include in Authorization header.
+	 * When provided, adds `Authorization: Bearer <jwt>` header.
+	 */
+	jwt?: string;
+}
+
+/**
  * Search for a PEP (Politically Exposed Person) by query.
  *
  * @param query - The search query (name or other identifying information)
+ * @param options - Optional configuration including JWT token
  * @returns Promise resolving to the search result
  * @throws ApiError if the request fails
  */
-export async function searchPep(query: string): Promise<PepSearchResponse> {
+export async function searchPep(
+	query: string,
+	options?: SearchPepOptions,
+): Promise<PepSearchResponse> {
 	const baseUrl = getWatchlistApiBaseUrl();
 	const url = `${baseUrl}/pep/search`;
 
@@ -117,6 +132,7 @@ export async function searchPep(query: string): Promise<PepSearchResponse> {
 				"content-type": "application/json",
 			},
 			body: JSON.stringify({ query }),
+			jwt: options?.jwt,
 		});
 
 		// Check if API response indicates success
