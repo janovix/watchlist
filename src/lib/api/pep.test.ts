@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { searchPep } from "./pep";
+import { evaluatePEP } from "./pep";
 import { ApiError } from "./http";
 
 // Mock the http module
@@ -20,35 +20,19 @@ describe("pep API", () => {
 		vi.restoreAllMocks();
 	});
 
-	describe("searchPep", () => {
-		it("should call the PEP search endpoint with correct parameters", async () => {
+	describe("evaluatePEP", () => {
+		it("should call the PEP evaluate endpoint with correct parameters", async () => {
 			const { fetchJson } = await import("./http");
 			const mockApiResponse = {
 				success: true,
 				result: {
-					target: {
-						id: "OFAC-12345",
-						schema: null,
-						name: "John Doe",
-						aliases: ["J. Doe"],
-						birthDate: "1980-01-01",
-						countries: ["US"],
-						addresses: null,
-						identifiers: null,
-						sanctions: null,
-						phones: null,
-						emails: null,
-						programIds: null,
-						dataset: "OFAC",
-						firstSeen: "2020-01-01T00:00:00Z",
-						lastChange: "2023-01-01T00:00:00Z",
-						lastSeen: "2024-01-01T00:00:00Z",
-						createdAt: "2020-01-01T00:00:00Z",
-						updatedAt: "2024-01-01T00:00:00Z",
-					},
-					pepStatus: true,
-					pepDetails: "PEP match found",
-					matchConfidence: "exact" as const,
+					isPEP: true,
+					confidence: "high" as const,
+					currentPosition: "Senador de la República",
+					country: "MX",
+					evidence: ["Found in official records"],
+					reasoning: "Person is a current senator",
+					source: "ai" as const,
 				},
 			};
 
@@ -57,23 +41,25 @@ describe("pep API", () => {
 				json: mockApiResponse,
 			});
 
-			const result = await searchPep("John Doe");
+			const result = await evaluatePEP({ fullName: "John Doe" });
 
 			expect(fetchJson).toHaveBeenCalledWith(
-				expect.stringContaining("/pep/search"),
+				expect.stringContaining("/pep/evaluate"),
 				expect.objectContaining({
 					method: "POST",
 					headers: expect.objectContaining({
 						"content-type": "application/json",
 					}),
-					body: JSON.stringify({ query: "John Doe" }),
+					body: JSON.stringify({ fullName: "John Doe" }),
 				}),
 			);
 
 			expect(result.isPep).toBe(true);
 			expect(result.record).not.toBeNull();
 			expect(result.record?.name).toBe("John Doe");
-			expect(result.matchConfidence).toBe("exact");
+			expect(result.confidence).toBe("high");
+			expect(result.currentPosition).toBe("Senador de la República");
+			expect(result.source).toBe("ai");
 		});
 
 		it("should handle non-PEP results", async () => {
@@ -81,29 +67,13 @@ describe("pep API", () => {
 			const mockApiResponse = {
 				success: true,
 				result: {
-					target: {
-						id: "TARGET-001",
-						schema: null,
-						name: "Jane Smith",
-						aliases: null,
-						birthDate: null,
-						countries: null,
-						addresses: null,
-						identifiers: null,
-						sanctions: null,
-						phones: null,
-						emails: null,
-						programIds: null,
-						dataset: null,
-						firstSeen: null,
-						lastSeen: null,
-						lastChange: null,
-						createdAt: "2024-01-01T00:00:00Z",
-						updatedAt: "2024-01-01T00:00:00Z",
-					},
-					pepStatus: false,
-					pepDetails: "No PEP match found",
-					matchConfidence: "possible" as const,
+					isPEP: false,
+					confidence: "high" as const,
+					currentPosition: null,
+					country: null,
+					evidence: [],
+					reasoning: "No PEP records found",
+					source: "ai" as const,
 				},
 			};
 
@@ -112,11 +82,14 @@ describe("pep API", () => {
 				json: mockApiResponse,
 			});
 
-			const result = await searchPep("Jane Smith");
+			const result = await evaluatePEP({
+				fullName: "Jane Smith",
+				country: "MX",
+			});
 
 			expect(result.isPep).toBe(false);
 			expect(result.record).toBeNull();
-			expect(result.matchConfidence).toBe("possible");
+			expect(result.confidence).toBe("high");
 		});
 
 		it("should throw ApiError when the API returns an error", async () => {
@@ -128,8 +101,12 @@ describe("pep API", () => {
 
 			vi.mocked(fetchJson).mockRejectedValue(apiError);
 
-			await expect(searchPep("Unknown Person")).rejects.toThrow(ApiError);
-			await expect(searchPep("Unknown Person")).rejects.toThrow("Not Found");
+			await expect(evaluatePEP({ fullName: "Unknown Person" })).rejects.toThrow(
+				ApiError,
+			);
+			await expect(evaluatePEP({ fullName: "Unknown Person" })).rejects.toThrow(
+				"Not Found",
+			);
 		});
 
 		it("should handle network errors", async () => {
@@ -138,63 +115,56 @@ describe("pep API", () => {
 
 			vi.mocked(fetchJson).mockRejectedValue(networkError);
 
-			await expect(searchPep("Test")).rejects.toThrow(ApiError);
-			await expect(searchPep("Test")).rejects.toThrow("Failed to search PEP");
+			await expect(evaluatePEP({ fullName: "Test" })).rejects.toThrow(ApiError);
+			await expect(evaluatePEP({ fullName: "Test" })).rejects.toThrow(
+				"Failed to evaluate PEP",
+			);
 		});
 
-		it("should use environment variable for API base URL when set", async () => {
+		it("should include all optional parameters", async () => {
 			const { fetchJson } = await import("./http");
-			const originalEnv = process.env.WATCHLIST_API_BASE_URL;
+			const mockApiResponse = {
+				success: true,
+				result: {
+					isPEP: true,
+					confidence: "medium" as const,
+					currentPosition: "Ex-Diputado",
+					country: "MX",
+					evidence: ["Historical record"],
+					reasoning: "Former deputy",
+					source: "gk" as const,
+				},
+			};
 
-			try {
-				process.env.WATCHLIST_API_BASE_URL = "https://custom-api.example.com";
-				const mockApiResponse = {
-					success: true,
-					result: {
-						target: {
-							id: "TARGET-001",
-							schema: null,
-							name: "Test",
-							aliases: null,
-							birthDate: null,
-							countries: null,
-							addresses: null,
-							identifiers: null,
-							sanctions: null,
-							phones: null,
-							emails: null,
-							programIds: null,
-							dataset: null,
-							firstSeen: null,
-							lastSeen: null,
-							lastChange: null,
-							createdAt: "2024-01-01T00:00:00Z",
-							updatedAt: "2024-01-01T00:00:00Z",
-						},
-						pepStatus: false,
-						pepDetails: "No PEP match",
-						matchConfidence: "possible" as const,
-					},
-				};
+			vi.mocked(fetchJson).mockResolvedValue({
+				status: 200,
+				json: mockApiResponse,
+			});
 
-				vi.mocked(fetchJson).mockResolvedValue({
-					status: 200,
-					json: mockApiResponse,
-				});
+			await evaluatePEP({
+				fullName: "Roberto Fernández",
+				birthDate: "1980-01-15",
+				country: "MX",
+				knownAliases: ["R. Fernández"],
+				occupation: "Politician",
+				additionalContext: "Former deputy",
+				useHybrid: true,
+			});
 
-				await searchPep("Test");
-
-				expect(fetchJson).toHaveBeenCalledWith(
-					"https://custom-api.example.com/pep/search",
-					expect.any(Object),
-				);
-			} finally {
-				if (originalEnv === undefined) {
-					delete process.env.WATCHLIST_API_BASE_URL;
-				} else {
-					process.env.WATCHLIST_API_BASE_URL = originalEnv;
-				}
-			}
+			expect(fetchJson).toHaveBeenCalledWith(
+				expect.stringContaining("/pep/evaluate"),
+				expect.objectContaining({
+					body: JSON.stringify({
+						fullName: "Roberto Fernández",
+						birthDate: "1980-01-15",
+						country: "MX",
+						knownAliases: ["R. Fernández"],
+						occupation: "Politician",
+						additionalContext: "Former deputy",
+						useHybrid: true,
+					}),
+				}),
+			);
 		});
 
 		it("should throw error when API returns success: false", async () => {
@@ -202,29 +172,13 @@ describe("pep API", () => {
 			const mockApiResponse = {
 				success: false,
 				result: {
-					target: {
-						id: "TARGET-001",
-						schema: null,
-						name: "Test",
-						aliases: null,
-						birthDate: null,
-						countries: null,
-						addresses: null,
-						identifiers: null,
-						sanctions: null,
-						phones: null,
-						emails: null,
-						programIds: null,
-						dataset: null,
-						firstSeen: null,
-						lastSeen: null,
-						lastChange: null,
-						createdAt: "2024-01-01T00:00:00Z",
-						updatedAt: "2024-01-01T00:00:00Z",
-					},
-					pepStatus: false,
-					pepDetails: "",
-					matchConfidence: "possible" as const,
+					isPEP: false,
+					confidence: "low" as const,
+					currentPosition: null,
+					country: null,
+					evidence: [],
+					reasoning: "",
+					source: "ai" as const,
 				},
 			};
 
@@ -233,53 +187,7 @@ describe("pep API", () => {
 				json: mockApiResponse,
 			});
 
-			await expect(searchPep("Test")).rejects.toThrow(ApiError);
-		});
-
-		it("should use default values when target fields are null", async () => {
-			const { fetchJson } = await import("./http");
-			const mockApiResponse = {
-				success: true,
-				result: {
-					target: {
-						id: "TARGET-001",
-						schema: null,
-						name: null,
-						aliases: null,
-						birthDate: null,
-						countries: null,
-						addresses: null,
-						identifiers: null,
-						sanctions: null,
-						phones: null,
-						emails: null,
-						programIds: null,
-						dataset: null,
-						firstSeen: null,
-						lastSeen: null,
-						lastChange: null,
-						createdAt: "2024-01-01T00:00:00Z",
-						updatedAt: "2024-01-01T00:00:00Z",
-					},
-					pepStatus: true,
-					pepDetails: "PEP match",
-					matchConfidence: "exact" as const,
-				},
-			};
-
-			vi.mocked(fetchJson).mockResolvedValue({
-				status: 200,
-				json: mockApiResponse,
-			});
-
-			const result = await searchPep("Test");
-
-			expect(result.isPep).toBe(true);
-			expect(result.record).not.toBeNull();
-			expect(result.record?.dataset).toBe("UNKNOWN");
-			expect(result.record?.name).toBe("Unknown");
-			expect(result.record?.aliases).toEqual([]);
-			expect(result.record?.countries).toEqual([]);
+			await expect(evaluatePEP({ fullName: "Test" })).rejects.toThrow(ApiError);
 		});
 
 		it("should handle non-Error exceptions", async () => {
@@ -287,8 +195,37 @@ describe("pep API", () => {
 
 			vi.mocked(fetchJson).mockRejectedValue("String error");
 
-			await expect(searchPep("Test")).rejects.toThrow(ApiError);
-			await expect(searchPep("Test")).rejects.toThrow("Unknown error");
+			await expect(evaluatePEP({ fullName: "Test" })).rejects.toThrow(ApiError);
+			await expect(evaluatePEP({ fullName: "Test" })).rejects.toThrow(
+				"Unknown error",
+			);
+		});
+
+		it("should handle null country in result", async () => {
+			const { fetchJson } = await import("./http");
+			const mockApiResponse = {
+				success: true,
+				result: {
+					isPEP: true,
+					confidence: "high" as const,
+					currentPosition: "Senator",
+					country: null,
+					evidence: ["Found in records"],
+					reasoning: "Person is a senator",
+					source: "watchlist" as const,
+				},
+			};
+
+			vi.mocked(fetchJson).mockResolvedValue({
+				status: 200,
+				json: mockApiResponse,
+			});
+
+			const result = await evaluatePEP({ fullName: "John Doe" });
+
+			expect(result.isPep).toBe(true);
+			expect(result.record).not.toBeNull();
+			expect(result.record?.countries).toEqual([]);
 		});
 	});
 });

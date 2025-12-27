@@ -10,6 +10,8 @@ import {
 	User,
 	Clock,
 	Download,
+	Briefcase,
+	Info,
 } from "lucide-react";
 import type { PEPResult } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
@@ -234,6 +236,93 @@ export function ResultView({ result, onNewSearch }: ResultViewProps) {
 								)}
 							</div>
 						</div>
+
+						{/* Current Position */}
+						{result.currentPosition && (
+							<div className="flex items-start gap-3">
+								<Briefcase className="h-5 w-5 text-primary mt-0.5" />
+								<div>
+									<span className="text-sm text-muted-foreground">
+										{t("currentPosition")}
+									</span>
+									<p className="font-medium text-foreground">
+										{result.currentPosition}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Confidence */}
+						<div className="flex items-start gap-3">
+							<span className="h-5 w-5 text-primary mt-0.5 font-mono text-xs flex items-center justify-center">
+								%
+							</span>
+							<div>
+								<span className="text-sm text-muted-foreground">
+									{t("confidence")}
+								</span>
+								<p className="font-medium text-foreground">
+									{result.confidence === "high"
+										? t("confidenceHigh")
+										: result.confidence === "medium"
+											? t("confidenceMedium")
+											: result.confidence === "low"
+												? t("confidenceLow")
+												: t("confidenceRequiresVerification")}
+								</p>
+							</div>
+						</div>
+
+						{/* Source */}
+						<div className="flex items-start gap-3">
+							<Search className="h-5 w-5 text-primary mt-0.5" />
+							<div>
+								<span className="text-sm text-muted-foreground">
+									{t("source")}
+								</span>
+								<p className="font-medium text-foreground">
+									{result.source === "ai"
+										? t("sourceAi")
+										: result.source === "watchlist"
+											? t("sourceWatchlist")
+											: t("sourceGk")}
+								</p>
+							</div>
+						</div>
+
+						{/* Evidence */}
+						{result.evidence && result.evidence.length > 0 && (
+							<div className="flex items-start gap-3">
+								<Info className="h-5 w-5 text-primary mt-0.5" />
+								<div>
+									<span className="text-sm text-muted-foreground">
+										{t("evidence")}
+									</span>
+									<ul className="list-disc list-inside text-foreground text-sm mt-1">
+										{result.evidence.map((item, idx) => (
+											<li key={idx}>{item}</li>
+										))}
+									</ul>
+								</div>
+							</div>
+						)}
+
+						{/* Reasoning */}
+						{result.reasoning && (
+							<div className="flex items-start gap-3">
+								<span className="h-5 w-5 text-primary mt-0.5 font-mono text-xs flex items-center justify-center">
+									🧠
+								</span>
+								<div>
+									<span className="text-sm text-muted-foreground">
+										{t("reasoning")}
+									</span>
+									<p className="text-foreground text-sm mt-1">
+										{result.reasoning}
+									</p>
+								</div>
+							</div>
+						)}
 
 						{/* Timestamps */}
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-border">

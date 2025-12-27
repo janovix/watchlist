@@ -1,5 +1,5 @@
 export interface PepRecord {
-	dataset: string; // e.g., OFAC, UN, EU
+	dataset: string; // e.g., OFAC, UN, EU, or source like "ai", "watchlist", "gk"
 	id: string;
 	name: string;
 	aliases: string[];
@@ -8,6 +8,7 @@ export interface PepRecord {
 	firstSeen: string | null;
 	lastChange: string | null;
 	lastSeen: string | null;
+	currentPosition: string | null;
 }
 
 export interface PEPResult {
@@ -16,6 +17,11 @@ export interface PEPResult {
 	isPep: boolean;
 	timestamp: Date;
 	record: PepRecord | null; // null if not PEP
+	confidence: "high" | "medium" | "low" | "requires_verification";
+	currentPosition: string | null;
+	evidence: string[];
+	reasoning: string;
+	source: "ai" | "watchlist" | "gk";
 }
 
 const mockPEPRecords: PepRecord[] = [
@@ -29,6 +35,7 @@ const mockPEPRecords: PepRecord[] = [
 		firstSeen: "2018-06-01T00:00:00Z",
 		lastChange: "2023-11-15T14:30:00Z",
 		lastSeen: "2024-01-10T08:00:00Z",
+		currentPosition: "Former Minister of Finance",
 	},
 	{
 		dataset: "EU",
@@ -40,6 +47,7 @@ const mockPEPRecords: PepRecord[] = [
 		firstSeen: "2015-03-10T00:00:00Z",
 		lastChange: "2022-09-05T10:15:00Z",
 		lastSeen: "2024-01-08T12:00:00Z",
+		currentPosition: "Deputy Director",
 	},
 	{
 		dataset: "UN",
@@ -51,6 +59,7 @@ const mockPEPRecords: PepRecord[] = [
 		firstSeen: "2010-01-15T00:00:00Z",
 		lastChange: "2024-01-02T16:45:00Z",
 		lastSeen: "2024-01-12T09:30:00Z",
+		currentPosition: "Ambassador",
 	},
 	{
 		dataset: "OFAC",
@@ -62,6 +71,7 @@ const mockPEPRecords: PepRecord[] = [
 		firstSeen: "2019-08-20T00:00:00Z",
 		lastChange: "2023-12-01T11:00:00Z",
 		lastSeen: "2024-01-11T15:20:00Z",
+		currentPosition: null,
 	},
 ];
 
@@ -86,6 +96,11 @@ export function generateMockResult(
 					isPep: true,
 					timestamp: new Date(),
 					record,
+					confidence: "high",
+					currentPosition: record.currentPosition,
+					evidence: ["Name match", "Date of birth match", "Country match"],
+					reasoning: "Strong match found in PEP database",
+					source: "watchlist",
 				});
 			} else {
 				resolve({
@@ -94,6 +109,11 @@ export function generateMockResult(
 					isPep: false,
 					timestamp: new Date(),
 					record: null,
+					confidence: "low",
+					currentPosition: null,
+					evidence: [],
+					reasoning: "No matches found in PEP databases",
+					source: "watchlist",
 				});
 			}
 		}, delay);

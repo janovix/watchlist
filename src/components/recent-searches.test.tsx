@@ -29,7 +29,13 @@ describe("RecentSearches", () => {
 				firstSeen: null,
 				lastChange: null,
 				lastSeen: null,
+				currentPosition: null,
 			},
+			confidence: "high",
+			currentPosition: null,
+			evidence: ["Name match"],
+			reasoning: "Match found in database",
+			source: "watchlist",
 		},
 		{
 			id: "2",
@@ -37,6 +43,11 @@ describe("RecentSearches", () => {
 			isPep: false,
 			timestamp: new Date("2024-01-02"),
 			record: null,
+			confidence: "low",
+			currentPosition: null,
+			evidence: [],
+			reasoning: "No matches found",
+			source: "watchlist",
 		},
 	];
 
@@ -109,6 +120,11 @@ describe("RecentSearches", () => {
 			isPep: false,
 			timestamp: new Date(),
 			record: null,
+			confidence: "low",
+			currentPosition: null,
+			evidence: [],
+			reasoning: "No matches found",
+			source: "watchlist",
 		}));
 
 		renderWithProvider(<RecentSearches searches={manySearches} />);

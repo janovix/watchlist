@@ -8,7 +8,7 @@ import { Header } from "@/components/header";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
-import { searchPep } from "@/lib/api/pep";
+import { evaluatePEP } from "@/lib/api/pep";
 import { useJwt } from "@/hooks/useJwt";
 
 type ViewState = "loading" | "result" | "not-found";
@@ -76,8 +76,11 @@ function QueryContent() {
 		// If not found, check for pending search
 		const pendingName = loadPendingSearch();
 		if (pendingName) {
-			// Call the actual PEP search API (only when JWT is loaded)
-			searchPep(pendingName, { jwt: jwt ?? undefined })
+			// Call the actual PEP evaluation API (only when JWT is loaded)
+			evaluatePEP(
+				{ fullName: pendingName, useHybrid: true },
+				{ jwt: jwt ?? undefined },
+			)
 				.then((apiResult) => {
 					// Transform API response to PEPResult format
 					const result: PEPResult = {
@@ -86,6 +89,11 @@ function QueryContent() {
 						isPep: apiResult.isPep,
 						timestamp: new Date(),
 						record: apiResult.record,
+						confidence: apiResult.confidence,
+						currentPosition: apiResult.currentPosition,
+						evidence: apiResult.evidence,
+						reasoning: apiResult.reasoning,
+						source: apiResult.source,
 					};
 
 					setCurrentResult(result);

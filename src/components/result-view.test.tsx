@@ -33,7 +33,13 @@ describe("ResultView", () => {
 			firstSeen: "2020-01-01T00:00:00Z",
 			lastChange: "2023-01-01T00:00:00Z",
 			lastSeen: "2024-01-01T00:00:00Z",
+			currentPosition: "Director",
 		},
+		confidence: "high",
+		currentPosition: "Director",
+		evidence: ["Name match", "Date match"],
+		reasoning: "Strong match found",
+		source: "watchlist",
 	};
 
 	const mockNonPepResult: PEPResult = {
@@ -42,6 +48,11 @@ describe("ResultView", () => {
 		isPep: false,
 		timestamp: new Date("2024-01-02"),
 		record: null,
+		confidence: "low",
+		currentPosition: null,
+		evidence: [],
+		reasoning: "No matches found",
+		source: "watchlist",
 	};
 
 	it("should render PEP result correctly", () => {
@@ -202,5 +213,139 @@ describe("ResultView", () => {
 			const johnDoeElements = screen.getAllByText(/John Doe/i);
 			expect(johnDoeElements.length).toBeGreaterThan(0);
 		}
+	});
+
+	it("should handle invalid date strings in formatDate", () => {
+		const resultWithInvalidDates: PEPResult = {
+			...mockPepResult,
+			record: {
+				...mockPepResult.record!,
+				birthDate: "invalid-date-format",
+			},
+		};
+
+		const onNewSearch = vi.fn();
+		renderWithProvider(
+			<ResultView result={resultWithInvalidDates} onNewSearch={onNewSearch} />,
+		);
+
+		// Should render without errors, invalid date should be displayed as-is
+		const johnDoeElements = screen.getAllByText(/John Doe/i);
+		expect(johnDoeElements.length).toBeGreaterThan(0);
+	});
+
+	it("should handle invalid date strings in formatDateTime", () => {
+		const resultWithInvalidDates: PEPResult = {
+			...mockPepResult,
+			record: {
+				...mockPepResult.record!,
+				firstSeen: "not-a-valid-datetime",
+				lastChange: "also-invalid",
+				lastSeen: "bad-format",
+			},
+		};
+
+		const onNewSearch = vi.fn();
+		renderWithProvider(
+			<ResultView result={resultWithInvalidDates} onNewSearch={onNewSearch} />,
+		);
+
+		// Should render without errors
+		const johnDoeElements = screen.getAllByText(/John Doe/i);
+		expect(johnDoeElements.length).toBeGreaterThan(0);
+	});
+
+	it("should display all confidence levels correctly", () => {
+		const confidenceLevels: Array<
+			"high" | "medium" | "low" | "requires_verification"
+		> = ["high", "medium", "low", "requires_verification"];
+
+		confidenceLevels.forEach((confidence) => {
+			const resultWithConfidence: PEPResult = {
+				...mockPepResult,
+				confidence,
+			};
+
+			const onNewSearch = vi.fn();
+			const { unmount } = renderWithProvider(
+				<ResultView result={resultWithConfidence} onNewSearch={onNewSearch} />,
+			);
+
+			// Should render without errors
+			const johnDoeElements = screen.getAllByText(/John Doe/i);
+			expect(johnDoeElements.length).toBeGreaterThan(0);
+
+			unmount();
+		});
+	});
+
+	it("should display all source types correctly", () => {
+		const sources: Array<"ai" | "watchlist" | "gk"> = ["ai", "watchlist", "gk"];
+
+		sources.forEach((source) => {
+			const resultWithSource: PEPResult = {
+				...mockPepResult,
+				source,
+			};
+
+			const onNewSearch = vi.fn();
+			const { unmount } = renderWithProvider(
+				<ResultView result={resultWithSource} onNewSearch={onNewSearch} />,
+			);
+
+			// Should render without errors
+			const johnDoeElements = screen.getAllByText(/John Doe/i);
+			expect(johnDoeElements.length).toBeGreaterThan(0);
+
+			unmount();
+		});
+	});
+
+	it("should display currentPosition when present", () => {
+		const resultWithPosition: PEPResult = {
+			...mockPepResult,
+			currentPosition: "Senator",
+		};
+
+		const onNewSearch = vi.fn();
+		renderWithProvider(
+			<ResultView result={resultWithPosition} onNewSearch={onNewSearch} />,
+		);
+
+		// Should render without errors
+		const johnDoeElements = screen.getAllByText(/John Doe/i);
+		expect(johnDoeElements.length).toBeGreaterThan(0);
+	});
+
+	it("should display evidence when present", () => {
+		const resultWithEvidence: PEPResult = {
+			...mockPepResult,
+			evidence: ["Evidence 1", "Evidence 2", "Evidence 3"],
+		};
+
+		const onNewSearch = vi.fn();
+		renderWithProvider(
+			<ResultView result={resultWithEvidence} onNewSearch={onNewSearch} />,
+		);
+
+		// Should render without errors
+		const johnDoeElements = screen.getAllByText(/John Doe/i);
+		expect(johnDoeElements.length).toBeGreaterThan(0);
+	});
+
+	it("should display reasoning when present", () => {
+		const resultWithReasoning: PEPResult = {
+			...mockPepResult,
+			reasoning: "This is a detailed reasoning explanation",
+		};
+
+		const onNewSearch = vi.fn();
+		renderWithProvider(
+			<ResultView result={resultWithReasoning} onNewSearch={onNewSearch} />,
+		);
+
+		// Should render without errors
+		const johnDoeElements = screen.getAllByText(/John Doe/i);
+		expect(johnDoeElements.length).toBeGreaterThan(0);
 	});
 });

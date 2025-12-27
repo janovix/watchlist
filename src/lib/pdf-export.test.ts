@@ -78,7 +78,13 @@ describe("exportResultToPdf", () => {
 			firstSeen: "2020-01-01T00:00:00Z",
 			lastChange: "2023-12-01T00:00:00Z",
 			lastSeen: "2024-01-10T00:00:00Z",
+			currentPosition: "Executive Director",
 		},
+		confidence: "high",
+		currentPosition: "Executive Director",
+		evidence: ["Name match", "Date match"],
+		reasoning: "Strong match found in database",
+		source: "watchlist",
 	};
 
 	const mockNonPepResult: PEPResult = {
@@ -87,6 +93,11 @@ describe("exportResultToPdf", () => {
 		isPep: false,
 		timestamp: new Date("2024-01-15T10:30:00Z"),
 		record: null,
+		confidence: "low",
+		currentPosition: null,
+		evidence: [],
+		reasoning: "No matches found",
+		source: "watchlist",
 	};
 
 	beforeEach(() => {
@@ -209,5 +220,29 @@ describe("exportResultToPdf", () => {
 		// Should have called addPage when content exceeds page height
 		expect(mockAddPage).toHaveBeenCalled();
 		expect(mockSave).toHaveBeenCalled();
+	});
+
+	it("should handle invalid date strings in formatDate catch block", () => {
+		// Mock toLocaleDateString to throw an error to trigger catch block
+		const originalToLocaleDateString = Date.prototype.toLocaleDateString;
+		Date.prototype.toLocaleDateString = vi.fn(() => {
+			throw new Error("Invalid date");
+		});
+
+		const resultWithInvalidBirthDate: PEPResult = {
+			...mockPepResult,
+			record: {
+				...mockPepResult.record!,
+				birthDate: "1980-05-15",
+			},
+		};
+
+		expect(() => {
+			exportResultToPdf(resultWithInvalidBirthDate, mockTranslations, "en-US");
+		}).not.toThrow();
+		expect(mockSave).toHaveBeenCalled();
+
+		// Restore
+		Date.prototype.toLocaleDateString = originalToLocaleDateString;
 	});
 });

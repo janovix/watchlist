@@ -143,4 +143,40 @@ describe("api/http fetchJson", () => {
 			expect(headers).not.toHaveProperty("Authorization");
 		}
 	});
+
+	it("should handle null content-type header", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				return new Response("text response", {
+					status: 200,
+					headers: {},
+				});
+			}),
+		);
+
+		const res = await fetchJson<string>("https://example.com");
+		expect(res.status).toBe(200);
+		expect(res.json).toBe("text response");
+	});
+
+	it("should handle JSON parsing error and return null", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				// Create a response that will fail JSON parsing
+				const response = new Response("invalid json {", {
+					status: 200,
+					headers: { "content-type": "application/json" },
+				});
+				// Mock json() to throw an error
+				response.json = vi.fn().mockRejectedValue(new Error("Invalid JSON"));
+				return response;
+			}),
+		);
+
+		const res = await fetchJson<unknown>("https://example.com");
+		expect(res.status).toBe(200);
+		expect(res.json).toBeNull();
+	});
 });

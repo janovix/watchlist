@@ -46,7 +46,13 @@ const pepResult: PEPResult = {
 		firstSeen: "2018-06-01T00:00:00Z",
 		lastChange: "2023-11-15T14:30:00Z",
 		lastSeen: "2024-01-10T08:00:00Z",
+		currentPosition: "Former Minister",
 	},
+	confidence: "high",
+	currentPosition: "Former Minister",
+	evidence: ["Name match", "Date match", "Country match"],
+	reasoning: "Strong match found in PEP database",
+	source: "watchlist",
 };
 
 const nonPepResult: PEPResult = {
@@ -55,6 +61,11 @@ const nonPepResult: PEPResult = {
 	isPep: false,
 	timestamp: new Date(),
 	record: null,
+	confidence: "low",
+	currentPosition: null,
+	evidence: [],
+	reasoning: "No matches found in PEP databases",
+	source: "watchlist",
 };
 
 export const IsPep: Story = {
