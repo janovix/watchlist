@@ -1,3 +1,10 @@
+# [1.0.0-rc.14](https://github.com/janovix/watchlist/compare/v1.0.0-rc.13...v1.0.0-rc.14) (2026-01-07)
+
+
+### Features
+
+* Add favicon ([80ec49b](https://github.com/janovix/watchlist/commit/80ec49b071f3f855b6ba5f0b59be830aca138ef1))
+
 # [1.0.0-rc.13](https://github.com/janovix/watchlist/compare/v1.0.0-rc.12...v1.0.0-rc.13) (2025-12-19)
 
 
