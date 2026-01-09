@@ -9,13 +9,13 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(nextConfig, {
-	org: "YOUR_SENTRY_ORG",
-	project: "YOUR_SENTRY_PROJECT",
+	org: process.env.SENTRY_ORG,
+	project: process.env.SENTRY_PROJECT,
 	silent: !process.env.CI,
 	widenClientFileUpload: true,
 	tunnelRoute: "/monitoring",
 	release: {
-		name: `watchlist@${sentryEnvironment}`,
+		name: `${process.env.SENTRY_PROJECT}@${sentryEnvironment}`,
 	},
 	webpack: {
 		automaticVercelMonitors: true,
