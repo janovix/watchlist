@@ -24,6 +24,8 @@ export default defineConfig({
 				// Type-only files and barrel exports
 				"**/index.ts",
 				"**/types.ts",
+				// Sentry instrumentation files
+				"src/instrumentation*.ts",
 			],
 			thresholds: {
 				lines: 90,
