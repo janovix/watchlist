@@ -1,3 +1,11 @@
+# [1.0.0-rc.15](https://github.com/janovix/watchlist/compare/v1.0.0-rc.14...v1.0.0-rc.15) (2026-01-09)
+
+
+### Features
+
+* Integrate Sentry for error monitoring and tracing ([cb4aa5f](https://github.com/janovix/watchlist/commit/cb4aa5f671de8bf9b8248d62fc187e380ff234d7))
+* Use environment variables for Sentry config ([4c7e0f1](https://github.com/janovix/watchlist/commit/4c7e0f1f84e2f8c18d5250de254bb926b1a2f843))
+
 # [1.0.0-rc.14](https://github.com/janovix/watchlist/compare/v1.0.0-rc.13...v1.0.0-rc.14) (2026-01-07)
 
 
