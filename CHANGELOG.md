@@ -1,3 +1,33 @@
+# [1.1.0](https://github.com/janovix/watchlist/compare/v1.0.0...v1.1.0) (2026-01-10)
+
+
+### Bug Fixes
+
+* **auth:** align logout logic with aml project ([566a7ee](https://github.com/janovix/watchlist/commit/566a7ee157b30542a2cb935c713674b2696b9919))
+* **auth:** align logout with aml - same function and better-auth v1.4.5 ([d13172a](https://github.com/janovix/watchlist/commit/d13172acb69ce706841fa7112ca9333ea25f12dc))
+* **auth:** prevent duplicate search requests by waiting for JWT to load ([6c9c0b6](https://github.com/janovix/watchlist/commit/6c9c0b662637d81985fdad208f11cee6e0640d50))
+* **auth:** remove SessionGuard to match aml middleware-only approach ([460d560](https://github.com/janovix/watchlist/commit/460d5601958f419821c1aa16cdad0866ebb89407))
+* **auth:** remove state update before logout to match aml ([4dcca67](https://github.com/janovix/watchlist/commit/4dcca678e484db8dfdd5d183ece4ec807bb86840))
+* **auth:** use authClient.signOut and redirect to /login path ([16fdb3e](https://github.com/janovix/watchlist/commit/16fdb3e41632a1b6045bc5559a779e446b431d4e))
+* **auth:** use authClient.signOut instead of manual fetch ([e47a480](https://github.com/janovix/watchlist/commit/e47a480c501d32601c9d06ee111c816dc944e2b0))
+* **auth:** use direct fetch with redirect manual on logout ([b39beae](https://github.com/janovix/watchlist/commit/b39beaebe6ebcb6e0e2033f9d60464d3555b81fd))
+* **auth:** use direct fetch with redirect manual to prevent auto-redirect ([3560853](https://github.com/janovix/watchlist/commit/3560853b61fdd1df97b0bd32712ed2a1e64ce7cc))
+* **auth:** use onSuccess callback in signOut to control redirect ([9855dea](https://github.com/janovix/watchlist/commit/9855deafeb6181a68fb45065e33cbc39f8caf472))
+* **middleware:** validate session with auth service ([6e175a1](https://github.com/janovix/watchlist/commit/6e175a18047659e5f05b59277b5afd47a2d65d37))
+
+
+### Features
+
+* Add auth module tests and utilities ([7f4999c](https://github.com/janovix/watchlist/commit/7f4999c22bbf6eb52b6faaf0d54fe2f000d0d729))
+* Add favicon ([b9cd8ce](https://github.com/janovix/watchlist/commit/b9cd8ce7448376df1d508bdc871cbca5d4bbdbb4))
+* Add PDF export functionality for search results ([9f17e4a](https://github.com/janovix/watchlist/commit/9f17e4ace09e436bed933c43c5593efe0a7439c5))
+* Add session guard and integrate auth ([262cb6e](https://github.com/janovix/watchlist/commit/262cb6e14fc7d95fab9d5de4ce994799314353f7))
+* Add tests for pep API and UI components ([5830183](https://github.com/janovix/watchlist/commit/5830183b2ffa7d9912312f8f7d6e9170a30ae931))
+* **auth:** add JWT authentication support for watchlist-svc API calls ([01a3eb9](https://github.com/janovix/watchlist/commit/01a3eb99142449e7759e0997195c40a442632a49))
+* Implement Better Auth integration ([1a76944](https://github.com/janovix/watchlist/commit/1a76944005e71b984f7159f48e64217a28f1c12d))
+* Integrate Sentry for error monitoring and tracing ([de433e7](https://github.com/janovix/watchlist/commit/de433e78c47daa8107d464ad5ff3eaf745aeb856))
+* Use environment variables for Sentry config ([a7b1c38](https://github.com/janovix/watchlist/commit/a7b1c38abf1ee8c4609a32962b1599845d89d86f))
+
 # [1.0.0-rc.15](https://github.com/janovix/watchlist/compare/v1.0.0-rc.14...v1.0.0-rc.15) (2026-01-09)
 
 
