@@ -40,75 +40,64 @@ describe("RecentSearches", () => {
 		},
 	];
 
-	it("should render nothing when searches array is empty", () => {
-		const onSelectSearch = vi.fn();
-		const { container } = renderWithProvider(
-			<RecentSearches searches={[]} onSelectSearch={onSelectSearch} />,
+	it("should render call-to-action when searches array is empty", () => {
+		const handleStartSearch = vi.fn();
+		renderWithProvider(
+			<RecentSearches searches={[]} onStartSearch={handleStartSearch} />,
 		);
 
-		expect(container.firstChild).toBeNull();
+		// Should show the call-to-action message
+		expect(screen.getByText(/no recent searches/i)).toBeInTheDocument();
+		expect(
+			screen.getByText(/start your first/i) ||
+				screen.getByText(/realiza tu primera/i) ||
+				screen.getByText(/comece sua primeira/i),
+		).toBeInTheDocument();
+
+		// Should have a button to start search
+		const button = screen.getByRole("button");
+		expect(button).toBeInTheDocument();
+
+		// Clicking the button should call onStartSearch
+		fireEvent.click(button);
+		expect(handleStartSearch).toHaveBeenCalledTimes(1);
 	});
 
 	it("should render recent searches list", () => {
-		const onSelectSearch = vi.fn();
-		renderWithProvider(
-			<RecentSearches
-				searches={mockSearches}
-				onSelectSearch={onSelectSearch}
-			/>,
-		);
+		renderWithProvider(<RecentSearches searches={mockSearches} />);
 
 		expect(screen.getByText("John Doe")).toBeInTheDocument();
 		expect(screen.getByText("Jane Smith")).toBeInTheDocument();
 	});
 
-	it("should call onSelectSearch when a search is clicked", () => {
-		const onSelectSearch = vi.fn();
-		renderWithProvider(
-			<RecentSearches
-				searches={mockSearches}
-				onSelectSearch={onSelectSearch}
-			/>,
-		);
+	it("should render links to query pages", () => {
+		renderWithProvider(<RecentSearches searches={mockSearches} />);
 
-		const johnDoeButton = screen.getByText("John Doe").closest("button");
-		if (johnDoeButton) {
-			fireEvent.click(johnDoeButton);
-		}
+		const johnDoeLink = screen.getByText("John Doe").closest("a");
+		expect(johnDoeLink).toHaveAttribute("href", "/1");
 
-		expect(onSelectSearch).toHaveBeenCalledWith(mockSearches[0]);
+		const janeSmithLink = screen.getByText("Jane Smith").closest("a");
+		expect(janeSmithLink).toHaveAttribute("href", "/2");
 	});
 
 	it("should display PEP indicator for PEP results", () => {
-		const onSelectSearch = vi.fn();
-		renderWithProvider(
-			<RecentSearches
-				searches={mockSearches}
-				onSelectSearch={onSelectSearch}
-			/>,
-		);
+		renderWithProvider(<RecentSearches searches={mockSearches} />);
 
 		// Should show "yes" or "Sí" for PEP results
 		const pepBadge = screen
 			.getByText("John Doe")
-			.closest("button")
+			.closest("a")
 			?.querySelector(".text-destructive");
 		expect(pepBadge).toBeInTheDocument();
 	});
 
 	it("should display non-PEP indicator for non-PEP results", () => {
-		const onSelectSearch = vi.fn();
-		renderWithProvider(
-			<RecentSearches
-				searches={mockSearches}
-				onSelectSearch={onSelectSearch}
-			/>,
-		);
+		renderWithProvider(<RecentSearches searches={mockSearches} />);
 
 		// Should show "no" or "No" for non-PEP results
 		const nonPepBadge = screen
 			.getByText("Jane Smith")
-			.closest("button")
+			.closest("a")
 			?.querySelector(".text-green-600");
 		expect(nonPepBadge).toBeInTheDocument();
 	});
@@ -122,32 +111,20 @@ describe("RecentSearches", () => {
 			record: null,
 		}));
 
-		const onSelectSearch = vi.fn();
-		renderWithProvider(
-			<RecentSearches
-				searches={manySearches}
-				onSelectSearch={onSelectSearch}
-			/>,
-		);
+		renderWithProvider(<RecentSearches searches={manySearches} />);
 
-		const buttons = screen.getAllByRole("button");
+		const links = screen.getAllByRole("link");
 		// Should only show 5 searches
-		expect(buttons.length).toBeLessThanOrEqual(5);
+		expect(links.length).toBeLessThanOrEqual(5);
 	});
 
 	it("should display formatted timestamp", () => {
-		const onSelectSearch = vi.fn();
-		renderWithProvider(
-			<RecentSearches
-				searches={mockSearches}
-				onSelectSearch={onSelectSearch}
-			/>,
-		);
+		renderWithProvider(<RecentSearches searches={mockSearches} />);
 
 		// Timestamp should be displayed
 		const timestamp = screen
 			.getByText("John Doe")
-			.closest("button")
+			.closest("a")
 			?.querySelector(".text-xs");
 		expect(timestamp).toBeInTheDocument();
 	});

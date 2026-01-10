@@ -21,6 +21,10 @@ export const translations = {
 
 		// Recent Searches
 		recentSearches: "Pesquisas recentes",
+		noRecentSearches: "Nenhuma pesquisa recente",
+		noRecentSearchesDescription:
+			"Comece sua primeira verificação PEP para ver suas pesquisas aqui.",
+		startFirstSearch: "Fazer primeira pesquisa",
 
 		// Loading View
 		verifyingIdentity: "Verificando identidade",
@@ -51,6 +55,7 @@ export const translations = {
 		queryDate: "Data da consulta:",
 		queryId: "ID da consulta:",
 		newSearch: "Realizar outra pesquisa",
+		exportPdf: "Exportar para PDF",
 		noData: "Sem dados",
 		na: "N/A",
 
@@ -98,6 +103,10 @@ export const translations = {
 
 		// Recent Searches
 		recentSearches: "Búsquedas recientes",
+		noRecentSearches: "No hay búsquedas recientes",
+		noRecentSearchesDescription:
+			"Realiza tu primera verificación PEP para ver tus búsquedas aquí.",
+		startFirstSearch: "Realizar primera búsqueda",
 
 		// Loading View
 		verifyingIdentity: "Verificando identidad",
@@ -129,6 +138,7 @@ export const translations = {
 		queryDate: "Fecha de consulta:",
 		queryId: "ID de consulta:",
 		newSearch: "Realizar otra búsqueda",
+		exportPdf: "Exportar a PDF",
 		noData: "Sin datos",
 		na: "N/A",
 
@@ -176,6 +186,10 @@ export const translations = {
 
 		// Recent Searches
 		recentSearches: "Recent searches",
+		noRecentSearches: "No recent searches",
+		noRecentSearchesDescription:
+			"Start your first PEP verification to see your searches here.",
+		startFirstSearch: "Start first search",
 
 		// Loading View
 		verifyingIdentity: "Verifying identity",
@@ -207,6 +221,7 @@ export const translations = {
 		queryDate: "Query date:",
 		queryId: "Query ID:",
 		newSearch: "Perform another search",
+		exportPdf: "Export to PDF",
 		noData: "No data",
 		na: "N/A",
 

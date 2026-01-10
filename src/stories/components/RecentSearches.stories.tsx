@@ -78,7 +78,6 @@ const mockSearches: PEPResult[] = [
 export const Default: Story = {
 	args: {
 		searches: mockSearches,
-		onSelectSearch: (result) => console.log("Selected:", result),
 	},
 	parameters: {
 		docs: {
@@ -93,13 +92,15 @@ export const Default: Story = {
 export const Empty: Story = {
 	args: {
 		searches: [],
-		onSelectSearch: (result) => console.log("Selected:", result),
+		onStartSearch: () => {
+			console.log("Start search clicked");
+		},
 	},
 	parameters: {
 		docs: {
 			description: {
 				story:
-					"Empty state - component renders nothing when there are no recent searches.",
+					"Empty state - component shows a call-to-action inviting the user to make their first search when there are no recent searches.",
 			},
 		},
 	},
@@ -134,7 +135,6 @@ export const ManySearches: Story = {
 				},
 			},
 		],
-		onSelectSearch: (result) => console.log("Selected:", result),
 	},
 	parameters: {
 		docs: {

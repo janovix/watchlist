@@ -9,11 +9,13 @@ import {
 	Globe,
 	User,
 	Clock,
+	Download,
 } from "lucide-react";
 import type { PEPResult } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/language-provider";
-import { getLocaleForLanguage } from "@/lib/translations";
+import { getLocaleForLanguage, translations } from "@/lib/translations";
+import { exportResultToPdf } from "@/lib/pdf-export";
 
 interface ResultViewProps {
 	result: PEPResult;
@@ -281,6 +283,15 @@ export function ResultView({ result, onNewSearch }: ResultViewProps) {
 				>
 					<Search className="mr-2 h-4 w-4" />
 					{t("newSearch")}
+				</Button>
+				<Button
+					onClick={() => {
+						exportResultToPdf(result, translations[language], locale);
+					}}
+					variant="outline"
+				>
+					<Download className="mr-2 h-4 w-4" />
+					{t("exportPdf")}
 				</Button>
 			</div>
 		</div>

@@ -43,7 +43,7 @@ export function LanguageToggle() {
 			<Button
 				variant="ghost"
 				size="sm"
-				className="h-8 px-3 text-xs font-medium rounded-lg bg-secondary text-foreground"
+				className="h-7 sm:h-8 px-2 sm:px-3 text-xs font-medium rounded-lg bg-secondary text-foreground"
 				onClick={() => setIsOpen(!isOpen)}
 			>
 				{currentLabel}

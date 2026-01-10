@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SessionHydrator } from "@/lib/auth/useAuthSession";
+import { getServerSession } from "@/lib/auth/getServerSession";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -14,18 +16,30 @@ export const metadata: Metadata = {
 	description:
 		"Sistema de verificación PEP para compliance y debida diligencia",
 	generator: "v0.app",
+	manifest: "/site.webmanifest",
+	icons: {
+		icon: [
+			{ url: "/favicon.ico" },
+			{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+			{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+		],
+		apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	// Fetch session on server for SSR hydration
+	const session = await getServerSession();
+
 	return (
 		<html lang="es" suppressHydrationWarning>
 			<body className="font-sans antialiased">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
+					<SessionHydrator serverSession={session}>{children}</SessionHydrator>
 				</ThemeProvider>
 				<Analytics />
 			</body>
