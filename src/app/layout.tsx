@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionHydrator } from "@/lib/auth/useAuthSession";
 import { getServerSession } from "@/lib/auth/getServerSession";
+import { getServerSettings, SettingsProvider } from "@/lib/settings";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -32,15 +33,34 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	// Fetch session on server for SSR hydration
-	const session = await getServerSession();
+	// Fetch session and settings on server for SSR hydration
+	const [session, settings] = await Promise.all([
+		getServerSession(),
+		getServerSettings(),
+	]);
+
+	// Use settings for language in HTML lang attribute
+	const htmlLang =
+		settings.language === "pt"
+			? "pt"
+			: settings.language === "en"
+				? "en"
+				: "es";
 
 	return (
-		<html lang="es" suppressHydrationWarning>
+		<html lang={htmlLang} suppressHydrationWarning>
 			<body className="font-sans antialiased">
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<SessionHydrator serverSession={session}>{children}</SessionHydrator>
-				</ThemeProvider>
+				<SettingsProvider serverSettings={settings}>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme={settings.theme}
+						enableSystem={settings.theme === "system"}
+					>
+						<SessionHydrator serverSession={session}>
+							{children}
+						</SessionHydrator>
+					</ThemeProvider>
+				</SettingsProvider>
 				<Analytics />
 			</body>
 		</html>
