@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { UserMenu } from "@/components/user-menu";
 import { LanguageProvider } from "@/components/language-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const meta: Meta<typeof UserMenu> = {
 	title: "Components/UserMenu",
@@ -16,11 +17,13 @@ const meta: Meta<typeof UserMenu> = {
 	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
-			<LanguageProvider>
-				<div className="flex justify-end p-8">
-					<Story />
-				</div>
-			</LanguageProvider>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<LanguageProvider>
+					<div className="flex justify-end p-8">
+						<Story />
+					</div>
+				</LanguageProvider>
+			</ThemeProvider>
 		),
 	],
 };
