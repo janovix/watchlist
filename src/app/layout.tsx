@@ -5,7 +5,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionHydrator } from "@/lib/auth/useAuthSession";
 import { getServerSession } from "@/lib/auth/getServerSession";
-import { getServerSettings, SettingsProvider } from "@/lib/settings";
+import { SettingsProvider } from "@/lib/settings";
+import { getServerSettings } from "@/lib/settings/getServerSettings";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });

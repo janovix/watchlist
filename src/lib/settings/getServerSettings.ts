@@ -1,3 +1,5 @@
+"use server";
+
 import { cookies, headers } from "next/headers";
 import { getAuthCoreBaseUrl, getAuthAppUrl } from "../auth/config";
 import type { ResolvedSettings, LanguageCode, Theme } from "./types";
