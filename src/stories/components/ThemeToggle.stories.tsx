@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageProvider } from "@/components/language-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const meta: Meta<typeof ThemeToggle> = {
 	title: "Components/ThemeToggle",
@@ -16,9 +17,11 @@ const meta: Meta<typeof ThemeToggle> = {
 	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
-			<LanguageProvider>
-				<Story />
-			</LanguageProvider>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<LanguageProvider>
+					<Story />
+				</LanguageProvider>
+			</ThemeProvider>
 		),
 	],
 };
