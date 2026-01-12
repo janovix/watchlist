@@ -11,6 +11,22 @@ export type DateFormat =
 export type LanguageCode = "en" | "es" | "pt";
 
 /**
+ * User settings from auth-svc
+ */
+export interface UserSettings {
+	id: string;
+	userId: string;
+	theme: Theme | null;
+	timezone: string | null;
+	language: LanguageCode | null;
+	dateFormat: DateFormat | null;
+	avatarUrl: string | null;
+	metadata: Record<string, unknown> | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
  * Resolved settings from auth-svc
  */
 export interface ResolvedSettings {
@@ -25,6 +41,26 @@ export interface ResolvedSettings {
 		language: "user" | "organization" | "browser" | "default";
 		dateFormat: "user" | "organization" | "default";
 	};
+}
+
+/**
+ * Input for updating user settings
+ */
+export interface UpdateUserSettingsInput {
+	theme?: Theme | null;
+	timezone?: string | null;
+	language?: LanguageCode | null;
+	dateFormat?: DateFormat | null;
+	avatarUrl?: string | null;
+}
+
+/**
+ * API response wrapper
+ */
+export interface SettingsApiResponse<T> {
+	success: boolean;
+	data: T;
+	error?: string;
 }
 
 /**

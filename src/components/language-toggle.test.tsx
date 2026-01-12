@@ -9,6 +9,25 @@ import {
 import { LanguageToggle } from "./language-toggle";
 import { LanguageProvider } from "./language-provider";
 
+// Mock cookies module
+vi.mock("@/lib/cookies", () => ({
+	getCookie: vi.fn(),
+	setCookie: vi.fn(),
+	COOKIE_NAMES: {
+		THEME: "janovix-theme",
+		LANGUAGE: "janovix-lang",
+	},
+}));
+
+// Mock settings module
+vi.mock("@/lib/settings", () => ({
+	getResolvedSettings: vi.fn(),
+	updateUserSettings: vi.fn(),
+}));
+
+import { getCookie, setCookie } from "@/lib/cookies";
+import { getResolvedSettings, updateUserSettings } from "@/lib/settings";
+
 const renderWithProvider = (component: React.ReactElement) => {
 	return render(<LanguageProvider>{component}</LanguageProvider>);
 };
@@ -17,21 +36,17 @@ describe("LanguageToggle", () => {
 	afterEach(() => {
 		cleanup();
 	});
-	const originalLocalStorage = global.localStorage;
 
 	beforeEach(() => {
-		global.localStorage = {
-			getItem: vi.fn(() => "es"),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage;
+		vi.clearAllMocks();
+		vi.mocked(getCookie).mockReturnValue("es");
+		vi.mocked(getResolvedSettings).mockRejectedValue(
+			new Error("Not authenticated"),
+		);
+		vi.mocked(updateUserSettings).mockResolvedValue({} as never);
 	});
 
 	afterEach(() => {
-		global.localStorage = originalLocalStorage;
 		vi.restoreAllMocks();
 	});
 
@@ -43,16 +58,9 @@ describe("LanguageToggle", () => {
 	});
 
 	it("should display current language code", async () => {
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => "en"),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue("en");
 
-		const { container } = renderWithProvider(<LanguageToggle />);
+		renderWithProvider(<LanguageToggle />);
 
 		await waitFor(() => {
 			expect(screen.getByText("EN")).toBeInTheDocument();
@@ -100,17 +108,9 @@ describe("LanguageToggle", () => {
 	});
 
 	it("should change language when a language option is clicked", async () => {
-		const setItemSpy = vi.fn();
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => "es"),
-			setItem: setItemSpy,
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue("es");
 
-		const { container } = renderWithProvider(<LanguageToggle />);
+		renderWithProvider(<LanguageToggle />);
 
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
@@ -122,21 +122,14 @@ describe("LanguageToggle", () => {
 		});
 
 		await waitFor(() => {
-			expect(setItemSpy).toHaveBeenCalledWith("language", "pt");
+			expect(setCookie).toHaveBeenCalledWith("janovix-lang", "pt");
 		});
 	});
 
 	it("should highlight current language in dropdown", async () => {
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => "en"),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue("en");
 
-		const { container } = renderWithProvider(<LanguageToggle />);
+		renderWithProvider(<LanguageToggle />);
 
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
@@ -150,17 +143,9 @@ describe("LanguageToggle", () => {
 	});
 
 	it("should handle language change to English", async () => {
-		const setItemSpy = vi.fn();
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => "es"),
-			setItem: setItemSpy,
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue("es");
 
-		const { container } = renderWithProvider(<LanguageToggle />);
+		renderWithProvider(<LanguageToggle />);
 
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
@@ -172,22 +157,14 @@ describe("LanguageToggle", () => {
 		});
 
 		await waitFor(() => {
-			expect(setItemSpy).toHaveBeenCalledWith("language", "en");
+			expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
 		});
 	});
 
 	it("should handle language change to Spanish", async () => {
-		const setItemSpy = vi.fn();
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => "en"),
-			setItem: setItemSpy,
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue("en");
 
-		const { container } = renderWithProvider(<LanguageToggle />);
+		renderWithProvider(<LanguageToggle />);
 
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
@@ -199,7 +176,7 @@ describe("LanguageToggle", () => {
 		});
 
 		await waitFor(() => {
-			expect(setItemSpy).toHaveBeenCalledWith("language", "es");
+			expect(setCookie).toHaveBeenCalledWith("janovix-lang", "es");
 		});
 	});
 });

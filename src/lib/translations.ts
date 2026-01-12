@@ -82,6 +82,25 @@ export const translations = {
 		help: "Ajuda e suporte",
 		notifications: "Notificações",
 		logout: "Sair",
+
+		// Subscription banner
+		subscriptionFreeTier: "Plano Gratuito",
+		subscriptionFreeTierDesc:
+			"Você está usando o plano gratuito com buscas limitadas.",
+		subscriptionNearLimit: "Perto do limite",
+		subscriptionNearLimitDesc:
+			"Você está se aproximando do limite de {metrics}.",
+		subscriptionLimitReached: "Limite atingido",
+		subscriptionLimitReachedDesc:
+			"Você atingiu o limite de {metrics}. Atualize para continuar.",
+		subscriptionUpgrade: "Atualizar plano",
+		subscriptionMetricNotices: "avisos",
+		subscriptionMetricUsers: "usuários",
+		subscriptionMetricAlerts: "buscas",
+		subscriptionMetricTransactions: "transações",
+
+		// Common additions
+		dismiss: "Descartar",
 	},
 	es: {
 		// Header
@@ -165,6 +184,24 @@ export const translations = {
 		help: "Ayuda y soporte",
 		notifications: "Notificaciones",
 		logout: "Cerrar sesión",
+
+		// Subscription banner
+		subscriptionFreeTier: "Plan Gratuito",
+		subscriptionFreeTierDesc:
+			"Estás usando el plan gratuito con búsquedas limitadas.",
+		subscriptionNearLimit: "Cerca del límite",
+		subscriptionNearLimitDesc: "Te estás acercando al límite de {metrics}.",
+		subscriptionLimitReached: "Límite alcanzado",
+		subscriptionLimitReachedDesc:
+			"Has alcanzado el límite de {metrics}. Mejora tu plan para continuar.",
+		subscriptionUpgrade: "Mejorar plan",
+		subscriptionMetricNotices: "avisos",
+		subscriptionMetricUsers: "usuarios",
+		subscriptionMetricAlerts: "búsquedas",
+		subscriptionMetricTransactions: "transacciones",
+
+		// Common additions
+		dismiss: "Descartar",
 	},
 	en: {
 		// Header
@@ -248,6 +285,24 @@ export const translations = {
 		help: "Help & support",
 		notifications: "Notifications",
 		logout: "Log out",
+
+		// Subscription banner
+		subscriptionFreeTier: "Free Plan",
+		subscriptionFreeTierDesc:
+			"You're using the free plan with limited searches.",
+		subscriptionNearLimit: "Near limit",
+		subscriptionNearLimitDesc: "You're approaching your {metrics} limit.",
+		subscriptionLimitReached: "Limit reached",
+		subscriptionLimitReachedDesc:
+			"You've reached your {metrics} limit. Upgrade to continue.",
+		subscriptionUpgrade: "Upgrade plan",
+		subscriptionMetricNotices: "notices",
+		subscriptionMetricUsers: "users",
+		subscriptionMetricAlerts: "searches",
+		subscriptionMetricTransactions: "transactions",
+
+		// Common additions
+		dismiss: "Dismiss",
 	},
 };
 
