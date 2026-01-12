@@ -5,6 +5,7 @@ import { User, Settings, HelpCircle, Bell, LogOut } from "lucide-react";
 import { useLanguage } from "./language-provider";
 import { useAuthSession } from "@/lib/auth/useAuthSession";
 import { logout } from "@/lib/auth/actions";
+import { getAuthAppUrl } from "@/lib/auth/config";
 
 function getInitials(name: string): string {
 	return name
@@ -37,22 +38,18 @@ export function UserMenu() {
 		await logout();
 	};
 
+	const authAppUrl = getAuthAppUrl();
+
 	const menuItems = [
 		{
 			icon: User,
 			label: t("profile"),
-			action: () => {
-				console.log("Profile clicked");
-				setIsOpen(false);
-			},
+			href: `${authAppUrl}/settings`,
 		},
 		{
 			icon: Settings,
 			label: t("settings"),
-			action: () => {
-				console.log("Settings clicked");
-				setIsOpen(false);
-			},
+			href: `${authAppUrl}/settings`,
 		},
 		{
 			icon: Bell,
@@ -111,25 +108,37 @@ export function UserMenu() {
 
 					{/* Menu items */}
 					<div className="py-1">
-						{menuItems.map((item, index) => (
-							<button
-								key={index}
-								onClick={item.action}
-								className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
-							>
-								<item.icon className="h-4 w-4 text-muted-foreground" />
-								{item.label}
-							</button>
-						))}
+						{menuItems.map((item, index) =>
+							item.href ? (
+								<a
+									key={index}
+									href={item.href}
+									className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
+									onClick={() => setIsOpen(false)}
+								>
+									<item.icon className="h-4 w-4 text-muted-foreground" />
+									{item.label}
+								</a>
+							) : (
+								<button
+									key={index}
+									onClick={item.action}
+									className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
+								>
+									<item.icon className="h-4 w-4 text-muted-foreground" />
+									{item.label}
+								</button>
+							),
+						)}
 					</div>
 
 					{/* Logout */}
 					<div className="border-t border-border py-1">
 						<button
 							onClick={handleSignOut}
-							className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+							className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
 						>
-							<LogOut className="h-4 w-4" />
+							<LogOut className="h-4 w-4 text-muted-foreground" />
 							{t("logout")}
 						</button>
 					</div>
