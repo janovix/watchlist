@@ -1,3 +1,12 @@
+# [1.1.0-rc.2](https://github.com/janovix/watchlist/compare/v1.1.0-rc.1...v1.1.0-rc.2) (2026-01-16)
+
+
+### Features
+
+* **middleware:** add onboarding redirection for users without a name or organization ([2daff26](https://github.com/janovix/watchlist/commit/2daff2648d95ef3a863db8743c5981c27488269e))
+* **middleware:** enhance session validation and add external URL handling for redirects ([e2f3f8e](https://github.com/janovix/watchlist/commit/e2f3f8e7da52a9b059fdfbac7e952a9582d4182d))
+* **subscription:** add SubscriptionBanner component and related functionality for subscription status notifications ([4cf6577](https://github.com/janovix/watchlist/commit/4cf65770a35d1199d7fbb0e1b9a056e156f76da0))
+
 # [1.1.0-rc.1](https://github.com/janovix/watchlist/compare/v1.0.0...v1.1.0-rc.1) (2026-01-12)
 
 
