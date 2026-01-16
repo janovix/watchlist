@@ -6,6 +6,7 @@ import {
 	waitFor,
 	cleanup,
 } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { LanguageToggle } from "./language-toggle";
 import { LanguageProvider } from "./language-provider";
 
@@ -68,62 +69,105 @@ describe("LanguageToggle", () => {
 	});
 
 	it("should open dropdown when clicked", async () => {
-		const { container } = renderWithProvider(<LanguageToggle />);
+		const user = userEvent.setup();
+		renderWithProvider(<LanguageToggle />);
+
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			expect(buttons.length).toBeGreaterThan(0);
+		});
 
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
-		fireEvent.click(toggleButton);
+		await user.click(toggleButton);
 
-		await waitFor(() => {
-			const ptButtons = screen.getAllByText("PT");
-			expect(ptButtons.length).toBeGreaterThan(0);
-		});
+		// Wait for dropdown menu items to appear (portaled content)
+		await waitFor(
+			() => {
+				const menuItems = screen.getAllByRole("menuitem");
+				expect(menuItems.length).toBeGreaterThan(0);
+				const ptButton = menuItems.find((item) => item.textContent === "PT");
+				expect(ptButton).toBeInTheDocument();
+			},
+			{ timeout: 3000 },
+		);
 	});
 
 	it("should close dropdown when clicking outside", async () => {
-		const { container } = renderWithProvider(
+		const user = userEvent.setup();
+		renderWithProvider(
 			<div>
 				<LanguageToggle />
 				<div data-testid="outside">Outside</div>
 			</div>,
 		);
 
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			expect(buttons.length).toBeGreaterThan(0);
+		});
+
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
-		fireEvent.click(toggleButton);
+		await user.click(toggleButton);
 
-		await waitFor(() => {
-			const ptButtons = screen.queryAllByText("PT");
-			expect(ptButtons.length).toBeGreaterThan(0);
-		});
+		// Wait for dropdown to open
+		await waitFor(
+			() => {
+				const menuItems = screen.getAllByRole("menuitem");
+				expect(menuItems.length).toBeGreaterThan(0);
+			},
+			{ timeout: 3000 },
+		);
 
 		const outside = screen.getByTestId("outside");
-		fireEvent.mouseDown(outside);
+		await user.click(outside);
 
-		await waitFor(() => {
-			// Dropdown should close - check that dropdown container is not visible
-			const dropdown = container.querySelector(".absolute.top-full");
-			expect(dropdown).not.toBeInTheDocument();
-		});
+		// Wait for dropdown to close (menu items should disappear)
+		await waitFor(
+			() => {
+				const menuItems = screen.queryAllByRole("menuitem");
+				expect(menuItems.length).toBe(0);
+			},
+			{ timeout: 3000 },
+		);
 	});
 
 	it("should change language when a language option is clicked", async () => {
+		const user = userEvent.setup();
 		vi.mocked(getCookie).mockReturnValue("es");
 
 		renderWithProvider(<LanguageToggle />);
 
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			expect(buttons.length).toBeGreaterThan(0);
+		});
+
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
-		fireEvent.click(toggleButton);
+		await user.click(toggleButton);
 
-		await waitFor(() => {
-			const ptButton = screen.getByText("PT");
-			fireEvent.click(ptButton);
-		});
+		// Wait for dropdown to open and find PT menu item
+		await waitFor(
+			async () => {
+				const menuItems = screen.getAllByRole("menuitem");
+				expect(menuItems.length).toBeGreaterThan(0);
+				const ptButton = menuItems.find((item) => item.textContent === "PT");
+				expect(ptButton).toBeInTheDocument();
+				if (ptButton) {
+					await user.click(ptButton);
+				}
+			},
+			{ timeout: 3000 },
+		);
 
-		await waitFor(() => {
-			expect(setCookie).toHaveBeenCalledWith("janovix-lang", "pt");
-		});
+		await waitFor(
+			() => {
+				expect(setCookie).toHaveBeenCalledWith("janovix-lang", "pt");
+			},
+			{ timeout: 3000 },
+		);
 	});
 
 	it("should highlight current language in dropdown", async () => {
@@ -131,52 +175,96 @@ describe("LanguageToggle", () => {
 
 		renderWithProvider(<LanguageToggle />);
 
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			expect(buttons.length).toBeGreaterThan(0);
+		});
+
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
 		fireEvent.click(toggleButton);
 
-		await waitFor(() => {
-			const allButtons = screen.getAllByRole("button");
-			const enButton = allButtons.find((btn) => btn.textContent === "EN");
-			expect(enButton).toBeDefined();
-		});
+		await waitFor(
+			() => {
+				const allButtons = screen.getAllByRole("button");
+				const enButton = allButtons.find((btn) => btn.textContent === "EN");
+				expect(enButton).toBeDefined();
+			},
+			{ timeout: 3000 },
+		);
 	});
 
 	it("should handle language change to English", async () => {
+		const user = userEvent.setup();
 		vi.mocked(getCookie).mockReturnValue("es");
 
 		renderWithProvider(<LanguageToggle />);
 
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			expect(buttons.length).toBeGreaterThan(0);
+		});
+
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
-		fireEvent.click(toggleButton);
+		await user.click(toggleButton);
 
-		await waitFor(() => {
-			const enButton = screen.getByText("EN");
-			fireEvent.click(enButton);
-		});
+		// Wait for dropdown to open and find EN menu item
+		await waitFor(
+			async () => {
+				const menuItems = screen.getAllByRole("menuitem");
+				expect(menuItems.length).toBeGreaterThan(0);
+				const enButton = menuItems.find((item) => item.textContent === "EN");
+				expect(enButton).toBeInTheDocument();
+				if (enButton) {
+					await user.click(enButton);
+				}
+			},
+			{ timeout: 3000 },
+		);
 
-		await waitFor(() => {
-			expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
-		});
+		await waitFor(
+			() => {
+				expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
+			},
+			{ timeout: 3000 },
+		);
 	});
 
 	it("should handle language change to Spanish", async () => {
+		const user = userEvent.setup();
 		vi.mocked(getCookie).mockReturnValue("en");
 
 		renderWithProvider(<LanguageToggle />);
 
+		await waitFor(() => {
+			const buttons = screen.getAllByRole("button");
+			expect(buttons.length).toBeGreaterThan(0);
+		});
+
 		const buttons = screen.getAllByRole("button");
 		const toggleButton = buttons[0];
-		fireEvent.click(toggleButton);
+		await user.click(toggleButton);
 
-		await waitFor(() => {
-			const esButton = screen.getByText("ES");
-			fireEvent.click(esButton);
-		});
+		// Wait for dropdown to open and find ES menu item
+		await waitFor(
+			async () => {
+				const menuItems = screen.getAllByRole("menuitem");
+				expect(menuItems.length).toBeGreaterThan(0);
+				const esButton = menuItems.find((item) => item.textContent === "ES");
+				expect(esButton).toBeInTheDocument();
+				if (esButton) {
+					await user.click(esButton);
+				}
+			},
+			{ timeout: 3000 },
+		);
 
-		await waitFor(() => {
-			expect(setCookie).toHaveBeenCalledWith("janovix-lang", "es");
-		});
+		await waitFor(
+			() => {
+				expect(setCookie).toHaveBeenCalledWith("janovix-lang", "es");
+			},
+			{ timeout: 3000 },
+		);
 	});
 });

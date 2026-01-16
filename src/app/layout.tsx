@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { SessionHydrator } from "@/lib/auth/useAuthSession";
 import { getServerSession } from "@/lib/auth/getServerSession";
 import { SettingsProvider } from "@/lib/settings";
@@ -60,6 +61,7 @@ export default async function RootLayout({
 						<SessionHydrator serverSession={session}>
 							{children}
 						</SessionHydrator>
+						<Toaster />
 					</ThemeProvider>
 				</SettingsProvider>
 				<Analytics />

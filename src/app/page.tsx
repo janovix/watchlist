@@ -8,16 +8,29 @@ import { RecentSearches } from "@/components/recent-searches";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
+import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
+import { NoWatchlistAccess } from "@/components/subscription";
 
 function HomeContent() {
 	const router = useRouter();
 	const [recentSearches, setRecentSearches] = useState<PEPResult[]>([]);
 	const [mounted, setMounted] = useState(false);
 	const { t } = useLanguage();
+	const subscription = useSubscriptionSafe();
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
+
+	// Check watchlist product access
+	if (subscription?.isLoading) {
+		return <NoWatchlistAccess isLoading />;
+	}
+
+	// If subscription is loaded but user doesn't have watchlist access, show blocker
+	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
+		return <NoWatchlistAccess />;
+	}
 
 	// Cargar búsquedas recientes del sessionStorage
 	useEffect(() => {

@@ -73,9 +73,12 @@ export const translations = {
 		noCountries: "Sem países",
 
 		// Theme
+		themeLabel: "Tema",
 		themeSystem: "Sistema",
 		themeLight: "Claro",
 		themeDark: "Escuro",
+		// Language
+		languageLabel: "Idioma",
 
 		profile: "Meu perfil",
 		settings: "Configurações",
@@ -98,6 +101,36 @@ export const translations = {
 		subscriptionMetricUsers: "usuários",
 		subscriptionMetricAlerts: "buscas",
 		subscriptionMetricTransactions: "transações",
+		"subscription.noWatchlistAccess.title": "Acesso Watchlist Não Disponível",
+		"subscription.noWatchlistAccess.description":
+			"Sua assinatura atual não inclui acesso ao produto Watchlist.",
+		"subscription.noWatchlistAccess.upgradePrompt":
+			"Para acessar consultas de listas de vigilância, assine um plano que inclua Watchlist.",
+		"subscription.noWatchlistAccess.upgradeCta": "Ver planos disponíveis",
+		"subscription.noWatchlistAccess.backToSettings": "Ir para configurações",
+
+		// Error pages
+		errorNotFoundTitle: "Página não encontrada",
+		errorNotFoundDescription:
+			"A página que você procura não existe ou foi movida. Verifique a URL ou volte para um lugar seguro.",
+		errorServerTitle: "Algo deu errado",
+		errorServerDescription:
+			"Encontramos um erro inesperado ao carregar esta página.",
+		errorServerHelp:
+			"Tente novamente ou volte para o início se o problema persistir.",
+		errorUnauthorizedTitle: "Login necessário",
+		errorUnauthorizedDescription:
+			"Você precisa fazer login para acessar esta página.",
+		errorUnauthorizedReason:
+			"Se você chegou aqui por um link compartilhado ou favorito, faça login e tente novamente.",
+		errorForbiddenTitle: "Acesso negado",
+		errorForbiddenDescription: "Você não tem acesso a esta página.",
+		errorForbiddenReason:
+			"Isso pode acontecer se sua função não incluir essa permissão ou se seu acesso foi revogado.",
+		errorGoBack: "Voltar",
+		errorHome: "Início",
+		errorTryAgain: "Tentar novamente",
+		errorSignIn: "Entrar",
 
 		// Common additions
 		dismiss: "Descartar",
@@ -175,9 +208,12 @@ export const translations = {
 		noCountries: "Sin países",
 
 		// Theme
+		themeLabel: "Tema",
 		themeSystem: "Sistema",
 		themeLight: "Claro",
 		themeDark: "Oscuro",
+		// Language
+		languageLabel: "Idioma",
 
 		profile: "Mi perfil",
 		settings: "Configuración",
@@ -199,6 +235,36 @@ export const translations = {
 		subscriptionMetricUsers: "usuarios",
 		subscriptionMetricAlerts: "búsquedas",
 		subscriptionMetricTransactions: "transacciones",
+		"subscription.noWatchlistAccess.title": "Acceso Watchlist No Disponible",
+		"subscription.noWatchlistAccess.description":
+			"Tu suscripción actual no incluye acceso al producto Watchlist.",
+		"subscription.noWatchlistAccess.upgradePrompt":
+			"Para acceder a consultas de listas de vigilancia, suscríbete a un plan que incluya Watchlist.",
+		"subscription.noWatchlistAccess.upgradeCta": "Ver planes disponibles",
+		"subscription.noWatchlistAccess.backToSettings": "Ir a configuración",
+
+		// Error pages
+		errorNotFoundTitle: "Página no encontrada",
+		errorNotFoundDescription:
+			"La página que buscas no existe o fue movida. Verifica la URL o vuelve a un lugar seguro.",
+		errorServerTitle: "Algo salió mal",
+		errorServerDescription:
+			"Se produjo un error inesperado al cargar esta página.",
+		errorServerHelp:
+			"Intenta nuevamente o vuelve al inicio si el problema continúa.",
+		errorUnauthorizedTitle: "Inicio de sesión requerido",
+		errorUnauthorizedDescription:
+			"Necesitas iniciar sesión para acceder a esta página.",
+		errorUnauthorizedReason:
+			"Si llegaste aquí desde un enlace compartido o un marcador, inicia sesión e inténtalo de nuevo.",
+		errorForbiddenTitle: "Acceso denegado",
+		errorForbiddenDescription: "No tienes acceso a esta página.",
+		errorForbiddenReason:
+			"Esto puede ocurrir si tu rol no incluye este permiso o si tu acceso fue revocado.",
+		errorGoBack: "Volver",
+		errorHome: "Inicio",
+		errorTryAgain: "Intentar de nuevo",
+		errorSignIn: "Iniciar sesión",
 
 		// Common additions
 		dismiss: "Descartar",
@@ -276,9 +342,12 @@ export const translations = {
 		noCountries: "No countries",
 
 		// Theme
+		themeLabel: "Theme",
 		themeSystem: "System",
 		themeLight: "Light",
 		themeDark: "Dark",
+		// Language
+		languageLabel: "Language",
 
 		profile: "My profile",
 		settings: "Settings",
@@ -295,11 +364,39 @@ export const translations = {
 		subscriptionLimitReached: "Limit reached",
 		subscriptionLimitReachedDesc:
 			"You've reached your {metrics} limit. Upgrade to continue.",
+		"subscription.noWatchlistAccess.title": "Watchlist Access Not Available",
+		"subscription.noWatchlistAccess.description":
+			"Your current subscription does not include access to the Watchlist product.",
+		"subscription.noWatchlistAccess.upgradePrompt":
+			"To access watchlist queries, subscribe to a plan that includes Watchlist.",
+		"subscription.noWatchlistAccess.upgradeCta": "View available plans",
+		"subscription.noWatchlistAccess.backToSettings": "Go to settings",
 		subscriptionUpgrade: "Upgrade plan",
 		subscriptionMetricNotices: "notices",
 		subscriptionMetricUsers: "users",
 		subscriptionMetricAlerts: "searches",
 		subscriptionMetricTransactions: "transactions",
+
+		// Error pages
+		errorNotFoundTitle: "Page not found",
+		errorNotFoundDescription:
+			"The page you're looking for doesn't exist or has been moved. Check the URL or navigate back to safety.",
+		errorServerTitle: "Something went wrong",
+		errorServerDescription:
+			"We hit an unexpected error while loading this page.",
+		errorServerHelp: "Try again, or return home if the problem persists.",
+		errorUnauthorizedTitle: "Sign in required",
+		errorUnauthorizedDescription: "You need to sign in to access this page.",
+		errorUnauthorizedReason:
+			"If you arrived here from a bookmark or shared link, sign in and try again.",
+		errorForbiddenTitle: "Access denied",
+		errorForbiddenDescription: "You don't have access to this page.",
+		errorForbiddenReason:
+			"This can happen if your role doesn't include this permission or your access was revoked.",
+		errorGoBack: "Go back",
+		errorHome: "Home",
+		errorTryAgain: "Try again",
+		errorSignIn: "Sign in",
 
 		// Common additions
 		dismiss: "Dismiss",
