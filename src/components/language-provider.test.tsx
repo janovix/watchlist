@@ -1,7 +1,25 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, act, fireEvent } from "@testing-library/react";
 import { LanguageProvider, useLanguage } from "./language-provider";
-import { detectBrowserLanguage } from "@/lib/translations";
+
+// Mock the cookies module
+vi.mock("@/lib/cookies", () => ({
+	getCookie: vi.fn(),
+	setCookie: vi.fn(),
+	COOKIE_NAMES: {
+		THEME: "janovix-theme",
+		LANGUAGE: "janovix-lang",
+	},
+}));
+
+// Mock the settings module
+vi.mock("@/lib/settings", () => ({
+	getResolvedSettings: vi.fn(),
+	updateUserSettings: vi.fn(),
+}));
+
+import { getCookie, setCookie } from "@/lib/cookies";
+import { getResolvedSettings, updateUserSettings } from "@/lib/settings";
 
 // Test component that uses the hook
 function TestComponent() {
@@ -18,21 +36,12 @@ function TestComponent() {
 }
 
 describe("LanguageProvider", () => {
-	const originalLocalStorage = global.localStorage;
 	const originalNavigator = global.navigator;
 
 	beforeEach(() => {
 		// Clean up any existing providers
 		document.body.innerHTML = "";
-		// Mock localStorage
-		global.localStorage = {
-			getItem: vi.fn(),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage;
+		vi.clearAllMocks();
 
 		// Mock navigator
 		Object.defineProperty(global, "navigator", {
@@ -42,10 +51,15 @@ describe("LanguageProvider", () => {
 			writable: true,
 			configurable: true,
 		});
+
+		// Default mock: API rejects (not logged in)
+		vi.mocked(getResolvedSettings).mockRejectedValue(
+			new Error("Not authenticated"),
+		);
+		vi.mocked(updateUserSettings).mockResolvedValue({} as never);
 	});
 
 	afterEach(() => {
-		global.localStorage = originalLocalStorage;
 		Object.defineProperty(global, "navigator", {
 			value: originalNavigator,
 			writable: true,
@@ -55,14 +69,7 @@ describe("LanguageProvider", () => {
 	});
 
 	it("should provide default language context during SSR", () => {
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => null),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue(undefined);
 
 		render(
 			<LanguageProvider>
@@ -73,15 +80,8 @@ describe("LanguageProvider", () => {
 		expect(screen.getByTestId("language")).toHaveTextContent("es");
 	});
 
-	it("should load language from localStorage if available", async () => {
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn((key) => (key === "language" ? "en" : null)),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+	it("should load language from cookie if available", async () => {
+		vi.mocked(getCookie).mockReturnValue("en");
 
 		const { container } = render(
 			<LanguageProvider>
@@ -97,15 +97,8 @@ describe("LanguageProvider", () => {
 		expect(languageElement).toHaveTextContent("en");
 	});
 
-	it("should detect browser language if localStorage is empty", async () => {
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => null),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+	it("should detect browser language if cookie is empty", async () => {
+		vi.mocked(getCookie).mockReturnValue(undefined);
 
 		Object.defineProperty(global, "navigator", {
 			value: {
@@ -130,15 +123,7 @@ describe("LanguageProvider", () => {
 	});
 
 	it("should update language when setLanguage is called", async () => {
-		const setItemSpy = vi.fn();
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => null),
-			setItem: setItemSpy,
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue(undefined);
 
 		const { container } = render(
 			<LanguageProvider>
@@ -157,18 +142,78 @@ describe("LanguageProvider", () => {
 
 		const languageElement = container.querySelector('[data-testid="language"]');
 		expect(languageElement).toHaveTextContent("en");
-		expect(setItemSpy).toHaveBeenCalledWith("language", "en");
+		expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
+	});
+
+	it("should sync with API when available", async () => {
+		vi.mocked(getCookie).mockReturnValue("es");
+		vi.mocked(getResolvedSettings).mockResolvedValue({
+			language: "en",
+			theme: "light",
+			timezone: "UTC",
+			dateFormat: "DD/MM/YYYY",
+			avatarUrl: null,
+			sources: {
+				language: "user",
+				theme: "default",
+				timezone: "default",
+				dateFormat: "default",
+			},
+		});
+
+		const { container } = render(
+			<LanguageProvider>
+				<TestComponent />
+			</LanguageProvider>,
+		);
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 200));
+		});
+
+		// Should update to API value
+		const languageElement = container.querySelector('[data-testid="language"]');
+		expect(languageElement).toHaveTextContent("en");
+		// Should sync cookie with API value
+		expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
+	});
+
+	it("should call API when language changes after sync", async () => {
+		vi.mocked(getCookie).mockReturnValue("es");
+		vi.mocked(getResolvedSettings).mockResolvedValue({
+			language: "es",
+			theme: "light",
+			timezone: "UTC",
+			dateFormat: "DD/MM/YYYY",
+			avatarUrl: null,
+			sources: {
+				language: "user",
+				theme: "default",
+				timezone: "default",
+				dateFormat: "default",
+			},
+		});
+
+		const { container } = render(
+			<LanguageProvider>
+				<TestComponent />
+			</LanguageProvider>,
+		);
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 200));
+		});
+
+		const englishButton = screen.getByText("Set English");
+		await act(async () => {
+			fireEvent.click(englishButton);
+		});
+
+		expect(updateUserSettings).toHaveBeenCalledWith({ language: "en" });
 	});
 
 	it("should provide translation function", async () => {
-		vi.spyOn(global, "localStorage", "get").mockReturnValue({
-			getItem: vi.fn(() => null),
-			setItem: vi.fn(),
-			removeItem: vi.fn(),
-			clear: vi.fn(),
-			key: vi.fn(),
-			length: 0,
-		} as unknown as Storage);
+		vi.mocked(getCookie).mockReturnValue("es");
 
 		const { container } = render(
 			<LanguageProvider>

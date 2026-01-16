@@ -4,13 +4,23 @@ export type {
 	DateFormat,
 	LanguageCode,
 	ResolvedSettings,
+	UserSettings,
+	UpdateUserSettingsInput,
+	SettingsApiResponse,
 } from "./types";
 export { DEFAULT_SETTINGS } from "./types";
 
-// Server-side
-export { getServerSettings } from "./getServerSettings";
+// Note: getServerSettings is server-only and should be imported directly
+// from "./getServerSettings" to avoid bundling issues with client components
 
-// Client-side
+// Client-side API
+export {
+	getUserSettings,
+	updateUserSettings,
+	getResolvedSettings,
+} from "./settingsClient";
+
+// Client-side Provider
 export {
 	SettingsProvider,
 	useSettings,
