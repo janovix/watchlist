@@ -134,6 +134,35 @@ export const translations = {
 
 		// Common additions
 		dismiss: "Descartar",
+
+		// Watchlist search
+		advancedSearch: "Pesquisa avançada",
+		hideAdvancedSearch: "Ocultar pesquisa avançada",
+		identifiersLabel: "Identificadores",
+		identifiersPlaceholder: "Passaporte, RFC, NIT... (separados por vírgula)",
+		birthDateLabel: "Data de nascimento",
+		countriesLabel: "Países",
+		countriesPlaceholder: "MX, US, CO... (códigos ISO separados por vírgula)",
+		matchesFound: "{count} coincidências encontradas",
+		noMatchesFound: "Nenhuma coincidência encontrada",
+		noMatchesDescription:
+			"Não foram encontrados registros que correspondam aos critérios de pesquisa nas bases de dados consultadas.",
+		highestScore: "Maior coincidência:",
+		score: "Pontuação",
+		scoreBreakdown: "Detalhamento da pontuação",
+		vectorScore: "Similaridade semântica",
+		nameScore: "Similaridade de nome",
+		metaScore: "Correspondência de metadados",
+		identifierMatch: "Correspondência exata de identificador",
+		highRisk: "Risco alto",
+		mediumRisk: "Risco médio",
+		lowRisk: "Risco baixo",
+		viewDetails: "Ver detalhes",
+		hideDetails: "Ocultar detalhes",
+		matchDetails: "Detalhes da coincidência",
+		searchResultsFor: "Resultados de pesquisa para",
+		searchNotFound: "Pesquisa não encontrada",
+		searchFailed: "Erro ao realizar a pesquisa",
 	},
 	es: {
 		// Header
@@ -268,6 +297,35 @@ export const translations = {
 
 		// Common additions
 		dismiss: "Descartar",
+
+		// Watchlist search
+		advancedSearch: "Búsqueda avanzada",
+		hideAdvancedSearch: "Ocultar búsqueda avanzada",
+		identifiersLabel: "Identificadores",
+		identifiersPlaceholder: "Pasaporte, RFC, NIT... (separados por coma)",
+		birthDateLabel: "Fecha de nacimiento",
+		countriesLabel: "Países",
+		countriesPlaceholder: "MX, US, CO... (códigos ISO separados por coma)",
+		matchesFound: "{count} coincidencias encontradas",
+		noMatchesFound: "No se encontraron coincidencias",
+		noMatchesDescription:
+			"No se encontraron registros que coincidan con los criterios de búsqueda en las bases de datos consultadas.",
+		highestScore: "Mayor coincidencia:",
+		score: "Puntuación",
+		scoreBreakdown: "Desglose de puntuación",
+		vectorScore: "Similitud semántica",
+		nameScore: "Similitud de nombre",
+		metaScore: "Coincidencia de metadatos",
+		identifierMatch: "Coincidencia exacta de identificador",
+		highRisk: "Riesgo alto",
+		mediumRisk: "Riesgo medio",
+		lowRisk: "Riesgo bajo",
+		viewDetails: "Ver detalles",
+		hideDetails: "Ocultar detalles",
+		matchDetails: "Detalles de la coincidencia",
+		searchResultsFor: "Resultados de búsqueda para",
+		searchNotFound: "Búsqueda no encontrada",
+		searchFailed: "Error al realizar la búsqueda",
 	},
 	en: {
 		// Header
@@ -400,6 +458,35 @@ export const translations = {
 
 		// Common additions
 		dismiss: "Dismiss",
+
+		// Watchlist search
+		advancedSearch: "Advanced search",
+		hideAdvancedSearch: "Hide advanced search",
+		identifiersLabel: "Identifiers",
+		identifiersPlaceholder: "Passport, RFC, NIT... (comma-separated)",
+		birthDateLabel: "Birth date",
+		countriesLabel: "Countries",
+		countriesPlaceholder: "MX, US, CO... (ISO codes comma-separated)",
+		matchesFound: "{count} matches found",
+		noMatchesFound: "No matches found",
+		noMatchesDescription:
+			"No records matching the search criteria were found in the consulted databases.",
+		highestScore: "Highest match:",
+		score: "Score",
+		scoreBreakdown: "Score breakdown",
+		vectorScore: "Semantic similarity",
+		nameScore: "Name similarity",
+		metaScore: "Metadata match",
+		identifierMatch: "Exact identifier match",
+		highRisk: "High risk",
+		mediumRisk: "Medium risk",
+		lowRisk: "Low risk",
+		viewDetails: "View details",
+		hideDetails: "Hide details",
+		matchDetails: "Match details",
+		searchResultsFor: "Search results for",
+		searchNotFound: "Search not found",
+		searchFailed: "Search failed",
 	},
 };
 

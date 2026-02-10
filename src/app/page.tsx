@@ -10,6 +10,7 @@ import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { type PEPResult } from "@/lib/mock-data";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
 import { NoWatchlistAccess } from "@/components/subscription";
+import type { WatchlistSearchRequest } from "@/lib/api/watchlist-search";
 
 function HomeContent() {
 	const router = useRouter();
@@ -50,7 +51,7 @@ function HomeContent() {
 		}
 	}, [mounted]);
 
-	const handleSearch = (name: string) => {
+	const handleSearch = (params: WatchlistSearchRequest) => {
 		// Generate a query ID
 		const queryId = crypto.randomUUID();
 
@@ -58,7 +59,7 @@ function HomeContent() {
 		try {
 			sessionStorage.setItem(
 				`pep-pending-${queryId}`,
-				JSON.stringify({ searchName: name }),
+				JSON.stringify({ searchParams: params }),
 			);
 		} catch (e) {
 			console.log("[v0] Error saving pending search:", e);

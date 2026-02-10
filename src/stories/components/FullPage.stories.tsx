@@ -11,6 +11,7 @@ import { UserMenu } from "@/components/user-menu";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { generateMockResult, type PEPResult } from "@/lib/mock-data";
+import type { WatchlistSearchRequest } from "@/lib/api/watchlist-search";
 
 const meta: Meta = {
 	title: "Views/Full Page",
@@ -65,11 +66,11 @@ function FullPageContent() {
 		loadMockSearches();
 	}, [mounted]);
 
-	const handleSearch = async (name: string) => {
-		setSearchName(name);
+	const handleSearch = async (params: WatchlistSearchRequest) => {
+		setSearchName(params.q);
 		setViewState("loading");
 		setTimeout(async () => {
-			const result = await generateMockResult(name);
+			const result = await generateMockResult(params.q);
 			setCurrentResult(result);
 			setRecentSearches((prev) => {
 				const filtered = prev.filter((s) => s.id !== result.id);
