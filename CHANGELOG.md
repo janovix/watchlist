@@ -1,3 +1,15 @@
+# [1.1.0-rc.3](https://github.com/janovix/watchlist/compare/v1.1.0-rc.2...v1.1.0-rc.3) (2026-02-11)
+
+
+### Bug Fixes
+
+* **ResultPage:** prevent search execution until JWT is fully loaded ([8f63438](https://github.com/janovix/watchlist/commit/8f6343853a5d013919dca96369c3883cb158c329))
+
+
+### Features
+
+* **watchlist:** implement advanced search functionality with new API integration ([42f6406](https://github.com/janovix/watchlist/commit/42f6406557e91c99c459f2081b6bc5aa2743987a))
+
 # [1.1.0-rc.2](https://github.com/janovix/watchlist/compare/v1.1.0-rc.1...v1.1.0-rc.2) (2026-01-16)
 
 
