@@ -1,3 +1,10 @@
+# [1.1.0-rc.4](https://github.com/janovix/watchlist/compare/v1.1.0-rc.3...v1.1.0-rc.4) (2026-02-11)
+
+
+### Bug Fixes
+
+* **middleware:** update matcher to exclude 'monitoring' from route handling ([6a55ad5](https://github.com/janovix/watchlist/commit/6a55ad524de5c8a6aa349f4e0014f214f1583546))
+
 # [1.1.0-rc.3](https://github.com/janovix/watchlist/compare/v1.1.0-rc.2...v1.1.0-rc.3) (2026-02-11)
 
 
