@@ -252,13 +252,13 @@ describe("MatchResultsList", () => {
 		expect(screen.getByText(/2.*found/i)).toBeInTheDocument();
 	});
 
-	it("should display high risk badge for scores > 0.75", () => {
+	it("should display high match badge for scores > 0.75", () => {
 		const mockMatches: WatchlistMatch[] = [
 			{
 				target: {
 					id: "test-1",
 					schema: null,
-					name: "High Risk Person",
+					name: "High Match Person",
 					aliases: null,
 					birthDate: null,
 					countries: null,
@@ -286,17 +286,17 @@ describe("MatchResultsList", () => {
 		];
 
 		renderWithProvider(<MatchResultsList matches={mockMatches} />);
-		const highRiskElements = screen.getAllByText(/high risk/i);
-		expect(highRiskElements.length).toBeGreaterThan(0);
+		const highMatchElements = screen.getAllByText(/high match/i);
+		expect(highMatchElements.length).toBeGreaterThan(0);
 	});
 
-	it("should display medium risk badge for scores between 0.51 and 0.75", () => {
+	it("should display medium match badge for scores between 0.51 and 0.75", () => {
 		const mockMatches: WatchlistMatch[] = [
 			{
 				target: {
 					id: "test-1",
 					schema: null,
-					name: "Medium Risk Person",
+					name: "Medium Match Person",
 					aliases: null,
 					birthDate: null,
 					countries: null,
@@ -324,17 +324,17 @@ describe("MatchResultsList", () => {
 		];
 
 		renderWithProvider(<MatchResultsList matches={mockMatches} />);
-		const mediumRiskElements = screen.getAllByText(/medium risk/i);
-		expect(mediumRiskElements.length).toBeGreaterThan(0);
+		const mediumMatchElements = screen.getAllByText(/medium match/i);
+		expect(mediumMatchElements.length).toBeGreaterThan(0);
 	});
 
-	it("should display low risk badge for scores <= 0.5", () => {
+	it("should display low match badge for scores <= 0.5", () => {
 		const mockMatches: WatchlistMatch[] = [
 			{
 				target: {
 					id: "test-1",
 					schema: null,
-					name: "Low Risk Person",
+					name: "Low Match Person",
 					aliases: null,
 					birthDate: null,
 					countries: null,
@@ -362,8 +362,8 @@ describe("MatchResultsList", () => {
 		];
 
 		renderWithProvider(<MatchResultsList matches={mockMatches} />);
-		const lowRiskElements = screen.getAllByText(/low risk/i);
-		expect(lowRiskElements.length).toBeGreaterThan(0);
+		const lowMatchElements = screen.getAllByText(/low match/i);
+		expect(lowMatchElements.length).toBeGreaterThan(0);
 	});
 
 	it("should handle match with null name by displaying 'Unknown'", () => {

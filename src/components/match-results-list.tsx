@@ -19,12 +19,12 @@ function getRiskLevel(score: number): "high" | "medium" | "low" {
 	return "low";
 }
 
-function getRiskBadgeVariant(
+function getMatchBadgeVariant(
 	level: "high" | "medium" | "low",
 ): "destructive" | "default" | "secondary" {
-	if (level === "high") return "destructive";
-	if (level === "medium") return "default";
-	return "secondary";
+	if (level === "high") return "destructive"; // Rojo para coincidencia alta (mayor alerta/peligro)
+	if (level === "medium") return "default"; // Amarillo para coincidencia media
+	return "secondary"; // Verde para coincidencia baja (menor alerta/seguro)
 }
 
 interface MatchCardProps {
@@ -34,35 +34,35 @@ interface MatchCardProps {
 function MatchCard({ match }: MatchCardProps) {
 	const [expanded, setExpanded] = useState(false);
 	const { t } = useLanguage();
-	const riskLevel = getRiskLevel(match.score);
-	const badgeVariant = getRiskBadgeVariant(riskLevel);
+	const matchLevel = getRiskLevel(match.score);
+	const badgeVariant = getMatchBadgeVariant(matchLevel);
 
-	const riskLabel =
-		riskLevel === "high"
-			? t("highRisk")
-			: riskLevel === "medium"
-				? t("mediumRisk")
-				: t("lowRisk");
+	const matchLabel =
+		matchLevel === "high"
+			? t("highMatch")
+			: matchLevel === "medium"
+				? t("mediumMatch")
+				: t("lowMatch");
 
 	return (
 		<Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
 			<div className="flex items-start gap-3 sm:gap-4">
-				{/* Risk Icon */}
+				{/* Match Icon - Traffic light: Green=low, Yellow=medium, Red=high */}
 				<div className="shrink-0 mt-1">
 					<div
 						className={`p-2 rounded-lg ${
-							riskLevel === "high"
+							matchLevel === "high"
 								? "bg-destructive/10"
-								: riskLevel === "medium"
+								: matchLevel === "medium"
 									? "bg-amber-500/10"
 									: "bg-green-500/10"
 						}`}
 					>
 						<Shield
 							className={`h-5 w-5 ${
-								riskLevel === "high"
+								matchLevel === "high"
 									? "text-destructive"
-									: riskLevel === "medium"
+									: matchLevel === "medium"
 										? "text-amber-500"
 										: "text-green-500"
 							}`}
@@ -79,7 +79,7 @@ function MatchCard({ match }: MatchCardProps) {
 								{match.target.name || "Unknown"}
 							</h3>
 							<Badge variant={badgeVariant} className="shrink-0">
-								{riskLabel} - {(match.score * 100).toFixed(0)}%
+								{matchLabel} - {(match.score * 100).toFixed(0)}%
 							</Badge>
 							{match.breakdown.identifierMatch && (
 								<Badge variant="outline" className="shrink-0 bg-primary/10">
