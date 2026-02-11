@@ -36,7 +36,7 @@ function ResultPage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [result, setResult] = useState<SearchResult | null>(null);
-	const { jwt } = useJwt();
+	const { jwt, isLoading: jwtLoading } = useJwt();
 	const subscription = useSubscriptionSafe();
 
 	const queryId = params?.id as string;
@@ -55,7 +55,7 @@ function ResultPage() {
 	}
 
 	useEffect(() => {
-		if (!mounted || !queryId) return;
+		if (!mounted || !queryId || jwtLoading) return;
 
 		const performSearch = async () => {
 			setLoading(true);
@@ -143,7 +143,7 @@ function ResultPage() {
 		};
 
 		performSearch();
-	}, [mounted, queryId, jwt, t]);
+	}, [mounted, queryId, jwt, jwtLoading, t]);
 
 	const handleNewSearch = () => {
 		router.push("/");
