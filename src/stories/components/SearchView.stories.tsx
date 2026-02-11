@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
 import { generateMockResult, type PEPResult } from "@/lib/mock-data";
 import { useState, useEffect } from "react";
+import type { WatchlistSearchRequest } from "@/lib/api/watchlist-search";
 
 const meta: Meta = {
 	title: "Views/Search View",
@@ -52,8 +53,8 @@ function SearchViewContent() {
 		loadMockSearches();
 	}, []);
 
-	const handleSearch = (name: string) => {
-		console.log("Searching for:", name);
+	const handleSearch = (params: WatchlistSearchRequest) => {
+		console.log("Search:", params);
 	};
 
 	const handleSelectSearch = (result: PEPResult) => {
@@ -88,7 +89,7 @@ function SearchViewContent() {
 
 					{/* Search Form */}
 					<div className="w-full mb-6">
-						<SearchForm onSearch={handleSearch} isLoading={false} />
+						<SearchForm onSearch={() => {}} isLoading={false} />
 					</div>
 
 					{/* Language/Theme Toggle */}
