@@ -252,7 +252,7 @@ describe("MatchResultsList", () => {
 		expect(screen.getByText(/2.*found/i)).toBeInTheDocument();
 	});
 
-	it("should display high risk badge for scores >= 0.95", () => {
+	it("should display high risk badge for scores > 0.75", () => {
 		const mockMatches: WatchlistMatch[] = [
 			{
 				target: {
@@ -275,11 +275,11 @@ describe("MatchResultsList", () => {
 					createdAt: "2024-01-01T00:00:00Z",
 					updatedAt: "2024-01-01T00:00:00Z",
 				},
-				score: 0.96,
+				score: 0.85,
 				breakdown: {
-					vectorScore: 0.92,
-					nameScore: 0.98,
-					metaScore: 1.0,
+					vectorScore: 0.82,
+					nameScore: 0.88,
+					metaScore: 0.8,
 					identifierMatch: false,
 				},
 			},
@@ -290,7 +290,7 @@ describe("MatchResultsList", () => {
 		expect(highRiskElements.length).toBeGreaterThan(0);
 	});
 
-	it("should display medium risk badge for scores between 0.8 and 0.95", () => {
+	it("should display medium risk badge for scores between 0.51 and 0.75", () => {
 		const mockMatches: WatchlistMatch[] = [
 			{
 				target: {
@@ -313,11 +313,11 @@ describe("MatchResultsList", () => {
 					createdAt: "2024-01-01T00:00:00Z",
 					updatedAt: "2024-01-01T00:00:00Z",
 				},
-				score: 0.88,
+				score: 0.65,
 				breakdown: {
-					vectorScore: 0.85,
-					nameScore: 0.9,
-					metaScore: 0.8,
+					vectorScore: 0.6,
+					nameScore: 0.7,
+					metaScore: 0.5,
 					identifierMatch: false,
 				},
 			},
@@ -328,7 +328,7 @@ describe("MatchResultsList", () => {
 		expect(mediumRiskElements.length).toBeGreaterThan(0);
 	});
 
-	it("should display low risk badge for scores < 0.8", () => {
+	it("should display low risk badge for scores <= 0.5", () => {
 		const mockMatches: WatchlistMatch[] = [
 			{
 				target: {
@@ -351,11 +351,11 @@ describe("MatchResultsList", () => {
 					createdAt: "2024-01-01T00:00:00Z",
 					updatedAt: "2024-01-01T00:00:00Z",
 				},
-				score: 0.75,
+				score: 0.45,
 				breakdown: {
-					vectorScore: 0.7,
-					nameScore: 0.8,
-					metaScore: 0.5,
+					vectorScore: 0.4,
+					nameScore: 0.5,
+					metaScore: 0.3,
 					identifierMatch: false,
 				},
 			},

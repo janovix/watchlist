@@ -14,8 +14,8 @@ interface MatchResultsListProps {
 }
 
 function getRiskLevel(score: number): "high" | "medium" | "low" {
-	if (score >= 0.95) return "high";
-	if (score >= 0.8) return "medium";
+	if (score > 0.75) return "high";
+	if (score > 0.5) return "medium";
 	return "low";
 }
 
