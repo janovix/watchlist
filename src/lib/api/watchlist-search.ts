@@ -1,6 +1,14 @@
 import { fetchJson, ApiError } from "./http";
 
 /**
+ * Identifier object structure from OFAC/watchlist
+ */
+export interface Identifier {
+	type?: string;
+	number?: string;
+}
+
+/**
  * Watchlist target from the API (reused from pep.ts)
  */
 export interface WatchlistTarget {
@@ -11,7 +19,7 @@ export interface WatchlistTarget {
 	birthDate: string | null;
 	countries: string[] | null;
 	addresses: string[] | null;
-	identifiers: string[] | null;
+	identifiers: Identifier[] | null;
 	sanctions: string[] | null;
 	phones: string[] | null;
 	emails: string[] | null;

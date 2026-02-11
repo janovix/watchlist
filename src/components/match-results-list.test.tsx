@@ -146,7 +146,7 @@ describe("MatchResultsList", () => {
 					birthDate: "1980-01-15",
 					countries: ["MX"],
 					addresses: ["123 Main St"],
-					identifiers: ["HEMA-621127"],
+					identifiers: [{ type: "R.F.C.", number: "HEMA-621127" }],
 					sanctions: null,
 					phones: null,
 					emails: null,
@@ -179,7 +179,7 @@ describe("MatchResultsList", () => {
 
 		// Details should now be visible
 		expect(screen.getByText("1980-01-15")).toBeInTheDocument();
-		expect(screen.getByText("HEMA-621127")).toBeInTheDocument();
+		expect(screen.getByText("R.F.C.: HEMA-621127")).toBeInTheDocument();
 	});
 
 	it("should display multiple matches", () => {
@@ -414,7 +414,10 @@ describe("MatchResultsList", () => {
 					birthDate: "1980-01-15",
 					countries: ["MX", "US"],
 					addresses: ["123 Main St", "456 Oak Ave"],
-					identifiers: ["HEMA-621127", "ID-123456"],
+					identifiers: [
+						{ type: "R.F.C.", number: "HEMA-621127" },
+						{ type: "Passport", number: "ID-123456" },
+					],
 					sanctions: ["OFAC SDN", "EU Sanctions"],
 					phones: null,
 					emails: null,

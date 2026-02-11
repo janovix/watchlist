@@ -128,7 +128,7 @@ describe("watchlist-search", () => {
 					birthDate: "1980-01-15",
 					countries: ["MX"],
 					addresses: null,
-					identifiers: ["HEMA-621127"],
+					identifiers: [{ type: "R.F.C.", number: "HEMA-621127" }],
 					sanctions: null,
 					phones: null,
 					emails: null,

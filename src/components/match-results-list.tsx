@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/components/language-provider";
-import type { WatchlistMatch } from "@/lib/api/watchlist-search";
+import type { WatchlistMatch, Identifier } from "@/lib/api/watchlist-search";
 
 interface MatchResultsListProps {
 	matches: WatchlistMatch[];
@@ -110,26 +110,26 @@ function MatchCard({ match }: MatchCardProps) {
 					<div className="space-y-2 mb-3">
 						<p className="text-sm font-medium">{t("scoreBreakdown")}</p>
 
-						{/* Vector Score - 55% weight */}
+						{/* Name Score - 55% weight */}
 						<div className="space-y-1">
 							<div className="flex justify-between text-xs text-muted-foreground">
-								<span>{t("vectorScore")} (55%)</span>
-								<span>{(match.breakdown.vectorScore * 100).toFixed(0)}%</span>
-							</div>
-							<Progress
-								value={match.breakdown.vectorScore * 100}
-								className="h-2"
-							/>
-						</div>
-
-						{/* Name Score - 35% weight */}
-						<div className="space-y-1">
-							<div className="flex justify-between text-xs text-muted-foreground">
-								<span>{t("nameScore")} (35%)</span>
+								<span>{t("nameScore")} (55%)</span>
 								<span>{(match.breakdown.nameScore * 100).toFixed(0)}%</span>
 							</div>
 							<Progress
 								value={match.breakdown.nameScore * 100}
+								className="h-2"
+							/>
+						</div>
+
+						{/* Vector Score - 35% weight */}
+						<div className="space-y-1">
+							<div className="flex justify-between text-xs text-muted-foreground">
+								<span>{t("vectorScore")} (35%)</span>
+								<span>{(match.breakdown.vectorScore * 100).toFixed(0)}%</span>
+							</div>
+							<Progress
+								value={match.breakdown.vectorScore * 100}
 								className="h-2"
 							/>
 						</div>
@@ -192,7 +192,14 @@ function MatchCard({ match }: MatchCardProps) {
 										<span className="font-medium">
 											{t("identifiersLabel")}:
 										</span>{" "}
-										{match.target.identifiers.join(", ")}
+										{match.target.identifiers
+											.map((id: Identifier) => {
+												const parts: string[] = [];
+												if (id.type) parts.push(id.type);
+												if (id.number) parts.push(id.number);
+												return parts.join(": ");
+											})
+											.join(", ")}
 									</div>
 								)}
 
