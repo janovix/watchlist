@@ -7,7 +7,7 @@ import { MatchResultsList } from "@/components/match-results-list";
 import { Logo } from "@/components/logo";
 import { LanguageProvider, useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
 	searchWatchlist,
@@ -18,6 +18,7 @@ import { useJwt } from "@/hooks/useJwt";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
 import { NoWatchlistAccess } from "@/components/subscription";
 import { ApiError } from "@/lib/api/http";
+import { usePepSearch, type PepRawResult } from "@/hooks/usePepSearch";
 
 // Result interface for session storage
 interface SearchResult {
@@ -26,6 +27,8 @@ interface SearchResult {
 	timestamp: Date;
 	matches: WatchlistMatch[];
 	matchCount: number;
+	pepSearchId?: string; // PEP search ID for SSE subscription
+	pepResults?: PepRawResult[]; // Cached PEP results
 }
 
 function ResultPage() {
@@ -38,6 +41,13 @@ function ResultPage() {
 	const [result, setResult] = useState<SearchResult | null>(null);
 	const { jwt, isLoading: jwtLoading } = useJwt();
 	const subscription = useSubscriptionSafe();
+
+	// PEP search via SSE
+	const {
+		results: pepResults,
+		error: pepError,
+		isLoading: pepLoading,
+	} = usePepSearch(result?.pepSearchId || null, !!result?.pepSearchId);
 
 	const queryId = params?.id as string;
 
@@ -97,6 +107,11 @@ function ResultPage() {
 					timestamp: new Date(),
 					matches: response.result.matches,
 					matchCount: response.result.count,
+					pepSearchId: response.result.pepSearch?.searchId,
+					pepResults:
+						response.result.pepSearch?.status === "completed"
+							? (response.result.pepSearch.results as PepRawResult[])
+							: undefined,
 				};
 
 				setResult(searchResult);
@@ -212,8 +227,178 @@ function ResultPage() {
 							</Button>
 						</div>
 
-						{/* Results */}
-						<MatchResultsList matches={result.matches} />
+						{/* OFAC Results */}
+						<div>
+							<h2 className="text-xl font-semibold mb-4">
+								{t("ofacResultsTitle").replace(
+									"{count}",
+									String(result.matchCount),
+								)}
+							</h2>
+							<MatchResultsList matches={result.matches} />
+						</div>
+
+						{/* PEP Results Section */}
+						{result.pepSearchId && (
+							<div className="border-t pt-6">
+								<h2 className="text-xl font-semibold mb-4">
+									{t("pepResultsTitle")}
+								</h2>
+
+								{/* Loading state */}
+								{pepLoading && !pepResults && (
+									<div className="flex items-center gap-3 py-8">
+										<Loader2 className="h-5 w-5 animate-spin text-primary" />
+										<span className="text-muted-foreground">
+											{t("pepSearching")}
+										</span>
+									</div>
+								)}
+
+								{/* Error state */}
+								{pepError && (
+									<Alert variant="destructive">
+										<AlertCircle className="h-4 w-4" />
+										<AlertDescription>
+											{t("pepError")} {pepError}
+										</AlertDescription>
+									</Alert>
+								)}
+
+								{/* Results */}
+								{pepResults && pepResults.length > 0 && (
+									<div className="space-y-4">
+										<p className="text-sm text-muted-foreground">
+											{t("pepResultsCount").replace(
+												"{count}",
+												String(pepResults.length),
+											)}
+										</p>
+										<div className="grid gap-4">
+											{pepResults.map((pepResult) => (
+												<div
+													key={pepResult.id}
+													className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors"
+												>
+													<h3 className="font-semibold text-lg mb-2">
+														{pepResult.nombre}
+													</h3>
+													<div className="grid gap-2 text-sm">
+														{pepResult.informacionPrincipal?.institucion && (
+															<p>
+																<span className="font-medium">
+																	Institución:
+																</span>{" "}
+																{pepResult.informacionPrincipal.institucion}
+															</p>
+														)}
+														{pepResult.informacionPrincipal?.cargo && (
+															<p>
+																<span className="font-medium">Cargo:</span>{" "}
+																{pepResult.informacionPrincipal.cargo}
+															</p>
+														)}
+														{pepResult.informacionPrincipal?.area && (
+															<p>
+																<span className="font-medium">Área:</span>{" "}
+																{pepResult.informacionPrincipal.area}
+															</p>
+														)}
+														{pepResult.entidadfederativa && (
+															<p>
+																<span className="font-medium">
+																	Entidad Federativa:
+																</span>{" "}
+																{pepResult.entidadfederativa}
+															</p>
+														)}
+														{pepResult.periodoreporta && (
+															<p>
+																<span className="font-medium">Periodo:</span>{" "}
+																{pepResult.periodoreporta}
+															</p>
+														)}
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+
+								{/* No results */}
+								{pepResults && pepResults.length === 0 && !pepLoading && (
+									<p className="text-muted-foreground py-8 text-center">
+										{t("pepNoResults")}
+									</p>
+								)}
+
+								{/* Cached results */}
+								{result.pepResults && !pepResults && !pepLoading && (
+									<div className="space-y-4">
+										<p className="text-sm text-muted-foreground">
+											{t("pepResultsCached").replace(
+												"{count}",
+												String(result.pepResults.length),
+											)}
+										</p>
+										<div className="grid gap-4">
+											{result.pepResults.map((pepResult) => (
+												<div
+													key={pepResult.id}
+													className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors"
+												>
+													<h3 className="font-semibold text-lg mb-2">
+														{pepResult.nombre}
+													</h3>
+													<div className="grid gap-2 text-sm">
+														{pepResult.informacionPrincipal?.institucion && (
+															<p>
+																<span className="font-medium">
+																	{t("pepInstitution")}
+																</span>{" "}
+																{pepResult.informacionPrincipal.institucion}
+															</p>
+														)}
+														{pepResult.informacionPrincipal?.cargo && (
+															<p>
+																<span className="font-medium">
+																	{t("pepPosition")}
+																</span>{" "}
+																{pepResult.informacionPrincipal.cargo}
+															</p>
+														)}
+														{pepResult.informacionPrincipal?.area && (
+															<p>
+																<span className="font-medium">
+																	{t("pepArea")}
+																</span>{" "}
+																{pepResult.informacionPrincipal.area}
+															</p>
+														)}
+														{pepResult.entidadfederativa && (
+															<p>
+																<span className="font-medium">
+																	{t("pepState")}
+																</span>{" "}
+																{pepResult.entidadfederativa}
+															</p>
+														)}
+														{pepResult.periodoreporta && (
+															<p>
+																<span className="font-medium">
+																	{t("pepPeriod")}
+																</span>{" "}
+																{pepResult.periodoreporta}
+															</p>
+														)}
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+							</div>
+						)}
 					</div>
 				)}
 			</div>
