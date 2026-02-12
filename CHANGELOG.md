@@ -1,3 +1,10 @@
+# [1.1.0-rc.6](https://github.com/janovix/watchlist/compare/v1.1.0-rc.5...v1.1.0-rc.6) (2026-02-12)
+
+
+### Features
+
+* **subscription:** add SubscriptionProvider to layout and enhance usage limit error handling in watchlist search ([bc1f66f](https://github.com/janovix/watchlist/commit/bc1f66f4535d009fa95bb2b58093f7b85179f13a))
+
 # [1.1.0-rc.5](https://github.com/janovix/watchlist/compare/v1.1.0-rc.4...v1.1.0-rc.5) (2026-02-12)
 
 
