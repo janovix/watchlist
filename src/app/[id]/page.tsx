@@ -55,15 +55,6 @@ function ResultPage() {
 		setMounted(true);
 	}, []);
 
-	// Check watchlist product access
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
-
 	useEffect(() => {
 		if (!mounted || !queryId || jwtLoading) return;
 
@@ -163,6 +154,15 @@ function ResultPage() {
 	const handleNewSearch = () => {
 		router.push("/");
 	};
+
+	// Check watchlist product access (after all hooks)
+	if (subscription?.isLoading) {
+		return <NoWatchlistAccess isLoading />;
+	}
+
+	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
+		return <NoWatchlistAccess />;
+	}
 
 	if (!mounted) {
 		return (

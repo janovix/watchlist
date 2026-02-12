@@ -23,17 +23,7 @@ function HomeContent() {
 		setMounted(true);
 	}, []);
 
-	// Check watchlist product access
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-
-	// If subscription is loaded but user doesn't have watchlist access, show blocker
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
-
-	// Cargar búsquedas recientes del sessionStorage
+	// Load recent searches from sessionStorage
 	useEffect(() => {
 		if (!mounted) return;
 		try {
@@ -50,6 +40,16 @@ function HomeContent() {
 			console.log("[v0] Error loading recent searches:", e);
 		}
 	}, [mounted]);
+
+	// Check watchlist product access (after all hooks)
+	if (subscription?.isLoading) {
+		return <NoWatchlistAccess isLoading />;
+	}
+
+	// If subscription is loaded but user doesn't have watchlist access, show blocker
+	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
+		return <NoWatchlistAccess />;
+	}
 
 	const handleSearch = (params: WatchlistSearchRequest) => {
 		// Generate a query ID
