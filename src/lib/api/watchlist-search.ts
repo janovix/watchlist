@@ -65,6 +65,15 @@ export interface WatchlistMatch {
 }
 
 /**
+ * PEP search information from the API
+ */
+export interface PepSearchInfo {
+	searchId: string;
+	status: "completed" | "pending";
+	results: unknown | null; // Can be PepRawResult[] when cached
+}
+
+/**
  * API response from POST /search
  */
 export interface WatchlistSearchApiResponse {
@@ -72,6 +81,7 @@ export interface WatchlistSearchApiResponse {
 	result: {
 		matches: WatchlistMatch[];
 		count: number;
+		pepSearch?: PepSearchInfo; // Optional PEP search information
 	};
 }
 

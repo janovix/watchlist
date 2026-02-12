@@ -163,6 +163,21 @@ export const translations = {
 		searchResultsFor: "Resultados de pesquisa para",
 		searchNotFound: "Pesquisa não encontrada",
 		searchFailed: "Erro ao realizar a pesquisa",
+
+		// PEP Results (Transparency Platform)
+		pepResultsTitle: "Resultados PEP (Plataforma de Transparência)",
+		pepSearching: "Pesquisando na Plataforma de Transparência...",
+		pepError: "Erro ao pesquisar em PEP:",
+		pepResultsCount: "Foram encontrados {count} resultados",
+		pepResultsCached: "Foram encontrados {count} resultados (em cache)",
+		pepNoResults:
+			"Não foram encontrados resultados na Plataforma de Transparência",
+		pepInstitution: "Instituição:",
+		pepPosition: "Cargo:",
+		pepArea: "Área:",
+		pepState: "Entidade Federativa:",
+		pepPeriod: "Período:",
+		ofacResultsTitle: "Resultados OFAC ({count})",
 	},
 	es: {
 		// Header
@@ -326,6 +341,21 @@ export const translations = {
 		searchResultsFor: "Resultados de búsqueda para",
 		searchNotFound: "Búsqueda no encontrada",
 		searchFailed: "Error al realizar la búsqueda",
+
+		// PEP Results (Transparency Platform)
+		pepResultsTitle: "Resultados PEP (Plataforma de Transparencia)",
+		pepSearching: "Buscando en Plataforma de Transparencia...",
+		pepError: "Error al buscar en PEP:",
+		pepResultsCount: "Se encontraron {count} resultados",
+		pepResultsCached: "Se encontraron {count} resultados (cacheados)",
+		pepNoResults:
+			"No se encontraron resultados en la Plataforma de Transparencia",
+		pepInstitution: "Institución:",
+		pepPosition: "Cargo:",
+		pepArea: "Área:",
+		pepState: "Entidad Federativa:",
+		pepPeriod: "Período:",
+		ofacResultsTitle: "Resultados OFAC ({count})",
 	},
 	en: {
 		// Header
@@ -487,6 +517,20 @@ export const translations = {
 		searchResultsFor: "Search results for",
 		searchNotFound: "Search not found",
 		searchFailed: "Search failed",
+
+		// PEP Results (Transparency Platform)
+		pepResultsTitle: "PEP Results (Transparency Platform)",
+		pepSearching: "Searching Transparency Platform...",
+		pepError: "Error searching PEP:",
+		pepResultsCount: "{count} results found",
+		pepResultsCached: "{count} results found (cached)",
+		pepNoResults: "No results found in Transparency Platform",
+		pepInstitution: "Institution:",
+		pepPosition: "Position:",
+		pepArea: "Area:",
+		pepState: "Federal Entity:",
+		pepPeriod: "Period:",
+		ofacResultsTitle: "OFAC Results ({count})",
 	},
 };
 
