@@ -8,6 +8,7 @@ import { SessionHydrator } from "@/lib/auth/useAuthSession";
 import { getServerSession } from "@/lib/auth/getServerSession";
 import { SettingsProvider } from "@/lib/settings";
 import { getServerSettings } from "@/lib/settings/getServerSettings";
+import { SubscriptionProvider } from "@/lib/subscription";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -59,7 +60,7 @@ export default async function RootLayout({
 						enableSystem={settings.theme === "system"}
 					>
 						<SessionHydrator serverSession={session}>
-							{children}
+							<SubscriptionProvider>{children}</SubscriptionProvider>
 						</SessionHydrator>
 						<Toaster />
 					</ThemeProvider>

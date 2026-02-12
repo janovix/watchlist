@@ -109,13 +109,40 @@ export interface SearchWatchlistOptions {
 }
 
 /**
+ * Usage limit error response from backend
+ */
+export interface UsageLimitError {
+	success: false;
+	error: string;
+	code: "USAGE_LIMIT_EXCEEDED";
+	upgradeRequired: boolean;
+	metric: string;
+	used: number;
+	limit: number;
+	entitlementType: "license" | "stripe" | "none";
+	message: string;
+}
+
+/**
+ * Type guard to check if error body is a usage limit error
+ */
+export function isUsageLimitError(body: unknown): body is UsageLimitError {
+	return (
+		typeof body === "object" &&
+		body !== null &&
+		"code" in body &&
+		body.code === "USAGE_LIMIT_EXCEEDED"
+	);
+}
+
+/**
  * Search watchlist using hybrid search algorithm.
  * Combines exact identifier matching, semantic vector search, and Jaro-Winkler name similarity.
  *
  * @param params - Search parameters
  * @param options - Optional configuration including JWT token
  * @returns Promise resolving to the search results with hybrid scoring
- * @throws ApiError if the request fails
+ * @throws ApiError if the request fails (including 403 for usage limits)
  */
 export async function searchWatchlist(
 	params: WatchlistSearchRequest,
@@ -145,6 +172,18 @@ export async function searchWatchlist(
 		return json;
 	} catch (error) {
 		if (error instanceof ApiError) {
+			// Preserve 403 errors with usage limit information
+			if (error.status === 403 && isUsageLimitError(error.body)) {
+				// Re-throw with usage limit details preserved in the body
+				throw new ApiError(
+					error.body.message ||
+						"Daily watchlist query limit reached. Please upgrade or try again tomorrow.",
+					{
+						status: 403,
+						body: error.body,
+					},
+				);
+			}
 			throw error;
 		}
 		throw new ApiError(

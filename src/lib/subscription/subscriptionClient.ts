@@ -65,7 +65,7 @@ interface ApiResponse<T> {
  */
 export async function getSubscriptionStatus(): Promise<SubscriptionStatus | null> {
 	try {
-		const response = await fetch(`${getBaseUrl()}/api/subscription`, {
+		const response = await fetch(`${getBaseUrl()}/api/subscription/status`, {
 			credentials: "include",
 		});
 

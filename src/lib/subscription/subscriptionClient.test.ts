@@ -71,7 +71,7 @@ describe("subscriptionClient", () => {
 			const result = await getSubscriptionStatus();
 
 			expect(global.fetch).toHaveBeenCalledWith(
-				"https://auth-svc.test/api/subscription",
+				"https://auth-svc.test/api/subscription/status",
 				{ credentials: "include" },
 			);
 			expect(result).toEqual(mockStatus);
