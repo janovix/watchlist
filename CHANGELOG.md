@@ -1,3 +1,10 @@
+# [1.1.0-rc.5](https://github.com/janovix/watchlist/compare/v1.1.0-rc.4...v1.1.0-rc.5) (2026-02-12)
+
+
+### Features
+
+* **ResultPage:** integrate PEP search functionality with SSE support and display results ([17635b8](https://github.com/janovix/watchlist/commit/17635b86330a0e7688ee1dd86ced48c57c81ad9f))
+
 # [1.1.0-rc.4](https://github.com/janovix/watchlist/compare/v1.1.0-rc.3...v1.1.0-rc.4) (2026-02-11)
 
 
