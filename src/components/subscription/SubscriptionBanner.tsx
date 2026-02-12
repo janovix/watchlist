@@ -4,15 +4,13 @@ import { useSubscriptionSafe } from "@/lib/subscription";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Zap, AlertTriangle, X } from "lucide-react";
+import { Zap, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 interface SubscriptionBannerProps {
 	/** The billing page URL */
 	billingUrl?: string;
-	/** Metrics to check for limit warnings */
-	checkMetrics?: ("notices" | "users" | "alerts" | "transactions")[];
 	/** Whether to show the banner even without limits (for free tier) */
 	showFreeTierBanner?: boolean;
 	/** Whether the banner can be dismissed */
@@ -23,12 +21,10 @@ interface SubscriptionBannerProps {
  * Banner component that shows subscription status warnings
  *
  * - Shows upgrade prompt for free tier users
- * - Shows warnings when approaching usage limits
- * - Shows urgent warnings when at limits
+ * - Usage limits are enforced on the backend via usage-rights system
  */
 export function SubscriptionBanner({
 	billingUrl,
-	checkMetrics = ["alerts"],
 	showFreeTierBanner = true,
 	dismissible = true,
 }: SubscriptionBannerProps) {
@@ -48,100 +44,31 @@ export function SubscriptionBanner({
 		return null;
 	}
 
-	const { isLoading, isFreeTier, hasPaidSubscription, isAtLimit, isNearLimit } =
-		subscription;
+	const { isLoading, isFreeTier, hasPaidSubscription } = subscription;
 
 	// Don't show while loading
 	if (isLoading) {
 		return null;
 	}
 
-	// Check for metrics at limit
-	const atLimitMetrics = checkMetrics.filter((m) => isAtLimit(m));
-	const nearLimitMetrics = checkMetrics.filter(
-		(m) => isNearLimit(m) && !isAtLimit(m),
-	);
-
-	// Determine banner content
-	let severity: "info" | "warning" | "urgent" = "info";
-	let title = "";
-	let description = "";
-	let showBanner = false;
-
-	// Helper to get metric translation key
-	const getMetricKey = (
-		m: "notices" | "users" | "alerts" | "transactions",
-	): string => {
-		const metricKeys: Record<typeof m, string> = {
-			notices: "subscriptionMetricNotices",
-			users: "subscriptionMetricUsers",
-			alerts: "subscriptionMetricAlerts",
-			transactions: "subscriptionMetricTransactions",
-		};
-		return metricKeys[m];
-	};
-
-	if (atLimitMetrics.length > 0) {
-		// Urgent: At limit
-		severity = "urgent";
-		title = t("subscriptionLimitReached");
-		description = t("subscriptionLimitReachedDesc").replace(
-			"{metrics}",
-			atLimitMetrics
-				.map((m) => t(getMetricKey(m) as Parameters<typeof t>[0]))
-				.join(", "),
-		);
-		showBanner = true;
-	} else if (nearLimitMetrics.length > 0) {
-		// Warning: Near limit
-		severity = "warning";
-		title = t("subscriptionNearLimit");
-		description = t("subscriptionNearLimitDesc").replace(
-			"{metrics}",
-			nearLimitMetrics
-				.map((m) => t(getMetricKey(m) as Parameters<typeof t>[0]))
-				.join(", "),
-		);
-		showBanner = true;
-	} else if (isFreeTier && showFreeTierBanner) {
-		// Info: Free tier
-		severity = "info";
-		title = t("subscriptionFreeTier");
-		description = t("subscriptionFreeTierDesc");
-		showBanner = true;
-	}
-
-	// Don't render if nothing to show, or if they have a paid subscription without warnings
-	if (!showBanner || (hasPaidSubscription && severity === "info")) {
+	// Only show for free tier users
+	if (!isFreeTier || !showFreeTierBanner || hasPaidSubscription) {
 		return null;
 	}
 
-	// Styling based on severity
-	const getBannerStyles = () => {
-		switch (severity) {
-			case "urgent":
-				return "bg-destructive/10 border-destructive/30 text-destructive";
-			case "warning":
-				return "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400";
-			default:
-				return "bg-primary/10 border-primary/30 text-primary";
-		}
-	};
-
-	const Icon =
-		severity === "urgent" || severity === "warning" ? AlertTriangle : Zap;
-
 	return (
 		<Alert
-			className={`rounded-none border-x-0 border-t-0 ${getBannerStyles()}`}
+			className={`rounded-none border-x-0 border-t-0 bg-primary/10 border-primary/30 text-primary`}
 		>
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center gap-3">
-					<Icon className="h-4 w-4" />
+					<Zap className="h-4 w-4" />
 					<div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-						<span className="font-medium text-sm">{title}</span>
+						<span className="font-medium text-sm">
+							{t("subscriptionFreeTier")}
+						</span>
 						<AlertDescription className="text-sm opacity-90">
-							{description}
+							{t("subscriptionFreeTierDesc")}
 						</AlertDescription>
 					</div>
 				</div>

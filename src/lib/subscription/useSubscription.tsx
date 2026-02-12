@@ -12,11 +12,8 @@ import {
 	getSubscriptionStatus,
 	isFreeTier as checkIsFreeTier,
 	hasPaidSubscription as checkHasPaidSubscription,
-	isNearLimit as checkIsNearLimit,
-	isAtLimit as checkIsAtLimit,
-	getUsagePercentage,
+	isEnterprise as checkIsEnterprise,
 	type SubscriptionStatus,
-	type UsageCheckResult,
 } from "./subscriptionClient";
 
 export interface SubscriptionContextValue {
@@ -28,26 +25,12 @@ export interface SubscriptionContextValue {
 	error: Error | null;
 	/** Refresh subscription status */
 	refresh: () => Promise<void>;
-	/** Check if on free tier */
+	/** Check if on free tier (no active subscription) */
 	isFreeTier: boolean;
-	/** Check if has paid subscription */
+	/** Check if has paid subscription (Stripe or license) */
 	hasPaidSubscription: boolean;
-	/** Get usage info for a specific metric */
-	getUsage: (
-		metric: "notices" | "users" | "alerts" | "transactions",
-	) => UsageCheckResult | null;
-	/** Check if a metric is near limit */
-	isNearLimit: (
-		metric: "notices" | "users" | "alerts" | "transactions",
-	) => boolean;
-	/** Check if a metric is at limit */
-	isAtLimit: (
-		metric: "notices" | "users" | "alerts" | "transactions",
-	) => boolean;
-	/** Get usage percentage for a metric */
-	getUsagePercentage: (
-		metric: "notices" | "users" | "alerts" | "transactions",
-	) => number;
+	/** Check if on enterprise license */
+	isEnterprise: boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextValue | null>(
@@ -83,41 +66,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 		refresh();
 	}, [refresh]);
 
-	const getUsage = useCallback(
-		(metric: "notices" | "users" | "alerts" | "transactions") => {
-			if (!subscription?.usage) return null;
-			return subscription.usage[metric] ?? null;
-		},
-		[subscription],
-	);
-
-	const isNearLimit = useCallback(
-		(metric: "notices" | "users" | "alerts" | "transactions") => {
-			const usage = getUsage(metric);
-			if (!usage) return false;
-			return checkIsNearLimit(usage);
-		},
-		[getUsage],
-	);
-
-	const isAtLimit = useCallback(
-		(metric: "notices" | "users" | "alerts" | "transactions") => {
-			const usage = getUsage(metric);
-			if (!usage) return false;
-			return checkIsAtLimit(usage);
-		},
-		[getUsage],
-	);
-
-	const getMetricUsagePercentage = useCallback(
-		(metric: "notices" | "users" | "alerts" | "transactions") => {
-			const usage = getUsage(metric);
-			if (!usage) return 0;
-			return getUsagePercentage(usage);
-		},
-		[getUsage],
-	);
-
 	const value: SubscriptionContextValue = {
 		subscription,
 		isLoading,
@@ -125,10 +73,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 		refresh,
 		isFreeTier: checkIsFreeTier(subscription),
 		hasPaidSubscription: checkHasPaidSubscription(subscription),
-		getUsage,
-		isNearLimit,
-		isAtLimit,
-		getUsagePercentage: getMetricUsagePercentage,
+		isEnterprise: checkIsEnterprise(subscription),
 	};
 
 	return (
