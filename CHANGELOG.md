@@ -1,3 +1,10 @@
+# [1.1.0-rc.8](https://github.com/janovix/watchlist/compare/v1.1.0-rc.7...v1.1.0-rc.8) (2026-02-13)
+
+
+### Features
+
+* **watchlist:** add UNSC results section to search results page ([bd2c586](https://github.com/janovix/watchlist/commit/bd2c5867b027ca6e135f8febfda65459d6a1e70c))
+
 # [1.1.0-rc.7](https://github.com/janovix/watchlist/compare/v1.1.0-rc.6...v1.1.0-rc.7) (2026-02-13)
 
 
