@@ -181,6 +181,8 @@ export const translations = {
 		sat69bResultsTitle: "Resultados SAT 69-B ({count})",
 		noOfacResults: "Não foram encontradas coincidências na lista OFAC.",
 		noSat69bResults: "Não foram encontradas coincidências na lista SAT 69-B.",
+		unscResultsTitle: "Resultados ONU ({count})",
+		noUnscResults: "Não foram encontradas coincidências na lista da ONU.",
 	},
 	es: {
 		// Header
@@ -362,6 +364,9 @@ export const translations = {
 		sat69bResultsTitle: "Resultados SAT 69-B ({count})",
 		noOfacResults: "No se encontraron coincidencias en la lista OFAC.",
 		noSat69bResults: "No se encontraron coincidencias en la lista SAT 69-B.",
+		unscResultsTitle: "Resultados ONU ({count})",
+		noUnscResults:
+			"No se encontraron coincidencias en la lista de sanciones de la ONU.",
 	},
 	en: {
 		// Header
@@ -540,6 +545,8 @@ export const translations = {
 		sat69bResultsTitle: "SAT 69-B Results ({count})",
 		noOfacResults: "No matches found in the OFAC list.",
 		noSat69bResults: "No matches found in the SAT 69-B list.",
+		unscResultsTitle: "UN Results ({count})",
+		noUnscResults: "No matches found in the UN sanctions list.",
 	},
 };
 

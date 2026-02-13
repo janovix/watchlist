@@ -275,6 +275,30 @@ function ResultPage() {
 							);
 						})()}
 
+						{/* UNSC Results */}
+						{(() => {
+							const unscMatches = result.matches.filter(
+								(m) => m.target.dataset === "unsc",
+							);
+							return (
+								<section className="space-y-4">
+									<h2 className="text-xl font-semibold">
+										{t("unscResultsTitle").replace(
+											"{count}",
+											String(unscMatches.length),
+										)}
+									</h2>
+									{unscMatches.length > 0 ? (
+										<MatchResultsList matches={unscMatches} />
+									) : (
+										<p className="text-muted-foreground py-4">
+											{t("noUnscResults")}
+										</p>
+									)}
+								</section>
+							);
+						})()}
+
 						{/* PEP Results Section */}
 						{result.pepSearchId && (
 							<div className="border-t pt-6">
