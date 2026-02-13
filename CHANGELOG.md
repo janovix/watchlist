@@ -1,3 +1,10 @@
+# [1.1.0-rc.7](https://github.com/janovix/watchlist/compare/v1.1.0-rc.6...v1.1.0-rc.7) (2026-02-13)
+
+
+### Features
+
+* **ResultPage:** add SAT 69-B results section and update translations ([ff91d50](https://github.com/janovix/watchlist/commit/ff91d50b8cc43698066f481c3ea51c0ff9ba1d71))
+
 # [1.1.0-rc.6](https://github.com/janovix/watchlist/compare/v1.1.0-rc.5...v1.1.0-rc.6) (2026-02-12)
 
 
