@@ -233,17 +233,21 @@ function ResultPage() {
 								(m) => m.target.dataset === "ofac_sdn",
 							);
 							return (
-								ofacMatches.length > 0 && (
-									<div>
-										<h2 className="text-xl font-semibold mb-4">
-											{t("ofacResultsTitle").replace(
-												"{count}",
-												String(ofacMatches.length),
-											)}
-										</h2>
+								<section className="space-y-4">
+									<h2 className="text-xl font-semibold">
+										{t("ofacResultsTitle").replace(
+											"{count}",
+											String(ofacMatches.length),
+										)}
+									</h2>
+									{ofacMatches.length > 0 ? (
 										<MatchResultsList matches={ofacMatches} />
-									</div>
-								)
+									) : (
+										<p className="text-muted-foreground py-4">
+											{t("noOfacResults")}
+										</p>
+									)}
+								</section>
 							);
 						})()}
 
@@ -253,17 +257,21 @@ function ResultPage() {
 								(m) => m.target.dataset === "sat_69b",
 							);
 							return (
-								sat69bMatches.length > 0 && (
-									<div>
-										<h2 className="text-xl font-semibold mb-4">
-											{t("sat69bResultsTitle").replace(
-												"{count}",
-												String(sat69bMatches.length),
-											)}
-										</h2>
+								<section className="space-y-4">
+									<h2 className="text-xl font-semibold">
+										{t("sat69bResultsTitle").replace(
+											"{count}",
+											String(sat69bMatches.length),
+										)}
+									</h2>
+									{sat69bMatches.length > 0 ? (
 										<MatchResultsList matches={sat69bMatches} />
-									</div>
-								)
+									) : (
+										<p className="text-muted-foreground py-4">
+											{t("noSat69bResults")}
+										</p>
+									)}
+								</section>
 							);
 						})()}
 
