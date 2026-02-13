@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, cleanup, act } from "@testing-library/react";
 import { Navbar } from "./navbar";
 import { LanguageProvider } from "./language-provider";
 import { ThemeProvider } from "./theme-provider";
@@ -36,6 +36,7 @@ describe("Navbar", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.useFakeTimers();
 		mockUseTheme.mockReturnValue({
 			resolvedTheme: "light",
 			systemTheme: "light",
@@ -60,7 +61,13 @@ describe("Navbar", () => {
 		})) as unknown as typeof window.matchMedia;
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
+		// Cleanup React components and flush pending timers
+		cleanup();
+		await act(async () => {
+			vi.runAllTimers();
+		});
+		vi.useRealTimers();
 		window.matchMedia = originalMatchMedia;
 	});
 
