@@ -228,15 +228,52 @@ function ResultPage() {
 						</div>
 
 						{/* OFAC Results */}
-						<div>
-							<h2 className="text-xl font-semibold mb-4">
-								{t("ofacResultsTitle").replace(
-									"{count}",
-									String(result.matchCount),
-								)}
-							</h2>
-							<MatchResultsList matches={result.matches} />
-						</div>
+						{(() => {
+							const ofacMatches = result.matches.filter(
+								(m) => m.target.dataset === "ofac_sdn",
+							);
+							return (
+								<section className="space-y-4">
+									<h2 className="text-xl font-semibold">
+										{t("ofacResultsTitle").replace(
+											"{count}",
+											String(ofacMatches.length),
+										)}
+									</h2>
+									{ofacMatches.length > 0 ? (
+										<MatchResultsList matches={ofacMatches} />
+									) : (
+										<p className="text-muted-foreground py-4">
+											{t("noOfacResults")}
+										</p>
+									)}
+								</section>
+							);
+						})()}
+
+						{/* SAT 69-B Results */}
+						{(() => {
+							const sat69bMatches = result.matches.filter(
+								(m) => m.target.dataset === "sat_69b",
+							);
+							return (
+								<section className="space-y-4">
+									<h2 className="text-xl font-semibold">
+										{t("sat69bResultsTitle").replace(
+											"{count}",
+											String(sat69bMatches.length),
+										)}
+									</h2>
+									{sat69bMatches.length > 0 ? (
+										<MatchResultsList matches={sat69bMatches} />
+									) : (
+										<p className="text-muted-foreground py-4">
+											{t("noSat69bResults")}
+										</p>
+									)}
+								</section>
+							);
+						})()}
 
 						{/* PEP Results Section */}
 						{result.pepSearchId && (
