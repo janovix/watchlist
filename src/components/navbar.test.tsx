@@ -32,7 +32,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 };
 
 describe("Navbar", () => {
-	const originalMatchMedia = window.matchMedia;
+	let originalMatchMedia: typeof window.matchMedia;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -43,6 +43,9 @@ describe("Navbar", () => {
 			setTheme: vi.fn(),
 			themes: ["light", "dark"],
 		});
+
+		// Save original matchMedia before mocking
+		originalMatchMedia = window.matchMedia;
 
 		// Mock matchMedia
 		window.matchMedia = vi.fn((query) => ({
