@@ -178,6 +178,7 @@ export const translations = {
 		pepState: "Entidade Federativa:",
 		pepPeriod: "Período:",
 		ofacResultsTitle: "Resultados OFAC ({count})",
+		sat69bResultsTitle: "Resultados SAT 69-B ({count})",
 	},
 	es: {
 		// Header
@@ -356,6 +357,7 @@ export const translations = {
 		pepState: "Entidad Federativa:",
 		pepPeriod: "Período:",
 		ofacResultsTitle: "Resultados OFAC ({count})",
+		sat69bResultsTitle: "Resultados SAT 69-B ({count})",
 	},
 	en: {
 		// Header
@@ -531,6 +533,7 @@ export const translations = {
 		pepState: "Federal Entity:",
 		pepPeriod: "Period:",
 		ofacResultsTitle: "OFAC Results ({count})",
+		sat69bResultsTitle: "SAT 69-B Results ({count})",
 	},
 };
 

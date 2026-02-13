@@ -228,15 +228,44 @@ function ResultPage() {
 						</div>
 
 						{/* OFAC Results */}
-						<div>
-							<h2 className="text-xl font-semibold mb-4">
-								{t("ofacResultsTitle").replace(
-									"{count}",
-									String(result.matchCount),
-								)}
-							</h2>
-							<MatchResultsList matches={result.matches} />
-						</div>
+						{(() => {
+							const ofacMatches = result.matches.filter(
+								(m) => m.target.dataset === "ofac_sdn",
+							);
+							return (
+								ofacMatches.length > 0 && (
+									<div>
+										<h2 className="text-xl font-semibold mb-4">
+											{t("ofacResultsTitle").replace(
+												"{count}",
+												String(ofacMatches.length),
+											)}
+										</h2>
+										<MatchResultsList matches={ofacMatches} />
+									</div>
+								)
+							);
+						})()}
+
+						{/* SAT 69-B Results */}
+						{(() => {
+							const sat69bMatches = result.matches.filter(
+								(m) => m.target.dataset === "sat_69b",
+							);
+							return (
+								sat69bMatches.length > 0 && (
+									<div>
+										<h2 className="text-xl font-semibold mb-4">
+											{t("sat69bResultsTitle").replace(
+												"{count}",
+												String(sat69bMatches.length),
+											)}
+										</h2>
+										<MatchResultsList matches={sat69bMatches} />
+									</div>
+								)
+							);
+						})()}
 
 						{/* PEP Results Section */}
 						{result.pepSearchId && (
