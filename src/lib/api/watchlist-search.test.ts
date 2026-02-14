@@ -3,7 +3,7 @@ import {
 	searchWatchlist,
 	type WatchlistSearchRequest,
 	type WatchlistSearchApiResponse,
-	type WatchlistMatch,
+	type OfacMatch,
 } from "./watchlist-search";
 import * as httpModule from "./http";
 
@@ -31,8 +31,9 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
-					matches: [],
-					count: 0,
+					ofac: { matches: [], count: 0 },
+					unsc: { matches: [], count: 0 },
+					sat69b: { matches: [], count: 0 },
 				},
 			};
 
@@ -64,8 +65,9 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
-					matches: [],
-					count: 0,
+					ofac: { matches: [], count: 0 },
+					unsc: { matches: [], count: 0 },
+					sat69b: { matches: [], count: 0 },
 				},
 			};
 
@@ -88,8 +90,9 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
-					matches: [],
-					count: 0,
+					ofac: { matches: [], count: 0 },
+					unsc: { matches: [], count: 0 },
+					sat69b: { matches: [], count: 0 },
 				},
 			};
 
@@ -118,25 +121,24 @@ describe("watchlist-search", () => {
 			);
 		});
 
-		it("should return matches with hybrid scoring breakdown", async () => {
-			const mockMatch: WatchlistMatch = {
+		it("should return matches separated by dataset", async () => {
+			const mockOfacMatch: OfacMatch = {
 				target: {
 					id: "test-1",
-					schema: null,
-					name: "Juan Perez Lopez",
+					partyType: "Individual",
+					primaryName: "Juan Perez Lopez",
 					aliases: ["JP Perez"],
 					birthDate: "1980-01-15",
-					countries: ["MX"],
+					birthPlace: "Mexico City, Mexico",
 					addresses: null,
-					identifiers: [{ type: "R.F.C.", number: "HEMA-621127" }],
-					sanctions: null,
-					phones: null,
-					emails: null,
-					programIds: null,
-					dataset: "ofac_sdn",
-					firstSeen: null,
-					lastSeen: null,
-					lastChange: null,
+					identifiers: [
+						{
+							type: "R.F.C.",
+							number: "HEMA-621127",
+						},
+					],
+					remarks: null,
+					sourceList: "SDN",
 					createdAt: "2024-01-01T00:00:00Z",
 					updatedAt: "2024-01-01T00:00:00Z",
 				},
@@ -152,8 +154,9 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
-					matches: [mockMatch],
-					count: 1,
+					ofac: { matches: [mockOfacMatch], count: 1 },
+					unsc: { matches: [], count: 0 },
+					sat69b: { matches: [], count: 0 },
 				},
 			};
 
@@ -164,10 +167,14 @@ describe("watchlist-search", () => {
 
 			const result = await searchWatchlist({ q: "Juan Perez" });
 
-			expect(result.result.matches).toHaveLength(1);
-			expect(result.result.matches[0].score).toBe(0.95);
-			expect(result.result.matches[0].breakdown.vectorScore).toBe(0.92);
-			expect(result.result.matches[0].breakdown.identifierMatch).toBe(true);
+			expect(result.result.ofac.matches).toHaveLength(1);
+			expect(result.result.ofac.matches[0].score).toBe(0.95);
+			expect(result.result.ofac.matches[0].breakdown.vectorScore).toBe(0.92);
+			expect(result.result.ofac.matches[0].breakdown.identifierMatch).toBe(
+				true,
+			);
+			expect(result.result.unsc.count).toBe(0);
+			expect(result.result.sat69b.count).toBe(0);
 		});
 
 		it("should handle unsuccessful API response", async () => {
@@ -196,8 +203,9 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
-					matches: [],
-					count: 0,
+					ofac: { matches: [], count: 0 },
+					unsc: { matches: [], count: 0 },
+					sat69b: { matches: [], count: 0 },
 				},
 			};
 

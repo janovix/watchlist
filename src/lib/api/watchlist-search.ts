@@ -1,33 +1,79 @@
 import { fetchJson, ApiError } from "./http";
 
 /**
- * Identifier object structure from OFAC/watchlist
+ * Identifier object structure
  */
 export interface Identifier {
 	type?: string;
 	number?: string;
+	country?: string;
+	issueDate?: string;
+	expirationDate?: string;
 }
 
 /**
- * Watchlist target from the API (reused from pep.ts)
+ * SAT 69-B Phase structure
  */
-export interface WatchlistTarget {
+export interface Sat69bPhase {
+	satNotice: string | null;
+	satDate: string | null;
+	dofNotice: string | null;
+	dofDate: string | null;
+}
+
+/**
+ * OFAC Target - Specially Designated Nationals
+ */
+export interface OfacTarget {
 	id: string;
-	schema: string | null;
-	name: string | null;
+	partyType: string;
+	primaryName: string;
 	aliases: string[] | null;
 	birthDate: string | null;
-	countries: string[] | null;
+	birthPlace: string | null;
 	addresses: string[] | null;
 	identifiers: Identifier[] | null;
-	sanctions: string[] | null;
-	phones: string[] | null;
-	emails: string[] | null;
-	programIds: string[] | null;
-	dataset: string | null;
-	firstSeen: string | null;
-	lastSeen: string | null;
-	lastChange: string | null;
+	remarks: string | null;
+	sourceList: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
+ * UNSC Target - UN Security Council sanctions
+ */
+export interface UnscTarget {
+	id: string;
+	partyType: string;
+	primaryName: string;
+	aliases: string[] | null;
+	birthDate: string | null;
+	birthPlace: string | null;
+	gender: string | null;
+	nationalities: string[] | null;
+	addresses: string[] | null;
+	identifiers: Identifier[] | null;
+	designations: string[] | null;
+	remarks: string | null;
+	unListType: string;
+	referenceNumber: string | null;
+	listedOn: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
+ * SAT 69-B Target - Mexican tax authority list
+ */
+export interface Sat69bTarget {
+	id: string;
+	rfc: string;
+	taxpayerName: string;
+	taxpayerStatus: string;
+	presumptionPhase: Sat69bPhase | null;
+	rebuttalPhase: Sat69bPhase | null;
+	definitivePhase: Sat69bPhase | null;
+	favorablePhase: Sat69bPhase | null;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -56,13 +102,28 @@ export interface ScoreBreakdown {
 }
 
 /**
- * Single match result with target and scoring
+ * Watchlist match with score breakdown
  */
-export interface WatchlistMatch {
-	target: WatchlistTarget;
-	score: number; // Final hybrid score (0-1)
+export interface OfacMatch {
+	target: OfacTarget;
+	score: number;
 	breakdown: ScoreBreakdown;
 }
+
+export interface UnscMatch {
+	target: UnscTarget;
+	score: number;
+	breakdown: ScoreBreakdown;
+}
+
+export interface Sat69bMatch {
+	target: Sat69bTarget;
+	score: number;
+	breakdown: ScoreBreakdown;
+}
+
+// Legacy type for backward compatibility (deprecated)
+export type WatchlistMatch = OfacMatch | UnscMatch | Sat69bMatch;
 
 /**
  * PEP search information from the API
@@ -79,9 +140,19 @@ export interface PepSearchInfo {
 export interface WatchlistSearchApiResponse {
 	success: boolean;
 	result: {
-		matches: WatchlistMatch[];
-		count: number;
-		pepSearch?: PepSearchInfo; // Optional PEP search information
+		ofac: {
+			matches: OfacMatch[];
+			count: number;
+		};
+		unsc: {
+			matches: UnscMatch[];
+			count: number;
+		};
+		sat69b: {
+			matches: Sat69bMatch[];
+			count: number;
+		};
+		pepSearch?: PepSearchInfo;
 	};
 }
 
