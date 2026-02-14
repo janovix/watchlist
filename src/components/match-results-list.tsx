@@ -7,7 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/components/language-provider";
-import type { WatchlistMatch, Identifier } from "@/lib/api/watchlist-search";
+import type {
+	OfacMatch,
+	UnscMatch,
+	Sat69bMatch,
+	OfacTarget,
+	UnscTarget,
+	Sat69bTarget,
+} from "@/lib/api/watchlist-search";
+
+type WatchlistMatch = OfacMatch | UnscMatch | Sat69bMatch;
 
 interface MatchResultsListProps {
 	matches: WatchlistMatch[];
@@ -22,9 +31,58 @@ function getRiskLevel(score: number): "high" | "medium" | "low" {
 function getMatchBadgeVariant(
 	level: "high" | "medium" | "low",
 ): "destructive" | "default" | "secondary" {
-	if (level === "high") return "destructive"; // Rojo para coincidencia alta (mayor alerta/peligro)
-	if (level === "medium") return "default"; // Amarillo para coincidencia media
-	return "secondary"; // Verde para coincidencia baja (menor alerta/seguro)
+	if (level === "high") return "destructive";
+	if (level === "medium") return "default";
+	return "secondary";
+}
+
+// Helper functions para determinar el tipo de target
+function isOfacTarget(
+	target: OfacTarget | UnscTarget | Sat69bTarget,
+): target is OfacTarget {
+	return "sourceList" in target;
+}
+
+function isUnscTarget(
+	target: OfacTarget | UnscTarget | Sat69bTarget,
+): target is UnscTarget {
+	return "unListType" in target;
+}
+
+function isSat69bTarget(
+	target: OfacTarget | UnscTarget | Sat69bTarget,
+): target is Sat69bTarget {
+	return "rfc" in target;
+}
+
+// Helper para obtener el nombre primario
+function getPrimaryName(
+	target: OfacTarget | UnscTarget | Sat69bTarget,
+): string {
+	if (isSat69bTarget(target)) {
+		return target.taxpayerName;
+	}
+	return target.primaryName;
+}
+
+// Helper para obtener aliases
+function getAliases(
+	target: OfacTarget | UnscTarget | Sat69bTarget,
+): string[] | null {
+	if (isSat69bTarget(target)) {
+		return null;
+	}
+	return target.aliases;
+}
+
+// Helper para obtener dataset label
+function getDatasetLabel(
+	target: OfacTarget | UnscTarget | Sat69bTarget,
+): string {
+	if (isOfacTarget(target)) return "OFAC";
+	if (isUnscTarget(target)) return "UNSC";
+	if (isSat69bTarget(target)) return "SAT 69-B";
+	return "Unknown";
 }
 
 interface MatchCardProps {
@@ -44,10 +102,13 @@ function MatchCard({ match }: MatchCardProps) {
 				? t("mediumMatch")
 				: t("lowMatch");
 
+	const primaryName = getPrimaryName(match.target);
+	const aliases = getAliases(match.target);
+	const datasetLabel = getDatasetLabel(match.target);
+
 	return (
 		<Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
 			<div className="flex items-start gap-3 sm:gap-4">
-				{/* Match Icon - Traffic light: Green=low, Yellow=medium, Red=high */}
 				<div className="shrink-0 mt-1">
 					<div
 						className={`p-2 rounded-lg ${
@@ -70,47 +131,33 @@ function MatchCard({ match }: MatchCardProps) {
 					</div>
 				</div>
 
-				{/* Content */}
 				<div className="flex-1 min-w-0">
-					{/* Header */}
-					<div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-						<div className="flex items-center gap-2 flex-wrap">
-							<h3 className="font-semibold text-lg truncate">
-								{match.target.name || "Unknown"}
+					<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+						<div className="flex-1 min-w-0">
+							<h3 className="font-semibold text-base sm:text-lg truncate">
+								{primaryName || t("unknownName")}
 							</h3>
-							<Badge variant={badgeVariant} className="shrink-0">
-								{matchLabel} - {(match.score * 100).toFixed(0)}%
+						</div>
+						<div className="flex items-center gap-2 flex-shrink-0">
+							<Badge variant="outline" className="text-xs">
+								{datasetLabel}
 							</Badge>
-							{match.breakdown.identifierMatch && (
-								<Badge variant="outline" className="shrink-0 bg-primary/10">
-									<AlertCircle className="h-3 w-3 mr-1" />
-									{t("identifierMatch")}
-								</Badge>
-							)}
+							<Badge variant={badgeVariant} className="text-xs">
+								{matchLabel}
+							</Badge>
 						</div>
 					</div>
 
-					{/* Metadata */}
-					<div className="text-sm text-muted-foreground space-y-1 mb-3">
-						{match.target.dataset && (
-							<p>
-								<span className="font-medium">Dataset:</span>{" "}
-								{match.target.dataset}
-							</p>
-						)}
-						{match.target.aliases && match.target.aliases.length > 0 && (
-							<p>
-								<span className="font-medium">Aliases:</span>{" "}
-								{match.target.aliases.join(", ")}
-							</p>
-						)}
-					</div>
+					{aliases && aliases.length > 0 && (
+						<div className="text-sm text-muted-foreground mb-2">
+							<span className="font-medium">{t("aliases")}: </span>
+							{aliases.slice(0, 2).join(", ")}
+							{aliases.length > 2 && ` +${aliases.length - 2}`}
+						</div>
+					)}
 
-					{/* Score Breakdown */}
 					<div className="space-y-2 mb-3">
 						<p className="text-sm font-medium">{t("scoreBreakdown")}</p>
-
-						{/* Name Score - 55% weight */}
 						<div className="space-y-1">
 							<div className="flex justify-between text-xs text-muted-foreground">
 								<span>{t("nameScore")} (55%)</span>
@@ -121,8 +168,6 @@ function MatchCard({ match }: MatchCardProps) {
 								className="h-2"
 							/>
 						</div>
-
-						{/* Vector Score - 35% weight */}
 						<div className="space-y-1">
 							<div className="flex justify-between text-xs text-muted-foreground">
 								<span>{t("vectorScore")} (35%)</span>
@@ -133,8 +178,6 @@ function MatchCard({ match }: MatchCardProps) {
 								className="h-2"
 							/>
 						</div>
-
-						{/* Meta Score - 10% weight */}
 						<div className="space-y-1">
 							<div className="flex justify-between text-xs text-muted-foreground">
 								<span>{t("metaScore")} (10%)</span>
@@ -147,79 +190,108 @@ function MatchCard({ match }: MatchCardProps) {
 						</div>
 					</div>
 
-					{/* Expand/Collapse Button */}
 					<Button
 						variant="ghost"
 						size="sm"
 						onClick={() => setExpanded(!expanded)}
-						className="w-full justify-center"
+						className="text-xs"
 					>
 						{expanded ? (
 							<>
-								<ChevronUp className="h-4 w-4 mr-2" />
+								<ChevronUp className="h-4 w-4 mr-1" />
 								{t("hideDetails")}
 							</>
 						) : (
 							<>
-								<ChevronDown className="h-4 w-4 mr-2" />
-								{t("viewDetails")}
+								<ChevronDown className="h-4 w-4 mr-1" />
+								{t("showDetails")}
 							</>
 						)}
 					</Button>
 
-					{/* Expanded Details */}
 					{expanded && (
-						<div className="mt-4 pt-4 border-t border-border space-y-3 text-sm">
-							<h4 className="font-medium">{t("matchDetails")}</h4>
-
-							{match.target.birthDate && (
+						<div className="mt-4 pt-4 border-t space-y-3 text-sm">
+							{!isSat69bTarget(match.target) && match.target.birthDate && (
 								<div>
-									<span className="font-medium">{t("birthDateLabel")}:</span>{" "}
-									{match.target.birthDate}
+									<span className="font-medium">{t("birthDate")}: </span>
+									<span className="text-muted-foreground">
+										{match.target.birthDate}
+									</span>
 								</div>
 							)}
 
-							{match.target.countries && match.target.countries.length > 0 && (
-								<div>
-									<span className="font-medium">{t("countriesLabel")}:</span>{" "}
-									{match.target.countries.join(", ")}
-								</div>
-							)}
-
-							{match.target.identifiers &&
-								match.target.identifiers.length > 0 && (
+							{isUnscTarget(match.target) &&
+								match.target.nationalities &&
+								match.target.nationalities.length > 0 && (
 									<div>
-										<span className="font-medium">
-											{t("identifiersLabel")}:
-										</span>{" "}
-										{match.target.identifiers
-											.map((id: Identifier) => {
-												const parts: string[] = [];
-												if (id.type) parts.push(id.type);
-												if (id.number) parts.push(id.number);
-												return parts.join(": ");
-											})
-											.join(", ")}
+										<span className="font-medium">{t("countries")}: </span>
+										<span className="text-muted-foreground">
+											{match.target.nationalities.join(", ")}
+										</span>
 									</div>
 								)}
 
-							{match.target.addresses && match.target.addresses.length > 0 && (
-								<div>
-									<span className="font-medium">Addresses:</span>{" "}
-									{match.target.addresses.join(", ")}
-								</div>
-							)}
+							{!isSat69bTarget(match.target) &&
+								match.target.identifiers &&
+								match.target.identifiers.length > 0 && (
+									<div>
+										<span className="font-medium">{t("identifiers")}: </span>
+										<div className="mt-1 space-y-1">
+											{match.target.identifiers.map((id, idx) => (
+												<div key={idx} className="text-muted-foreground ml-4">
+													{id.type && `${id.type}: `}
+													{id.number}
+													{id.country && ` (${id.country})`}
+												</div>
+											))}
+										</div>
+									</div>
+								)}
 
-							{match.target.sanctions && match.target.sanctions.length > 0 && (
-								<div>
-									<span className="font-medium">Sanctions:</span>{" "}
-									{match.target.sanctions.join(", ")}
-								</div>
+							{!isSat69bTarget(match.target) &&
+								match.target.addresses &&
+								match.target.addresses.length > 0 && (
+									<div>
+										<span className="font-medium">{t("addresses")}: </span>
+										<span className="text-muted-foreground">
+											{match.target.addresses.join("; ")}
+										</span>
+									</div>
+								)}
+
+							{isUnscTarget(match.target) &&
+								match.target.designations &&
+								match.target.designations.length > 0 && (
+									<div>
+										<span className="font-medium">{t("sanctions")}: </span>
+										<span className="text-muted-foreground">
+											{match.target.designations.join(", ")}
+										</span>
+									</div>
+								)}
+
+							{isSat69bTarget(match.target) && (
+								<>
+									<div>
+										<span className="font-medium">RFC: </span>
+										<span className="text-muted-foreground">
+											{match.target.rfc}
+										</span>
+									</div>
+									<div>
+										<span className="font-medium">{t("taxpayerStatus")}: </span>
+										<span className="text-muted-foreground">
+											{match.target.taxpayerStatus}
+										</span>
+									</div>
+								</>
 							)}
 
 							<div>
-								<span className="font-medium">Record ID:</span>{" "}
-								{match.target.id}
+								<span className="font-medium">{t("recordId")}: </span>
+								<span className="text-muted-foreground font-mono text-xs">
+									{match.target.id}
+								</span>
 							</div>
 						</div>
 					)}
@@ -246,30 +318,11 @@ export function MatchResultsList({ matches }: MatchResultsListProps) {
 		);
 	}
 
-	// Find highest score for display
-	const highestScore = Math.max(...matches.map((m) => m.score));
-
 	return (
-		<div className="space-y-6">
-			{/* Summary Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-border">
-				<p className="text-lg font-semibold">
-					{t("matchesFound").replace("{count}", matches.length.toString())}
-				</p>
-				<p className="text-sm text-muted-foreground">
-					{t("highestScore")}{" "}
-					<span className="font-bold text-foreground">
-						{(highestScore * 100).toFixed(0)}%
-					</span>
-				</p>
-			</div>
-
-			{/* Matches List */}
-			<div className="space-y-4">
-				{matches.map((match, index) => (
-					<MatchCard key={`${match.target.id}-${index}`} match={match} />
-				))}
-			</div>
+		<div className="space-y-4">
+			{matches.map((match, index) => (
+				<MatchCard key={`${match.target.id}-${index}`} match={match} />
+			))}
 		</div>
 	);
 }

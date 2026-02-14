@@ -183,6 +183,12 @@ export const translations = {
 		noSat69bResults: "Não foram encontradas coincidências na lista SAT 69-B.",
 		unscResultsTitle: "Resultados ONU ({count})",
 		noUnscResults: "Não foram encontradas coincidências na lista da ONU.",
+		taxpayerStatus: "Status do Contribuinte",
+		unknownName: "Desconhecido",
+		showDetails: "Mostrar detalhes",
+		identifiers: "Identificadores",
+		addresses: "Endereços",
+		sanctions: "Sanções",
 	},
 	es: {
 		// Header
@@ -367,6 +373,12 @@ export const translations = {
 		unscResultsTitle: "Resultados ONU ({count})",
 		noUnscResults:
 			"No se encontraron coincidencias en la lista de sanciones de la ONU.",
+		taxpayerStatus: "Estatus del Contribuyente",
+		unknownName: "Desconocido",
+		showDetails: "Mostrar detalles",
+		identifiers: "Identificadores",
+		addresses: "Direcciones",
+		sanctions: "Sanciones",
 	},
 	en: {
 		// Header
@@ -547,6 +559,12 @@ export const translations = {
 		noSat69bResults: "No matches found in the SAT 69-B list.",
 		unscResultsTitle: "UN Results ({count})",
 		noUnscResults: "No matches found in the UN sanctions list.",
+		taxpayerStatus: "Taxpayer Status",
+		unknownName: "Unknown",
+		showDetails: "Show details",
+		identifiers: "Identifiers",
+		addresses: "Addresses",
+		sanctions: "Sanctions",
 	},
 };
 

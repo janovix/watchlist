@@ -12,7 +12,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
 	searchWatchlist,
 	type WatchlistSearchRequest,
-	type WatchlistMatch,
+	type OfacMatch,
+	type UnscMatch,
+	type Sat69bMatch,
 } from "@/lib/api/watchlist-search";
 import { useJwt } from "@/hooks/useJwt";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
@@ -25,8 +27,9 @@ interface SearchResult {
 	id: string;
 	searchParams: WatchlistSearchRequest;
 	timestamp: Date;
-	matches: WatchlistMatch[];
-	matchCount: number;
+	ofac: { matches: OfacMatch[]; count: number };
+	unsc: { matches: UnscMatch[]; count: number };
+	sat69b: { matches: Sat69bMatch[]; count: number };
 	pepSearchId?: string; // PEP search ID for SSE subscription
 	pepResults?: PepRawResult[]; // Cached PEP results
 }
@@ -105,8 +108,9 @@ function ResultPage() {
 					id: queryId,
 					searchParams,
 					timestamp: new Date(),
-					matches: response.result.matches,
-					matchCount: response.result.count,
+					ofac: response.result.ofac,
+					unsc: response.result.unsc,
+					sat69b: response.result.sat69b,
 					pepSearchId: response.result.pepSearch?.searchId,
 					pepResults:
 						response.result.pepSearch?.status === "completed"
@@ -228,76 +232,55 @@ function ResultPage() {
 						</div>
 
 						{/* OFAC Results */}
-						{(() => {
-							const ofacMatches = result.matches.filter(
-								(m) => m.target.dataset === "ofac_sdn",
-							);
-							return (
-								<section className="space-y-4">
-									<h2 className="text-xl font-semibold">
-										{t("ofacResultsTitle").replace(
-											"{count}",
-											String(ofacMatches.length),
-										)}
-									</h2>
-									{ofacMatches.length > 0 ? (
-										<MatchResultsList matches={ofacMatches} />
-									) : (
-										<p className="text-muted-foreground py-4">
-											{t("noOfacResults")}
-										</p>
-									)}
-								</section>
-							);
-						})()}
+						<section className="space-y-4">
+							<h2 className="text-xl font-semibold">
+								{t("ofacResultsTitle").replace(
+									"{count}",
+									String(result.ofac.count),
+								)}
+							</h2>
+							{result.ofac.matches.length > 0 ? (
+								<MatchResultsList matches={result.ofac.matches} />
+							) : (
+								<p className="text-muted-foreground py-4">
+									{t("noOfacResults")}
+								</p>
+							)}
+						</section>
 
 						{/* SAT 69-B Results */}
-						{(() => {
-							const sat69bMatches = result.matches.filter(
-								(m) => m.target.dataset === "sat_69b",
-							);
-							return (
-								<section className="space-y-4">
-									<h2 className="text-xl font-semibold">
-										{t("sat69bResultsTitle").replace(
-											"{count}",
-											String(sat69bMatches.length),
-										)}
-									</h2>
-									{sat69bMatches.length > 0 ? (
-										<MatchResultsList matches={sat69bMatches} />
-									) : (
-										<p className="text-muted-foreground py-4">
-											{t("noSat69bResults")}
-										</p>
-									)}
-								</section>
-							);
-						})()}
+						<section className="space-y-4">
+							<h2 className="text-xl font-semibold">
+								{t("sat69bResultsTitle").replace(
+									"{count}",
+									String(result.sat69b.count),
+								)}
+							</h2>
+							{result.sat69b.matches.length > 0 ? (
+								<MatchResultsList matches={result.sat69b.matches} />
+							) : (
+								<p className="text-muted-foreground py-4">
+									{t("noSat69bResults")}
+								</p>
+							)}
+						</section>
 
 						{/* UNSC Results */}
-						{(() => {
-							const unscMatches = result.matches.filter(
-								(m) => m.target.dataset === "unsc",
-							);
-							return (
-								<section className="space-y-4">
-									<h2 className="text-xl font-semibold">
-										{t("unscResultsTitle").replace(
-											"{count}",
-											String(unscMatches.length),
-										)}
-									</h2>
-									{unscMatches.length > 0 ? (
-										<MatchResultsList matches={unscMatches} />
-									) : (
-										<p className="text-muted-foreground py-4">
-											{t("noUnscResults")}
-										</p>
-									)}
-								</section>
-							);
-						})()}
+						<section className="space-y-4">
+							<h2 className="text-xl font-semibold">
+								{t("unscResultsTitle").replace(
+									"{count}",
+									String(result.unsc.count),
+								)}
+							</h2>
+							{result.unsc.matches.length > 0 ? (
+								<MatchResultsList matches={result.unsc.matches} />
+							) : (
+								<p className="text-muted-foreground py-4">
+									{t("noUnscResults")}
+								</p>
+							)}
+						</section>
 
 						{/* PEP Results Section */}
 						{result.pepSearchId && (
