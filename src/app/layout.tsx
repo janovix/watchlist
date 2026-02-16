@@ -8,6 +8,7 @@ import { SessionHydrator } from "@/lib/auth/useAuthSession";
 import { getServerSession } from "@/lib/auth/getServerSession";
 import { SettingsProvider } from "@/lib/settings";
 import { getServerSettings } from "@/lib/settings/getServerSettings";
+import { LanguageProvider } from "@/components/language-provider";
 import { SubscriptionProvider } from "@/lib/subscription";
 import { BackgroundSpeedProvider } from "@/contexts/background-speed-context";
 import { PageTransitionProvider } from "@/contexts/page-transition-context";
@@ -57,22 +58,24 @@ export default async function RootLayout({
 		<html lang={htmlLang} suppressHydrationWarning>
 			<body className="font-sans antialiased">
 				<SettingsProvider serverSettings={settings}>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme={settings.theme}
-						enableSystem={settings.theme === "system"}
-					>
-						<SessionHydrator serverSession={session}>
-							<SubscriptionProvider>
-								<BackgroundSpeedProvider>
-									<PageTransitionProvider>
-										<LayoutContent>{children}</LayoutContent>
-									</PageTransitionProvider>
-								</BackgroundSpeedProvider>
-							</SubscriptionProvider>
-						</SessionHydrator>
-						<Toaster />
-					</ThemeProvider>
+					<LanguageProvider>
+						<ThemeProvider
+							attribute="class"
+							defaultTheme={settings.theme}
+							enableSystem={settings.theme === "system"}
+						>
+							<SessionHydrator serverSession={session}>
+								<SubscriptionProvider>
+									<BackgroundSpeedProvider>
+										<PageTransitionProvider>
+											<LayoutContent>{children}</LayoutContent>
+										</PageTransitionProvider>
+									</BackgroundSpeedProvider>
+								</SubscriptionProvider>
+							</SessionHydrator>
+							<Toaster />
+						</ThemeProvider>
+					</LanguageProvider>
 				</SettingsProvider>
 				<Analytics />
 			</body>

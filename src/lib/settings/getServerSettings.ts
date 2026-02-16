@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies, headers } from "next/headers";
-import { getAuthCoreBaseUrl, getAuthAppUrl } from "../auth/config";
+import { getAuthCoreServerUrl, getAuthAppUrl } from "../auth/config";
 import type { ResolvedSettings, LanguageCode, Theme } from "./types";
 import { DEFAULT_SETTINGS } from "./types";
 
@@ -61,7 +61,7 @@ export async function getServerSettings(): Promise<ResolvedSettings> {
 			params.set("browserLanguage", browserHints.language);
 		if (browserHints.theme) params.set("browserTheme", browserHints.theme);
 
-		const url = new URL("/api/settings/resolved", getAuthCoreBaseUrl());
+		const url = new URL("/api/settings/resolved", getAuthCoreServerUrl());
 		url.search = params.toString();
 
 		const response = await fetch(url.toString(), {

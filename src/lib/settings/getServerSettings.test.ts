@@ -11,6 +11,7 @@ vi.mock("next/headers", () => ({
 // Mock config
 vi.mock("../auth/config", () => ({
 	getAuthCoreBaseUrl: vi.fn(() => "https://auth-svc.test.workers.dev"),
+	getAuthCoreServerUrl: vi.fn(() => "https://auth-svc.test.workers.dev"),
 	getAuthAppUrl: vi.fn(() => "https://auth.test.workers.dev"),
 }));
 
