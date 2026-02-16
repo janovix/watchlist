@@ -1,3 +1,10 @@
+# [1.1.0-rc.9](https://github.com/janovix/watchlist/compare/v1.1.0-rc.8...v1.1.0-rc.9) (2026-02-16)
+
+
+### Features
+
+* add background animation and new info and queries pages ([ad63c94](https://github.com/janovix/watchlist/commit/ad63c9488012e6855ce76a8ac49b86f63b63631c))
+
 # [1.1.0-rc.8](https://github.com/janovix/watchlist/compare/v1.1.0-rc.7...v1.1.0-rc.8) (2026-02-13)
 
 
