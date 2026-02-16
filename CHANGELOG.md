@@ -1,3 +1,10 @@
+# [1.1.0-rc.10](https://github.com/janovix/watchlist/compare/v1.1.0-rc.9...v1.1.0-rc.10) (2026-02-16)
+
+
+### Features
+
+* add LanguageProvider and update auth service URL handling ([9c1f67f](https://github.com/janovix/watchlist/commit/9c1f67f42a2476576b43614c635bd4d594a5d8e1))
+
 # [1.1.0-rc.9](https://github.com/janovix/watchlist/compare/v1.1.0-rc.8...v1.1.0-rc.9) (2026-02-16)
 
 
