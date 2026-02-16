@@ -9,7 +9,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useLanguage } from "@/components/language-provider";
 
 interface TypeSwitchProps {
 	checked: boolean;
@@ -24,7 +23,6 @@ function TypeSwitch({
 	onCheckedChange,
 	compact = false,
 }: TypeSwitchProps) {
-	const { t } = useLanguage();
 	const ariaLabel = checked ? "Company" : "Individual";
 	const tooltipLabel = checked ? "Company" : "Individual";
 
