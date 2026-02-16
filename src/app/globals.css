@@ -23,6 +23,11 @@
 	--border: oklch(0.9276 0.0058 264.5313);
 	--input: oklch(0.8717 0.0093 258.3382);
 	--ring: oklch(0.5477 0.2518 292.8796);
+
+	/* Aurora colors for ChromaWaves background */
+	--aurora-color-1: #5227ff;
+	--aurora-color-2: #7cff67;
+	--aurora-color-3: #5227ff;
 	--chart-1: oklch(0.5477 0.2518 292.8796);
 	--chart-2: oklch(0.432 0.2106 292.7591);
 	--chart-3: oklch(0.5575 0.2525 302.3212);
@@ -83,6 +88,11 @@
 	--border: oklch(0.3703 0.0119 285.8054);
 	--input: oklch(0.4461 0.0263 256.8018);
 	--ring: oklch(0.8285 0.1089 307.5875);
+
+	/* Aurora colors remain the same in dark mode */
+	--aurora-color-1: #5227ff;
+	--aurora-color-2: #7cff67;
+	--aurora-color-3: #5227ff;
 	--chart-1: oklch(0.8285 0.1089 307.5875);
 	--chart-2: oklch(0.7141 0.1639 299.8224);
 	--chart-3: oklch(0.5987 0.206 294.869);

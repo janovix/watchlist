@@ -31,6 +31,7 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
+					queryId: "test-query-id",
 					ofac: { matches: [], count: 0 },
 					unsc: { matches: [], count: 0 },
 					sat69b: { matches: [], count: 0 },
@@ -65,6 +66,7 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
+					queryId: "test-query-id",
 					ofac: { matches: [], count: 0 },
 					unsc: { matches: [], count: 0 },
 					sat69b: { matches: [], count: 0 },
@@ -90,6 +92,7 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
+					queryId: "test-query-id",
 					ofac: { matches: [], count: 0 },
 					unsc: { matches: [], count: 0 },
 					sat69b: { matches: [], count: 0 },
@@ -154,6 +157,7 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
+					queryId: "test-query-id",
 					ofac: { matches: [mockOfacMatch], count: 1 },
 					unsc: { matches: [], count: 0 },
 					sat69b: { matches: [], count: 0 },
@@ -203,6 +207,7 @@ describe("watchlist-search", () => {
 			const mockResponse: WatchlistSearchApiResponse = {
 				success: true,
 				result: {
+					queryId: "test-query-id",
 					ofac: { matches: [], count: 0 },
 					unsc: { matches: [], count: 0 },
 					sat69b: { matches: [], count: 0 },

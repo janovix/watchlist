@@ -84,6 +84,7 @@ export interface Sat69bTarget {
 export interface WatchlistSearchRequest {
 	q: string; // Required: name/query text
 	dataset?: string; // Optional: filter by dataset (e.g., "ofac_sdn")
+	entityType?: "person" | "organization"; // Optional: entity type for adverse media search
 	countries?: string[]; // Optional: country filter
 	birthDate?: string; // Optional: for meta scoring
 	identifiers?: string[]; // Optional: exact identifier lookup
@@ -140,6 +141,7 @@ export interface PepSearchInfo {
 export interface WatchlistSearchApiResponse {
 	success: boolean;
 	result: {
+		queryId: string; // Persistent query ID for result aggregation
 		ofac: {
 			matches: OfacMatch[];
 			count: number;

@@ -9,6 +9,9 @@ import { getServerSession } from "@/lib/auth/getServerSession";
 import { SettingsProvider } from "@/lib/settings";
 import { getServerSettings } from "@/lib/settings/getServerSettings";
 import { SubscriptionProvider } from "@/lib/subscription";
+import { BackgroundSpeedProvider } from "@/contexts/background-speed-context";
+import { PageTransitionProvider } from "@/contexts/page-transition-context";
+import { LayoutContent } from "@/components/layout-content";
 import "./globals.css";
 
 const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -60,7 +63,13 @@ export default async function RootLayout({
 						enableSystem={settings.theme === "system"}
 					>
 						<SessionHydrator serverSession={session}>
-							<SubscriptionProvider>{children}</SubscriptionProvider>
+							<SubscriptionProvider>
+								<BackgroundSpeedProvider>
+									<PageTransitionProvider>
+										<LayoutContent>{children}</LayoutContent>
+									</PageTransitionProvider>
+								</BackgroundSpeedProvider>
+							</SubscriptionProvider>
 						</SessionHydrator>
 						<Toaster />
 					</ThemeProvider>
