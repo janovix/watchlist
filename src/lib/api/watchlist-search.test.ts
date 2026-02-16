@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
 	searchWatchlist,
+	isUsageLimitError,
 	type WatchlistSearchRequest,
 	type WatchlistSearchApiResponse,
 	type OfacMatch,
@@ -224,6 +225,109 @@ describe("watchlist-search", () => {
 			// Should call with URL containing /search endpoint
 			const callArgs = vi.mocked(httpModule.fetchJson).mock.calls[0];
 			expect(callArgs[0]).toMatch(/\/search$/);
+		});
+
+		it("should handle 403 usage limit error and re-throw with message", async () => {
+			const usageLimitError = {
+				success: false,
+				error: "Usage limit exceeded",
+				code: "USAGE_LIMIT_EXCEEDED",
+				upgradeRequired: true,
+				metric: "queries",
+				used: 100,
+				limit: 100,
+				entitlementType: "stripe" as const,
+				message: "Daily watchlist query limit reached",
+			};
+
+			const apiError = new (httpModule.ApiError as any)("403 error", {
+				status: 403,
+				body: usageLimitError,
+			});
+
+			vi.mocked(httpModule.fetchJson).mockRejectedValue(apiError);
+
+			await expect(searchWatchlist({ q: "test" })).rejects.toThrow(
+				"Daily watchlist query limit reached",
+			);
+		});
+
+		it("should handle 403 usage limit error with default message", async () => {
+			const usageLimitError = {
+				success: false,
+				error: "Usage limit exceeded",
+				code: "USAGE_LIMIT_EXCEEDED",
+				upgradeRequired: true,
+				metric: "queries",
+				used: 100,
+				limit: 100,
+				entitlementType: "stripe" as const,
+				message: "", // Empty message
+			};
+
+			const apiError = new (httpModule.ApiError as any)("403 error", {
+				status: 403,
+				body: usageLimitError,
+			});
+
+			vi.mocked(httpModule.fetchJson).mockRejectedValue(apiError);
+
+			await expect(searchWatchlist({ q: "test" })).rejects.toThrow(
+				/Daily watchlist query limit reached/,
+			);
+		});
+
+		it("should re-throw non-usage-limit 403 error as-is", async () => {
+			const apiError = new (httpModule.ApiError as any)("403 Forbidden", {
+				status: 403,
+				body: { error: "Some other 403 error" },
+			});
+
+			vi.mocked(httpModule.fetchJson).mockRejectedValue(apiError);
+
+			await expect(searchWatchlist({ q: "test" })).rejects.toThrow(
+				"403 Forbidden",
+			);
+		});
+
+		it("should wrap non-ApiError exceptions in ApiError", async () => {
+			vi.mocked(httpModule.fetchJson).mockRejectedValue(
+				new TypeError("Something went wrong"),
+			);
+
+			await expect(searchWatchlist({ q: "test" })).rejects.toThrow(
+				/Failed to search watchlist/,
+			);
+		});
+	});
+
+	describe("isUsageLimitError", () => {
+		it("should return true for valid usage limit error", () => {
+			const error = {
+				code: "USAGE_LIMIT_EXCEEDED",
+				message: "Limit exceeded",
+			};
+			expect(isUsageLimitError(error)).toBe(true);
+		});
+
+		it("should return false for null", () => {
+			expect(isUsageLimitError(null)).toBe(false);
+		});
+
+		it("should return false for non-object", () => {
+			expect(isUsageLimitError("not an object")).toBe(false);
+			expect(isUsageLimitError(123)).toBe(false);
+			expect(isUsageLimitError(true)).toBe(false);
+		});
+
+		it("should return false for object without code property", () => {
+			const error = { message: "Some error" };
+			expect(isUsageLimitError(error)).toBe(false);
+		});
+
+		it("should return false for object with wrong code", () => {
+			const error = { code: "SOME_OTHER_ERROR", message: "Error" };
+			expect(isUsageLimitError(error)).toBe(false);
 		});
 	});
 });

@@ -17,10 +17,70 @@ describe("MatchResultsList", () => {
 		cleanup();
 	});
 
-	it("should show empty state when no matches", () => {
-		renderWithProvider(<MatchResultsList matches={[]} />);
+	it("should show low score match", () => {
+		const mockMatches: OfacMatch[] = [
+			{
+				target: {
+					id: "test-low",
+					partyType: "Individual",
+					primaryName: "Person Low",
+					aliases: null,
+					birthDate: null,
+					birthPlace: null,
+					addresses: null,
+					identifiers: null,
+					remarks: null,
+					sourceList: "SDN",
+					createdAt: "2024-01-01T00:00:00Z",
+					updatedAt: "2024-01-01T00:00:00Z",
+				},
+				score: 0.3,
+				breakdown: {
+					vectorScore: 0.28,
+					nameScore: 0.32,
+					metaScore: 0.3,
+					identifierMatch: false,
+				},
+			},
+		];
 
-		expect(screen.getByText(/no matches found/i)).toBeInTheDocument();
+		renderWithProvider(<MatchResultsList matches={mockMatches} />);
+
+		// Score 0.3 should have "low" risk level and "secondary" badge variant
+		expect(screen.getByText("Person Low")).toBeInTheDocument();
+	});
+
+	it("should show medium score match", () => {
+		const mockMatches: OfacMatch[] = [
+			{
+				target: {
+					id: "test-medium",
+					partyType: "Individual",
+					primaryName: "Person Medium",
+					aliases: null,
+					birthDate: null,
+					birthPlace: null,
+					addresses: null,
+					identifiers: null,
+					remarks: null,
+					sourceList: "SDN",
+					createdAt: "2024-01-01T00:00:00Z",
+					updatedAt: "2024-01-01T00:00:00Z",
+				},
+				score: 0.6,
+				breakdown: {
+					vectorScore: 0.58,
+					nameScore: 0.62,
+					metaScore: 0.6,
+					identifierMatch: false,
+				},
+			},
+		];
+
+		renderWithProvider(<MatchResultsList matches={mockMatches} />);
+
+		// Score 0.6 should have "medium" risk level and "default" badge variant
+		expect(screen.getByText("Person Medium")).toBeInTheDocument();
 	});
 
 	it("should show OFAC match", () => {

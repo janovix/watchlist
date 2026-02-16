@@ -86,9 +86,8 @@ export function usePepSearch(searchId: string | null, enabled = true) {
 		setIsLoading(true);
 		setError(null);
 
-		// Get base URL for watchlist service
+		// Get base URL for watchlist service (client-side URL for EventSource)
 		const baseUrl =
-			process.env.WATCHLIST_API_BASE_URL ??
 			process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ??
 			"https://watchlist-svc.janovix.workers.dev";
 

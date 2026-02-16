@@ -267,4 +267,20 @@ describe("LanguageToggle", () => {
 			{ timeout: 3000 },
 		);
 	});
+
+	it("should render with mini variant", () => {
+		renderWithProvider(<LanguageToggle variant="mini" />);
+
+		// The component should render without errors with mini variant
+		const buttons = screen.getAllByRole("button");
+		expect(buttons.length).toBeGreaterThan(0);
+	});
+
+	it("should render with default variant", () => {
+		renderWithProvider(<LanguageToggle variant="default" />);
+
+		// The component should render without errors with default variant
+		const buttons = screen.getAllByRole("button");
+		expect(buttons.length).toBeGreaterThan(0);
+	});
 });

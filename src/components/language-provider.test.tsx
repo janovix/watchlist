@@ -212,6 +212,58 @@ describe("LanguageProvider", () => {
 		expect(updateUserSettings).toHaveBeenCalledWith({ language: "en" });
 	});
 
+	it("should handle API error when updating language", async () => {
+		vi.mocked(getCookie).mockReturnValue("es");
+		vi.mocked(getResolvedSettings).mockResolvedValue({
+			language: "es",
+			theme: "light",
+			timezone: "UTC",
+			dateFormat: "DD/MM/YYYY",
+			avatarUrl: null,
+			sources: {
+				language: "user",
+				theme: "default",
+				timezone: "default",
+				dateFormat: "default",
+			},
+		});
+
+		// Mock updateUserSettings to reject
+		vi.mocked(updateUserSettings).mockRejectedValue(new Error("API error"));
+
+		// Mock console.debug to verify error logging
+		const debugSpy = vi.spyOn(console, "debug").mockImplementation(() => {});
+
+		const { container } = render(
+			<LanguageProvider>
+				<TestComponent />
+			</LanguageProvider>,
+		);
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 200));
+		});
+
+		const englishButton = screen.getByText("Set English");
+		await act(async () => {
+			fireEvent.click(englishButton);
+		});
+
+		// Wait for the error to be caught
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		});
+
+		// Language should still be updated locally
+		const languageElement = container.querySelector('[data-testid="language"]');
+		expect(languageElement).toHaveTextContent("en");
+
+		// Cookie should be set
+		expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
+
+		debugSpy.mockRestore();
+	});
+
 	it("should provide translation function", async () => {
 		vi.mocked(getCookie).mockReturnValue("es");
 

@@ -479,4 +479,65 @@ describe("queries API", () => {
 			expect(result.result.ofacStatus).toBeNull();
 		});
 	});
+
+	describe("API Base URL resolution", () => {
+		it("should use NEXT_PUBLIC_WATCHLIST_API_BASE_URL when available", async () => {
+			const originalEnv = process.env;
+			process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL =
+				"https://custom-watchlist.example.com";
+
+			const mockResponse: ListQueriesResponse = {
+				success: true,
+				result: {
+					queries: [],
+					total: 0,
+					page: 1,
+					pageSize: 20,
+					hasMore: false,
+				},
+			};
+
+			vi.mocked(httpModule.fetchJson).mockResolvedValue({
+				json: mockResponse,
+				status: 200,
+			});
+
+			await listQueries();
+
+			const callArgs = vi.mocked(httpModule.fetchJson).mock.calls[0];
+			expect(callArgs[0]).toContain("custom-watchlist.example.com");
+
+			process.env = originalEnv;
+		});
+
+		it("should fall back to default URL when env var not set", async () => {
+			const originalEnv = process.env;
+			delete process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL;
+			delete process.env.WATCHLIST_API_BASE_URL_INTERNAL;
+			delete process.env.WATCHLIST_API_BASE_URL;
+
+			const mockResponse: ListQueriesResponse = {
+				success: true,
+				result: {
+					queries: [],
+					total: 0,
+					page: 1,
+					pageSize: 20,
+					hasMore: false,
+				},
+			};
+
+			vi.mocked(httpModule.fetchJson).mockResolvedValue({
+				json: mockResponse,
+				status: 200,
+			});
+
+			await listQueries();
+
+			const callArgs = vi.mocked(httpModule.fetchJson).mock.calls[0];
+			expect(callArgs[0]).toContain("watchlist-svc.janovix.workers.dev");
+
+			process.env = originalEnv;
+		});
+	});
 });
