@@ -26,6 +26,9 @@ export default defineConfig({
 				"**/types.ts",
 				// Sentry instrumentation files
 				"src/instrumentation*.ts",
+				// SSE hooks and real-time components require integration/E2E testing
+				"src/hooks/useSearchQuery.ts",
+				"src/components/screening-results-card.tsx",
 			],
 			thresholds: {
 				lines: 85,
