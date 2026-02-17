@@ -1,3 +1,10 @@
+# [1.1.0-rc.13](https://github.com/janovix/watchlist/compare/v1.1.0-rc.12...v1.1.0-rc.13) (2026-02-17)
+
+
+### Features
+
+* implement real-time search query updates with useSearchQuery hook and add ScreeningResultsCard component ([b607867](https://github.com/janovix/watchlist/commit/b607867f96f4834b85151fcde3249eb56e5e5237))
+
 # [1.1.0-rc.12](https://github.com/janovix/watchlist/compare/v1.1.0-rc.11...v1.1.0-rc.12) (2026-02-17)
 
 
