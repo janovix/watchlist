@@ -94,7 +94,7 @@ export default function HomePage() {
 		}
 	};
 
-	const canSubmit = query.trim().length > 3 && !isSearching;
+	const canSubmit = query.trim().length > 3 && !isSearching && !jwtLoading;
 
 	return (
 		<main className="h-screen flex flex-col px-3 sm:px-6 md:px-8 pt-16 overflow-hidden">
