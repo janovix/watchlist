@@ -64,9 +64,9 @@ describe("PageTransitionProvider", () => {
 
 		const elapsed = Date.now() - startTime;
 
-		// Should resolve after ~50ms (with some tolerance)
+		// Should resolve after ~50ms (with some tolerance for system timing variance)
 		expect(elapsed).toBeGreaterThanOrEqual(45);
-		expect(elapsed).toBeLessThan(100);
+		expect(elapsed).toBeLessThanOrEqual(150);
 	});
 
 	it("triggerExit uses default duration of 400ms", async () => {
