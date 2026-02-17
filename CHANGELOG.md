@@ -1,3 +1,10 @@
+# [1.1.0-rc.12](https://github.com/janovix/watchlist/compare/v1.1.0-rc.11...v1.1.0-rc.12) (2026-02-17)
+
+
+### Bug Fixes
+
+* update canSubmit condition to include jwtLoading state ([a3281b6](https://github.com/janovix/watchlist/commit/a3281b6eb8829db53eda83f95b018b9d7a4ce2ac))
+
 # [1.1.0-rc.11](https://github.com/janovix/watchlist/compare/v1.1.0-rc.10...v1.1.0-rc.11) (2026-02-17)
 
 
