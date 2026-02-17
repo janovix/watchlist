@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
+/**
+ * Helper to add Set-Cookie headers from auth-svc to a Next.js response.
+ * This is CRITICAL for cookie cache refresh - without forwarding these headers,
+ * the browser never receives refreshed session cookies and sessions expire prematurely.
+ */
+function addAuthCookies(
+	response: NextResponse,
+	cookies: string[],
+): NextResponse {
+	if (!cookies || cookies.length === 0) {
+		return response;
+	}
+
+	// Add the auth-svc Set-Cookie headers to the response
+	for (const cookie of cookies) {
+		response.headers.append("Set-Cookie", cookie);
+	}
+
+	return response;
+}
+
 const getAuthAppUrl = () => {
 	return (
 		process.env.NEXT_PUBLIC_AUTH_APP_URL || "https://auth.janovix.workers.dev"
@@ -149,6 +170,8 @@ export async function middleware(request: NextRequest) {
 	}
 
 	// Validate session with auth service
+	let authServiceSetCookies: string[] = [];
+
 	try {
 		const cookieHeader = request.headers.get("cookie") || "";
 		console.log("[Watchlist Middleware] Validating session with auth-svc...");
@@ -168,17 +191,29 @@ export async function middleware(request: NextRequest) {
 			response.status,
 		);
 
+		// CRITICAL: Capture Set-Cookie headers from auth-svc
+		// These headers contain refreshed session cookies that MUST be forwarded to the browser
+		// Without this, the cookie cache never refreshes and sessions expire prematurely
+		const setCookies = response.headers.getSetCookie?.();
+		if (setCookies && setCookies.length > 0) {
+			authServiceSetCookies = setCookies;
+			console.log(
+				`[Watchlist Middleware] Captured ${setCookies.length} Set-Cookie headers from auth-svc`,
+			);
+		}
+
 		// Invalid/expired session → redirect to auth app
 		if (!response.ok) {
 			console.log(
 				"[Watchlist Middleware] Response not OK, redirecting to login",
 			);
-			return redirectToLogin(request);
+			const redirectResponse = redirectToLogin(request);
+			return addAuthCookies(redirectResponse, authServiceSetCookies);
 		}
 
 		const data = (await response.json()) as {
 			session?: unknown;
-			user?: { name?: string | null };
+			user?: { name?: string | null; banned?: boolean };
 		};
 
 		console.log(
@@ -191,7 +226,17 @@ export async function middleware(request: NextRequest) {
 			console.log(
 				"[Watchlist Middleware] No session/user in response, redirecting to login",
 			);
-			return redirectToLogin(request);
+			const redirectResponse = redirectToLogin(request);
+			return addAuthCookies(redirectResponse, authServiceSetCookies);
+		}
+
+		// Check if user is banned
+		if (data.user?.banned) {
+			console.log(
+				"[Watchlist Middleware] User is banned, redirecting to login",
+			);
+			const redirectResponse = redirectToLogin(request);
+			return addAuthCookies(redirectResponse, authServiceSetCookies);
 		}
 
 		// Check if user needs profile onboarding (no name set)
@@ -199,7 +244,8 @@ export async function middleware(request: NextRequest) {
 			console.log(
 				"[Watchlist Middleware] User needs profile onboarding, redirecting",
 			);
-			return redirectToOnboarding(request);
+			const onboardingResponse = redirectToOnboarding(request);
+			return addAuthCookies(onboardingResponse, authServiceSetCookies);
 		}
 
 		// Fetch user organizations to check if they have any membership
@@ -216,17 +262,20 @@ export async function middleware(request: NextRequest) {
 			console.log(
 				"[Watchlist Middleware] User has no organization, redirecting to onboarding",
 			);
-			return redirectToOnboarding(request);
+			const onboardingResponse = redirectToOnboarding(request);
+			return addAuthCookies(onboardingResponse, authServiceSetCookies);
 		}
 
 		console.log("[Watchlist Middleware] Session valid, allowing request");
 	} catch (error) {
 		// Auth service error → redirect to auth app
 		console.log("[Watchlist Middleware] Error during validation:", error);
-		return redirectToLogin(request);
+		const redirectResponse = redirectToLogin(request);
+		return addAuthCookies(redirectResponse, authServiceSetCookies);
 	}
 
-	return NextResponse.next();
+	const nextResponse = NextResponse.next();
+	return addAuthCookies(nextResponse, authServiceSetCookies);
 }
 
 export const config = {

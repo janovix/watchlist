@@ -60,6 +60,9 @@ describe("middleware", () => {
 		mockFetch
 			.mockResolvedValueOnce({
 				ok: true,
+				headers: {
+					getSetCookie: () => [],
+				},
 				json: () =>
 					Promise.resolve({
 						session: { id: "123" },
@@ -68,6 +71,9 @@ describe("middleware", () => {
 			})
 			.mockResolvedValueOnce({
 				ok: true,
+				headers: {
+					getSetCookie: () => [],
+				},
 				json: () =>
 					Promise.resolve({
 						organizations: [{ id: "org1", slug: "acme", name: "Acme Inc" }],
@@ -86,6 +92,9 @@ describe("middleware", () => {
 		mockGetSessionCookie.mockReturnValue("session-token-123");
 		mockFetch.mockResolvedValue({
 			ok: true,
+			headers: {
+				getSetCookie: () => [],
+			},
 			json: () =>
 				Promise.resolve({
 					session: { id: "123" },
@@ -108,6 +117,9 @@ describe("middleware", () => {
 		mockGetSessionCookie.mockReturnValue("session-token-123");
 		mockFetch.mockResolvedValue({
 			ok: true,
+			headers: {
+				getSetCookie: () => [],
+			},
 			json: () =>
 				Promise.resolve({
 					session: { id: "123" },
@@ -129,6 +141,9 @@ describe("middleware", () => {
 		mockGetSessionCookie.mockReturnValue("invalid-session");
 		mockFetch.mockResolvedValue({
 			ok: false,
+			headers: {
+				getSetCookie: () => [],
+			},
 			json: () => Promise.resolve({}),
 		});
 		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://auth.example.com";
@@ -146,6 +161,9 @@ describe("middleware", () => {
 		mockGetSessionCookie.mockReturnValue("session-token");
 		mockFetch.mockResolvedValue({
 			ok: true,
+			headers: {
+				getSetCookie: () => [],
+			},
 			json: () => Promise.resolve({}), // No session or user data
 		});
 		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://auth.example.com";
@@ -223,6 +241,9 @@ describe("middleware", () => {
 		mockFetch
 			.mockResolvedValueOnce({
 				ok: true,
+				headers: {
+					getSetCookie: () => [],
+				},
 				json: () =>
 					Promise.resolve({
 						session: { id: "123" },
@@ -231,6 +252,9 @@ describe("middleware", () => {
 			})
 			.mockResolvedValueOnce({
 				ok: true,
+				headers: {
+					getSetCookie: () => [],
+				},
 				json: () =>
 					Promise.resolve({
 						organizations: [{ id: "org1", slug: "acme", name: "Acme Inc" }],
