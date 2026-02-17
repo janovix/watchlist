@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { MatchResultsList } from "@/components/match-results-list";
+import { useLanguage } from "@/components/language-provider";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
 import type { ConnectionStatus } from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
@@ -21,13 +22,13 @@ import type { PepRawResult } from "@/hooks/usePepSearch";
 
 interface GrokPepResult {
 	probability: number;
-	summary: string;
+	summary: string | { es: string; en: string };
 	sources?: string[];
 }
 
 interface AdverseMediaResult {
 	risk_level: "none" | "low" | "medium" | "high";
-	findings?: string;
+	findings?: string | { es: string; en: string };
 	sources?: string[];
 }
 
@@ -38,6 +39,20 @@ interface ErrorResult {
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Extract the correct language text from a bilingual field or plain string.
+ * Falls back to Spanish for Portuguese since backend doesn't provide Portuguese translations.
+ */
+function getBilingualText(
+	value: string | { es: string; en: string } | undefined,
+	language: "es" | "en" | "pt",
+): string {
+	if (!value) return "";
+	if (typeof value === "string") return value;
+	// For Portuguese, fall back to Spanish
+	return value[language === "pt" ? "es" : language] || value.es || "";
+}
 
 type ItemStatus = "loading" | "complete_clear" | "complete_match" | "failed";
 
@@ -149,6 +164,8 @@ export function ScreeningResultsCard({
 	data,
 	connectionStatus,
 }: ScreeningResultsCardProps) {
+	const { language } = useLanguage();
+
 	// Synchronous result statuses
 	const ofacStatus = resolveItemStatus(data.ofacStatus, data.ofacCount);
 	const unStatus = resolveItemStatus(data.unStatus, data.unCount);
@@ -474,7 +491,10 @@ export function ScreeningResultsCard({
 										</div>
 										{(pepAiRaw as GrokPepResult).summary && (
 											<p className="text-muted-foreground">
-												{(pepAiRaw as GrokPepResult).summary}
+												{getBilingualText(
+													(pepAiRaw as GrokPepResult).summary,
+													language as "es" | "en" | "pt",
+												)}
 											</p>
 										)}
 										{(pepAiRaw as GrokPepResult).sources &&
@@ -551,7 +571,10 @@ export function ScreeningResultsCard({
 								</div>
 								{(adverseMediaRaw as AdverseMediaResult).findings && (
 									<p className="text-muted-foreground">
-										{(adverseMediaRaw as AdverseMediaResult).findings}
+										{getBilingualText(
+											(adverseMediaRaw as AdverseMediaResult).findings,
+											language as "es" | "en" | "pt",
+										)}
 									</p>
 								)}
 								{(adverseMediaRaw as AdverseMediaResult).sources &&

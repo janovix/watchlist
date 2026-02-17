@@ -2,7 +2,6 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -118,8 +117,7 @@ export default function QueryDetailPage() {
 	}
 
 	return (
-		<main className="min-h-screen flex flex-col pt-20">
-			<Header />
+		<main className="min-h-screen flex flex-col">
 			<div className="flex-1 px-4 py-6 sm:py-8 max-w-4xl mx-auto w-full space-y-6">
 				{/* Back + New Search */}
 				<div className="flex items-center justify-between">
