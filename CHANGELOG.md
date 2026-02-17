@@ -1,3 +1,10 @@
+# [1.1.0-rc.11](https://github.com/janovix/watchlist/compare/v1.1.0-rc.10...v1.1.0-rc.11) (2026-02-17)
+
+
+### Bug Fixes
+
+* **middleware:** enhance session cookie handling in middleware to prevent premature session expiration ([4a35396](https://github.com/janovix/watchlist/commit/4a3539659688d5d4242594fc27d77fb2f99adaa9))
+
 # [1.1.0-rc.10](https://github.com/janovix/watchlist/compare/v1.1.0-rc.9...v1.1.0-rc.10) (2026-02-16)
 
 
