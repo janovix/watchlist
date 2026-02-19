@@ -66,6 +66,12 @@
 	--shadow-2xl: 0 0.125rem 0.5rem 0 hsl(0 0% 0% / 0.25);
 	--tracking-normal: normal;
 	--spacing: 0.25rem;
+	--logo-icon-bg: #e9edf9;
+	--logo-icon-shadow: #cbd5e1;
+	--logo-icon-text: #1e2938;
+	--logo-icon-accent: #7a22ce;
+	--logo-text-primary: #1e2938;
+	--logo-text-accent: #7a22ce;
 }
 
 .dark {
@@ -129,6 +135,12 @@
 	--shadow-xl:
 		0 0.125rem 0.5rem 0 hsl(0 0% 0% / 0.3), 0 8px 10px -1px hsl(0 0% 0% / 0.3);
 	--shadow-2xl: 0 0.125rem 0.5rem 0 hsl(0 0% 0% / 0.75);
+	--logo-icon-bg: #1e2938;
+	--logo-icon-shadow: #0f1728;
+	--logo-icon-text: #ffffff;
+	--logo-icon-accent: #dab4fe;
+	--logo-text-primary: #ffffff;
+	--logo-text-accent: #dab4fe;
 }
 
 @theme inline {

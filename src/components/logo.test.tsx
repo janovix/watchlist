@@ -69,14 +69,15 @@ describe("Logo", () => {
 		expect(svg?.getAttribute("height")).toBe("24");
 	});
 
-	it("should use forceTheme when provided", () => {
-		render(
+	it("should render logo with CSS custom properties", () => {
+		const { container } = render(
 			<ThemeProvider attribute="class" defaultTheme="light">
-				<Logo variant="logo" forceTheme="dark" />
+				<Logo variant="logo" />
 			</ThemeProvider>,
 		);
-		const svg = document.querySelector("svg");
+		const svg = container.querySelector("svg");
 		expect(svg).toBeInTheDocument();
+		expect(svg?.innerHTML).toContain("var(--logo-text-primary)");
 	});
 
 	it("should apply className to wrapper", () => {
