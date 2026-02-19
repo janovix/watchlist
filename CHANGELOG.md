@@ -1,3 +1,10 @@
+# [1.1.0-rc.14](https://github.com/janovix/watchlist/compare/v1.1.0-rc.13...v1.1.0-rc.14) (2026-02-19)
+
+
+### Features
+
+* update logo component to use CSS custom properties for theming ([3956f26](https://github.com/janovix/watchlist/commit/3956f26b7d62aad915f955b4424110454a289abd))
+
 # [1.1.0-rc.13](https://github.com/janovix/watchlist/compare/v1.1.0-rc.12...v1.1.0-rc.13) (2026-02-17)
 
 
