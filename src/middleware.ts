@@ -24,20 +24,17 @@ function addAuthCookies(
 
 const getAuthAppUrl = () => {
 	return (
-		process.env.NEXT_PUBLIC_AUTH_APP_URL || "https://auth.janovix.workers.dev"
+		process.env.NEXT_PUBLIC_AUTH_APP_URL || "https://auth.example.workers.dev"
 	);
 };
 
 const getAuthServiceUrl = () => {
 	// For middleware (Edge Runtime), prefer internal URL that doesn't need DNS resolution
 	// This allows local development where hosts file entries aren't available in Edge Runtime
-	const internalUrl = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL_INTERNAL;
-	if (internalUrl) {
-		return internalUrl;
-	}
 	return (
+		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL_INTERNAL ||
 		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ||
-		"https://auth-svc.janovix.workers.dev"
+		"https://auth-svc.example.workers.dev"
 	);
 };
 

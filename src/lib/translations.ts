@@ -175,13 +175,12 @@ export const translations = {
 		searchFailed: "Error al realizar la búsqueda",
 
 		// PEP Results
-		pepResultsTitle: "Resultados PEP (Plataforma de Transparencia)",
-		pepSearching: "Buscando en Plataforma de Transparencia...",
+		pepResultsTitle: "Resultados PEP (Medios Oficiales)",
+		pepSearching: "Buscando en Medios Oficiales...",
 		pepError: "Error al buscar en PEP:",
 		pepResultsCount: "Se encontraron {count} resultados",
 		pepResultsCached: "Se encontraron {count} resultados (cacheados)",
-		pepNoResults:
-			"No se encontraron resultados en la Plataforma de Transparencia",
+		pepNoResults: "No se encontraron resultados en los Medios Oficiales",
 		pepInstitution: "Institución:",
 		pepPosition: "Cargo:",
 		pepArea: "Área:",
@@ -233,14 +232,14 @@ export const translations = {
 		statusError: "Error",
 		statusCompleted2: "Completado",
 		liveConnection: "En vivo",
-		processingAsync: "Procesando búsquedas asíncronas (PEP, Media Adversa)…",
+		processingAsync: "Procesando búsquedas asíncronas (PEP, Medios Adversos)…",
 
 		// Screening section titles
 		ofacSanctionsList: "Lista de Sanciones OFAC",
 		unSanctionsList: "Lista de Sanciones ONU",
 		sat69bTitle: "SAT 69-B",
 		pepTitle: "Persona Políticamente Expuesta (PEP)",
-		adverseMediaTitle: "Media Adversa",
+		adverseMediaTitle: "Medios Adversos",
 
 		// Screening loading/result messages
 		verifyingOfac: "Verificando lista OFAC...",
@@ -251,15 +250,14 @@ export const translations = {
 		noSat69bMatches: "Sin coincidencias en la lista SAT 69-B.",
 
 		// PEP subsections
-		pepOfficialSubtitle: "Plataforma de Transparencia (Oficial)",
-		pepAiSubtitle: "Detección AI (Grok)",
-		searchingPepOfficial: "Buscando en la Plataforma de Transparencia...",
-		pepOfficialError: "Error al consultar la Plataforma de Transparencia",
-		pepOfficialNoMatch:
-			"No identificado como PEP en la Plataforma de Transparencia.",
+		pepOfficialSubtitle: "Medios Oficiales",
+		pepAiSubtitle: "Detección con IA",
+		searchingPepOfficial: "Buscando en Medios Oficiales...",
+		pepOfficialError: "Error al consultar los Medios Oficiales",
+		pepOfficialNoMatch: "No identificado como PEP en Medios Oficiales.",
 		analyzingAi: "Analizando con inteligencia artificial...",
-		pepAiError: "Error en la detección AI",
-		pepAiNoMatch: "No identificado como PEP por análisis AI.",
+		pepAiError: "Error en la detección con IA",
+		pepAiNoMatch: "No identificado como PEP por análisis con IA.",
 		probability: "Probabilidad:",
 		sources: "Fuentes:",
 		institution: "Institución:",
@@ -301,7 +299,7 @@ export const translations = {
 		unSanctionsDescription:
 			"Lista Consolidada de Sanciones del Consejo de Seguridad de las Naciones Unidas. Incluye individuos y entidades sujetos a medidas de sanciones impuestas por el Consejo de Seguridad de la ONU.",
 		pepDatabaseDescription:
-			"Base de datos de Personas Políticamente Expuestas (PEP) de las plataformas de transparencia del gobierno mexicano. Identifica individuos que ocupan o han ocupado cargos públicos prominentes.",
+			"Base de datos de Personas Políticamente Expuestas (PEP) de los medios oficiales del gobierno mexicano. Identifica individuos que ocupan o han ocupado cargos públicos prominentes.",
 
 		// Info page how it works
 		howItWorksStep1Title: "1. Ingresar Consulta",
@@ -486,12 +484,12 @@ export const translations = {
 		searchFailed: "Search failed",
 
 		// PEP Results
-		pepResultsTitle: "PEP Results (Transparency Platform)",
-		pepSearching: "Searching Transparency Platform...",
+		pepResultsTitle: "PEP Results (Official Sources)",
+		pepSearching: "Searching Official Sources...",
 		pepError: "Error searching PEP:",
 		pepResultsCount: "{count} results found",
 		pepResultsCached: "{count} results found (cached)",
-		pepNoResults: "No results found in Transparency Platform",
+		pepNoResults: "No results found in Official Sources",
 		pepInstitution: "Institution:",
 		pepPosition: "Position:",
 		pepArea: "Area:",
@@ -560,11 +558,11 @@ export const translations = {
 		noSat69bMatches: "No matches found in the SAT 69-B list.",
 
 		// PEP subsections
-		pepOfficialSubtitle: "Transparency Platform (Official)",
-		pepAiSubtitle: "AI Detection (Grok)",
-		searchingPepOfficial: "Searching Transparency Platform...",
-		pepOfficialError: "Error querying the Transparency Platform",
-		pepOfficialNoMatch: "Not identified as PEP in the Transparency Platform.",
+		pepOfficialSubtitle: "Official Sources (Official)",
+		pepAiSubtitle: "AI Powered Detection",
+		searchingPepOfficial: "Searching Official Sources...",
+		pepOfficialError: "Error querying the Official Sources",
+		pepOfficialNoMatch: "Not identified as PEP in the Official Sources.",
 		analyzingAi: "Analyzing with artificial intelligence...",
 		pepAiError: "AI detection error",
 		pepAiNoMatch: "Not identified as PEP by AI analysis.",
@@ -609,7 +607,7 @@ export const translations = {
 		unSanctionsDescription:
 			"United Nations Security Council Consolidated Sanctions List. Includes individuals and entities subject to sanctions measures imposed by the UN Security Council.",
 		pepDatabaseDescription:
-			"Politically Exposed Persons (PEP) database from Mexican government transparency platforms. Identifies individuals holding or having held prominent public positions.",
+			"Politically Exposed Persons (PEP) database from Mexican government Official Sourcess. Identifies individuals holding or having held prominent public positions.",
 
 		// Info page how it works
 		howItWorksStep1Title: "1. Enter Search Query",

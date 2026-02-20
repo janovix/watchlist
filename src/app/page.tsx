@@ -39,6 +39,7 @@ export default function HomePage() {
 		}[]
 	>([]);
 	const [showRecent, setShowRecent] = useState(true);
+	const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
 	const { jwt, isLoading: jwtLoading } = useJwt();
 	const subscription = useSubscriptionSafe();
 
@@ -46,6 +47,7 @@ export default function HomePage() {
 	useEffect(() => {
 		if (!jwt) return;
 		const fetchRecent = async () => {
+			setIsLoadingRecentSearches(true);
 			try {
 				const response = await listQueries({}, { jwt });
 				const recent = response.queries
@@ -63,6 +65,8 @@ export default function HomePage() {
 				setRecentSearches(recent);
 			} catch (error) {
 				console.error("Error fetching recent searches:", error);
+			} finally {
+				setIsLoadingRecentSearches(false);
 			}
 		};
 		fetchRecent();
@@ -236,9 +240,10 @@ export default function HomePage() {
 						</div>
 					</div>
 					{/* Recent Searches */}
-					{showRecent && recentSearches.length > 0 && (
+					{showRecent && (
 						<RecentSearches
 							searches={recentSearches}
+							isLoading={isLoadingRecentSearches}
 							onSelect={(search) => {
 								router.push(`/queries/${search.id}`);
 							}}

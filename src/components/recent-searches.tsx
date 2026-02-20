@@ -3,6 +3,7 @@
 import { Clock, Search, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 
 interface RecentSearch {
@@ -14,19 +15,28 @@ interface RecentSearch {
 
 interface RecentSearchesProps {
 	searches: RecentSearch[];
+	isLoading?: boolean;
 	onSelect: (search: RecentSearch) => void;
 	onFocusSearch: () => void;
 }
 
+// Each row: py-3.5 (14px top + 14px bottom) + text-sm line-height (20px) + 1px border-b = 49px.
+// Used to pad the list to a stable 5-row height when fewer results are shown.
+const MAX_ITEMS = 5;
+const ROW_HEIGHT_PX = 49;
+
 export function RecentSearches({
 	searches,
+	isLoading = false,
 	onSelect,
 	onFocusSearch,
 }: RecentSearchesProps) {
 	const { t } = useLanguage();
 
+	const missingRows = Math.max(0, MAX_ITEMS - searches.length);
+
 	return (
-		<div className="overflow-hidden rounded-xl border border-border animate-fade-in-up">
+		<div className="overflow-hidden rounded-xl border border-border min-w-0">
 			<div className="flex items-center justify-between gap-2 border-b border-border bg-card px-6 py-4">
 				<div className="flex items-center gap-2">
 					<Clock className="h-4 w-4 text-muted-foreground" />
@@ -41,7 +51,22 @@ export function RecentSearches({
 				</Link>
 			</div>
 
-			{searches.length === 0 ? (
+			{isLoading ? (
+				<div className="flex flex-col bg-card">
+					{[...Array(MAX_ITEMS)].map((_, i) => (
+						<div
+							key={i}
+							className="flex items-center justify-between border-b border-border/50 px-6 py-3.5 last:border-0"
+						>
+							<div className="flex items-center gap-3">
+								<Skeleton className="h-3.5 w-3.5 rounded-sm" />
+								<Skeleton className="h-4 w-48" />
+							</div>
+							<Skeleton className="h-3.5 w-32" />
+						</div>
+					))}
+				</div>
+			) : searches.length === 0 ? (
 				<div className="flex flex-col items-center justify-center bg-card px-6 py-16">
 					<div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
 						<Search className="h-7 w-7 text-muted-foreground" />
@@ -64,7 +89,14 @@ export function RecentSearches({
 					</button>
 				</div>
 			) : (
-				<div className="flex flex-col bg-card">
+				<div
+					className="flex flex-col bg-card"
+					style={
+						missingRows > 0
+							? { paddingBottom: `${missingRows * ROW_HEIGHT_PX}px` }
+							: undefined
+					}
+				>
 					{searches.map((search, i) => (
 						<button
 							key={`${search.id}-${i}`}

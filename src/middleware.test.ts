@@ -50,7 +50,7 @@ describe("middleware", () => {
 
 		expect(response.status).toBe(307);
 		expect(response.headers.get("location")).toContain(
-			"https://auth.janovix.workers.dev/login",
+			"https://auth.example.workers.dev/login",
 		);
 	});
 

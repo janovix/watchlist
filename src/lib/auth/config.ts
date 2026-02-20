@@ -12,7 +12,6 @@ export const getAuthCoreBaseUrl = (): string => {
  */
 export const getAuthCoreServerUrl = (): string => {
 	return (
-		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL_INTERNAL ||
 		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ||
 		"https://auth-svc.example.workers.dev"
 	);

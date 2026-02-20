@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
 /**
- * PEP raw result from the Transparency Platform API
+ * PEP raw result from the Official Sources API
  */
 export interface PepRawResult {
 	id: string;

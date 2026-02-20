@@ -51,10 +51,19 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 function QueryDetailSkeleton() {
 	return (
 		<div className="space-y-4">
-			<div className="space-y-2">
-				<Skeleton className="h-9 w-36" />
-				<Skeleton className="h-8 w-64" />
-				<Skeleton className="h-4 w-48" />
+			{/* Header: mirrors real layout — flex row with title+subtitle left, badge right */}
+			<div className="flex items-start justify-between gap-4">
+				<div className="space-y-1">
+					{/* Title row: icon + h1 text-2xl (line-height 2rem = 32px) */}
+					<div className="flex items-center gap-3">
+						<Skeleton className="h-5 w-5 rounded-full" />
+						<Skeleton className="h-8 w-56" />
+					</div>
+					{/* Subtitle row: text-sm (line-height 1.25rem = 20px) */}
+					<Skeleton className="h-5 w-48" />
+				</div>
+				{/* StatusBadge */}
+				<Skeleton className="h-6 w-20 rounded-full shrink-0" />
 			</div>
 			<div className="space-y-2">
 				{Array.from({ length: 5 }).map((_, i) => (
