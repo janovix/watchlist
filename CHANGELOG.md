@@ -1,3 +1,10 @@
+# [1.1.0-rc.15](https://github.com/janovix/watchlist/compare/v1.1.0-rc.14...v1.1.0-rc.15) (2026-02-20)
+
+
+### Features
+
+* update styles and layout for improved UI and user experience ([bc12b77](https://github.com/janovix/watchlist/commit/bc12b77eabdcb577e99cde3c4983533b4022c850))
+
 # [1.1.0-rc.14](https://github.com/janovix/watchlist/compare/v1.1.0-rc.13...v1.1.0-rc.14) (2026-02-19)
 
 
