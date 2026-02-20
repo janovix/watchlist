@@ -8,7 +8,7 @@ export type DateFormat =
 	| "DD/MM/YYYY"
 	| "YYYY-MM-DD"
 	| "DD.MM.YYYY";
-export type LanguageCode = "en" | "es" | "pt";
+export type LanguageCode = "en" | "es";
 
 /**
  * User settings from auth-svc

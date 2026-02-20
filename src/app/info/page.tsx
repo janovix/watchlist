@@ -32,17 +32,15 @@ export default function InfoPage() {
 				{/* Header */}
 				<Button variant="ghost" onClick={navigateBack} className="mb-6 -ml-2">
 					<ArrowLeft className="h-4 w-4 mr-2" />
-					Back to Home
+					{t("backToHome")}
 				</Button>
 
 				<div className="mb-10">
 					<h1 className="text-3xl md:text-4xl font-bold mb-3 text-balance">
-						About Watchlist
+						{t("aboutWatchlist")}
 					</h1>
 					<p className="text-muted-foreground text-lg text-pretty">
-						Background screening and due diligence platform for compliance
-						officers, KYC teams, and business operators in the Mexican market
-						and the USMCA region.
+						{t("aboutWatchlistDescription")}
 					</p>
 				</div>
 
@@ -53,14 +51,11 @@ export default function InfoPage() {
 							<Shield className="h-5 w-5 text-primary" />
 						</div>
 						<div>
-							<h2 className="text-xl font-semibold mb-2">What is Watchlist?</h2>
+							<h2 className="text-xl font-semibold mb-2">
+								{t("whatIsWatchlist")}
+							</h2>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								Watchlist is a background screening tool designed for compliance
-								and KYC officers within organizations, as well as business
-								operators who need to screen clients or associates before
-								conducting business. The platform consolidates multiple public
-								data sources into a single query workflow, enabling informed
-								decision-making at speed.
+								{t("whatIsWatchlistDescription")}
 							</p>
 						</div>
 					</div>
@@ -70,41 +65,31 @@ export default function InfoPage() {
 				<section className="mb-10">
 					<div className="flex items-center gap-3 mb-5">
 						<Database className="h-5 w-5 text-primary" />
-						<h2 className="text-xl font-semibold">Data Sources</h2>
+						<h2 className="text-xl font-semibold">{t("dataSources")}</h2>
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div className="p-5 rounded-lg bg-card/80 backdrop-blur-sm border">
 							<h3 className="font-semibold mb-2">OFAC SDN List</h3>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								The U.S. Department of the Treasury Office of Foreign Assets
-								Control (OFAC) Specially Designated Nationals and Blocked
-								Persons List (SDN). Includes sanctioned individuals and entities
-								with whom commercial transactions are prohibited under U.S. law.
+								{t("ofacSdnDescription")}
 							</p>
 						</div>
 						<div className="p-5 rounded-lg bg-card/80 backdrop-blur-sm border">
 							<h3 className="font-semibold mb-2">SAT 69-B (EFOS)</h3>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								Companies that Invoice Simulated Operations (EFOS), published by
-								Mexico's Tax Administration Service (SAT) under Article 69-B of
-								the Federal Fiscal Code. Identifies taxpayers presumed to be
-								involved in issuing invoices covering non-existent operations.
+								{t("sat69bDescription")}
 							</p>
 						</div>
 						<div className="p-5 rounded-lg bg-card/80 backdrop-blur-sm border">
-							<h3 className="font-semibold mb-2">UN Sanctions List</h3>
+							<h3 className="font-semibold mb-2">{t("unSanctionsList")}</h3>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								United Nations Security Council Consolidated Sanctions List.
-								Includes individuals and entities subject to sanctions measures
-								imposed by the UN Security Council.
+								{t("unSanctionsDescription")}
 							</p>
 						</div>
 						<div className="p-5 rounded-lg bg-card/80 backdrop-blur-sm border">
 							<h3 className="font-semibold mb-2">PEP Database</h3>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								Politically Exposed Persons (PEP) database from Mexican
-								government transparency platforms. Identifies individuals
-								holding or having held prominent public positions.
+								{t("pepDatabaseDescription")}
 							</p>
 						</div>
 					</div>
@@ -114,40 +99,30 @@ export default function InfoPage() {
 				<section className="mb-10">
 					<div className="flex items-center gap-3 mb-5">
 						<Globe className="h-5 w-5 text-primary" />
-						<h2 className="text-xl font-semibold">How It Works</h2>
+						<h2 className="text-xl font-semibold">{t("howItWorks")}</h2>
 					</div>
 					<Accordion type="single" collapsible className="w-full">
 						<AccordionItem value="item-1">
-							<AccordionTrigger>1. Enter Search Query</AccordionTrigger>
+							<AccordionTrigger>{t("howItWorksStep1Title")}</AccordionTrigger>
 							<AccordionContent>
 								<p className="text-muted-foreground text-sm leading-relaxed">
-									Enter the name of an individual or company you want to screen.
-									You can optionally provide additional information like birth
-									date, identifiers (RFC, CURP), or country of origin to improve
-									matching accuracy.
+									{t("howItWorksStep1Description")}
 								</p>
 							</AccordionContent>
 						</AccordionItem>
 						<AccordionItem value="item-2">
-							<AccordionTrigger>2. Hybrid Search Algorithm</AccordionTrigger>
+							<AccordionTrigger>{t("howItWorksStep2Title")}</AccordionTrigger>
 							<AccordionContent>
 								<p className="text-muted-foreground text-sm leading-relaxed">
-									Our system performs a hybrid search combining exact identifier
-									matching, semantic vector search, and Jaro-Winkler name
-									similarity scoring across all data sources simultaneously.
-									This ensures high accuracy while catching variations in names
-									and spellings.
+									{t("howItWorksStep2Description")}
 								</p>
 							</AccordionContent>
 						</AccordionItem>
 						<AccordionItem value="item-3">
-							<AccordionTrigger>3. Review Results</AccordionTrigger>
+							<AccordionTrigger>{t("howItWorksStep3Title")}</AccordionTrigger>
 							<AccordionContent>
 								<p className="text-muted-foreground text-sm leading-relaxed">
-									Results are organized by data source (OFAC, SAT 69-B, UNSC,
-									PEP) with match scores and detailed information for each hit.
-									You can review the full details of each match to make informed
-									decisions about your due diligence process.
+									{t("howItWorksStep3Description")}
 								</p>
 							</AccordionContent>
 						</AccordionItem>
@@ -160,19 +135,13 @@ export default function InfoPage() {
 						<AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
 						<div>
 							<h2 className="text-xl font-semibold mb-2">
-								Important Disclaimer
+								{t("importantDisclaimer")}
 							</h2>
 							<p className="text-muted-foreground text-sm leading-relaxed mb-3">
-								Watchlist is a screening tool that aggregates publicly available
-								data from official government sources. The information provided
-								is for informational purposes only and should not be considered
-								as legal advice or a definitive determination of risk.
+								{t("disclaimerText1")}
 							</p>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								Users are responsible for conducting their own due diligence and
-								verifying information through official channels. Janovix is not
-								liable for decisions made based on the information provided by
-								this platform.
+								{t("disclaimerText2")}
 							</p>
 						</div>
 					</div>
@@ -192,7 +161,7 @@ export default function InfoPage() {
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
 							>
-								Privacy
+								{t("privacy")}
 							</a>
 							<a
 								href="https://janovix.com/terms"
@@ -200,7 +169,7 @@ export default function InfoPage() {
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
 							>
-								Terms
+								{t("terms")}
 							</a>
 						</div>
 					</div>

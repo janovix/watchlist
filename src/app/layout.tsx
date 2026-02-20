@@ -9,8 +9,6 @@ import { SettingsProvider } from "@/lib/settings";
 import { getServerSettings } from "@/lib/settings/getServerSettings";
 import { LanguageProvider } from "@/components/language-provider";
 import { SubscriptionProvider } from "@/lib/subscription";
-import { BackgroundSpeedProvider } from "@/contexts/background-speed-context";
-import { PageTransitionProvider } from "@/contexts/page-transition-context";
 import { LayoutContent } from "@/components/layout-content";
 import "./globals.css";
 
@@ -19,7 +17,7 @@ const _firaCode = Fira_Code({ subsets: ["latin"] });
 const _playfair = Playfair_Display({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "isPep - PEP Verification by Janovix",
+	title: "Janovix Watchlist",
 	description:
 		"Sistema de verificación PEP para compliance y debida diligencia",
 	generator: "v0.app",
@@ -46,12 +44,7 @@ export default async function RootLayout({
 	]);
 
 	// Use settings for language in HTML lang attribute
-	const htmlLang =
-		settings.language === "pt"
-			? "pt"
-			: settings.language === "en"
-				? "en"
-				: "es";
+	const htmlLang = settings.language === "en" ? "en" : "es";
 
 	return (
 		<html lang={htmlLang} suppressHydrationWarning>
@@ -65,11 +58,7 @@ export default async function RootLayout({
 						>
 							<SessionHydrator serverSession={session}>
 								<SubscriptionProvider>
-									<BackgroundSpeedProvider>
-										<PageTransitionProvider>
-											<LayoutContent>{children}</LayoutContent>
-										</PageTransitionProvider>
-									</BackgroundSpeedProvider>
+									<LayoutContent>{children}</LayoutContent>
 								</SubscriptionProvider>
 							</SessionHydrator>
 							<Toaster />

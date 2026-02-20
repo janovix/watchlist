@@ -6,7 +6,15 @@ import { TypeSwitch } from "./type-switch";
 // Mock the language provider
 vi.mock("@/components/language-provider", () => ({
 	useLanguage: () => ({
-		t: (key: string) => key,
+		t: (key: string) => {
+			const translations: Record<string, string> = {
+				company: "Company",
+				individual: "Individual",
+				companies: "Companies",
+				individuals: "Individuals",
+			};
+			return translations[key] || key;
+		},
 		language: "en",
 		setLanguage: vi.fn(),
 	}),

@@ -79,7 +79,7 @@ describe("getServerSettings", () => {
 		expect(settings.sources.language).toBe("browser");
 	});
 
-	it("should detect Portuguese language from browser headers", async () => {
+	it("should default to Spanish for unsupported languages from browser headers", async () => {
 		const mockCookieStore = {
 			toString: () => "",
 		};
@@ -91,7 +91,7 @@ describe("getServerSettings", () => {
 
 		const settings = await getServerSettings();
 
-		expect(settings.language).toBe("pt");
+		expect(settings.language).toBe("es");
 		expect(settings.sources.language).toBe("browser");
 	});
 

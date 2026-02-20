@@ -46,7 +46,7 @@ describe("Settings types", () => {
 		});
 
 		it("should allow valid language code values", () => {
-			const languages: LanguageCode[] = ["en", "es", "pt"];
+			const languages: LanguageCode[] = ["en", "es"];
 			languages.forEach((lang) => {
 				expect(typeof lang).toBe("string");
 			});

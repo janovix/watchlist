@@ -14,8 +14,7 @@ export function useTranslation() {
 	const language = useLanguage();
 
 	// Map settings language to translations language
-	const lang: Language =
-		language === "pt" ? "pt" : language === "en" ? "en" : "es";
+	const lang: Language = language === "en" ? "en" : "es";
 	const t = translations[lang];
 
 	/**

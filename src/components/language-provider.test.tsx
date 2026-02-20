@@ -29,7 +29,6 @@ function TestComponent() {
 			<span data-testid="language">{language}</span>
 			<span data-testid="translation">{t("appName")}</span>
 			<button onClick={() => setLanguage("en")}>Set English</button>
-			<button onClick={() => setLanguage("pt")}>Set Portuguese</button>
 			<button onClick={() => setLanguage("es")}>Set Spanish</button>
 		</div>
 	);
@@ -102,7 +101,7 @@ describe("LanguageProvider", () => {
 
 		Object.defineProperty(global, "navigator", {
 			value: {
-				language: "pt-BR",
+				language: "en-US",
 			},
 			writable: true,
 			configurable: true,
@@ -119,7 +118,7 @@ describe("LanguageProvider", () => {
 		});
 
 		const languageElement = container.querySelector('[data-testid="language"]');
-		expect(languageElement).toHaveTextContent("pt");
+		expect(languageElement).toHaveTextContent("en");
 	});
 
 	it("should update language when setLanguage is called", async () => {

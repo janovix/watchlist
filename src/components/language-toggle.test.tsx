@@ -86,8 +86,9 @@ describe("LanguageToggle", () => {
 			() => {
 				const menuItems = screen.getAllByRole("menuitem");
 				expect(menuItems.length).toBeGreaterThan(0);
-				const ptButton = menuItems.find((item) => item.textContent === "PT");
-				expect(ptButton).toBeInTheDocument();
+				// Should have ES and EN options
+				const esButton = menuItems.find((item) => item.textContent === "ES");
+				expect(esButton).toBeInTheDocument();
 			},
 			{ timeout: 3000 },
 		);
@@ -148,15 +149,15 @@ describe("LanguageToggle", () => {
 		const toggleButton = buttons[0];
 		await user.click(toggleButton);
 
-		// Wait for dropdown to open and find PT menu item
+		// Wait for dropdown to open and find EN menu item
 		await waitFor(
 			async () => {
 				const menuItems = screen.getAllByRole("menuitem");
 				expect(menuItems.length).toBeGreaterThan(0);
-				const ptButton = menuItems.find((item) => item.textContent === "PT");
-				expect(ptButton).toBeInTheDocument();
-				if (ptButton) {
-					await user.click(ptButton);
+				const enButton = menuItems.find((item) => item.textContent === "EN");
+				expect(enButton).toBeInTheDocument();
+				if (enButton) {
+					await user.click(enButton);
 				}
 			},
 			{ timeout: 3000 },
@@ -164,7 +165,7 @@ describe("LanguageToggle", () => {
 
 		await waitFor(
 			() => {
-				expect(setCookie).toHaveBeenCalledWith("janovix-lang", "pt");
+				expect(setCookie).toHaveBeenCalledWith("janovix-lang", "en");
 			},
 			{ timeout: 3000 },
 		);

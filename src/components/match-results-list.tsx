@@ -107,7 +107,7 @@ function MatchCard({ match }: MatchCardProps) {
 	const datasetLabel = getDatasetLabel(match.target);
 
 	return (
-		<Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
+		<Card className="p-4 sm:p-6 hover:shadow-md transition-shadow border-dashed">
 			<div className="flex items-start gap-3 sm:gap-4">
 				<div className="shrink-0 mt-1">
 					<div

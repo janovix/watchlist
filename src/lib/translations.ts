@@ -1,195 +1,6 @@
-export type Language = "pt" | "es" | "en";
+export type Language = "es" | "en";
 
 export const translations = {
-	pt: {
-		// Header
-		appName: "isPep",
-		byJanovix: "Janovix",
-		appDescription: "Verificação de Pessoas Politicamente Expostas",
-
-		// Loading
-		loading: "Carregando...",
-
-		// Hero
-		heroTitle: "Verificação PEP para Compliance",
-		heroDescription:
-			"Consulte se um indivíduo é ou foi uma Pessoa Politicamente Exposta. Nossa ferramenta verifica múltiplas bases de dados nacionais e internacionais.",
-
-		// Search Form
-		searchPlaceholder: "Digite o nome completo do indivíduo...",
-		searchButton: "Verificar PEP",
-
-		// Recent Searches
-		recentSearches: "Pesquisas recentes",
-		noRecentSearches: "Nenhuma pesquisa recente",
-		noRecentSearchesDescription:
-			"Comece sua primeira verificação PEP para ver suas pesquisas aqui.",
-		startFirstSearch: "Fazer primeira pesquisa",
-
-		// Loading View
-		verifyingIdentity: "Verificando identidade",
-		searching: "Pesquisando:",
-		progress: "Progresso",
-		timeElapsed: "Tempo decorrido:",
-		loadingWarning:
-			"Não atualize nem saia desta página. A consulta pode demorar até um minuto enquanto verificamos múltiplas bases de dados.",
-		important: "Importante:",
-
-		// Loading Steps
-		step1: "Conectando com bases de dados nacionais...",
-		step2: "Consultando registros internacionais...",
-		step3: "Verificando listas de sanções...",
-		step4: "Analisando coincidências...",
-		step5: "Gerando relatório...",
-
-		// Result View
-		isPep: "É PEP",
-		isNotPep: "Não é PEP",
-		isPepDescription: "Esta pessoa é ou foi uma Pessoa Politicamente Exposta.",
-		isNotPepDescription:
-			"Não foram encontrados registros deste indivíduo nas bases de dados consultadas.",
-		yes: "Sim",
-		no: "Não",
-		searchInfo: "Informações da pesquisa",
-		searchedName: "Nome pesquisado:",
-		queryDate: "Data da consulta:",
-		queryId: "ID da consulta:",
-		newSearch: "Realizar outra pesquisa",
-		exportPdf: "Exportar para PDF",
-		noData: "Sem dados",
-		na: "N/A",
-
-		pepRecordDetails: "Detalhes do registro PEP",
-		dataset: "Base de dados",
-		recordId: "ID do registro",
-		registeredName: "Nome registrado",
-		aliases: "Aliases",
-		birthDate: "Data de nascimento",
-		countries: "Países",
-		firstSeen: "Primeira publicação",
-		lastChange: "Última alteração",
-		lastSeen: "Última observação",
-		noAliases: "Sem aliases",
-		noCountries: "Sem países",
-
-		// Theme
-		themeLabel: "Tema",
-		themeSystem: "Sistema",
-		themeLight: "Claro",
-		themeDark: "Escuro",
-		// Language
-		languageLabel: "Idioma",
-
-		profile: "Meu perfil",
-		settings: "Configurações",
-		help: "Ajuda e suporte",
-		notifications: "Notificações",
-		logout: "Sair",
-
-		// Subscription banner
-		subscriptionFreeTier: "Plano Gratuito",
-		subscriptionFreeTierDesc:
-			"Você está usando o plano gratuito com buscas limitadas.",
-		subscriptionNearLimit: "Perto do limite",
-		subscriptionNearLimitDesc:
-			"Você está se aproximando do limite de {metrics}.",
-		subscriptionLimitReached: "Limite atingido",
-		subscriptionLimitReachedDesc:
-			"Você atingiu o limite de {metrics}. Atualize para continuar.",
-		subscriptionUpgrade: "Atualizar plano",
-		subscriptionMetricNotices: "avisos",
-		subscriptionMetricUsers: "usuários",
-		subscriptionMetricAlerts: "buscas",
-		subscriptionMetricTransactions: "transações",
-		"subscription.noWatchlistAccess.title": "Acesso Watchlist Não Disponível",
-		"subscription.noWatchlistAccess.description":
-			"Sua assinatura atual não inclui acesso ao produto Watchlist.",
-		"subscription.noWatchlistAccess.upgradePrompt":
-			"Para acessar consultas de listas de vigilância, assine um plano que inclua Watchlist.",
-		"subscription.noWatchlistAccess.upgradeCta": "Ver planos disponíveis",
-		"subscription.noWatchlistAccess.backToSettings": "Ir para configurações",
-
-		// Error pages
-		errorNotFoundTitle: "Página não encontrada",
-		errorNotFoundDescription:
-			"A página que você procura não existe ou foi movida. Verifique a URL ou volte para um lugar seguro.",
-		errorServerTitle: "Algo deu errado",
-		errorServerDescription:
-			"Encontramos um erro inesperado ao carregar esta página.",
-		errorServerHelp:
-			"Tente novamente ou volte para o início se o problema persistir.",
-		errorUnauthorizedTitle: "Login necessário",
-		errorUnauthorizedDescription:
-			"Você precisa fazer login para acessar esta página.",
-		errorUnauthorizedReason:
-			"Se você chegou aqui por um link compartilhado ou favorito, faça login e tente novamente.",
-		errorForbiddenTitle: "Acesso negado",
-		errorForbiddenDescription: "Você não tem acesso a esta página.",
-		errorForbiddenReason:
-			"Isso pode acontecer se sua função não incluir essa permissão ou se seu acesso foi revogado.",
-		errorGoBack: "Voltar",
-		errorHome: "Início",
-		errorTryAgain: "Tentar novamente",
-		errorSignIn: "Entrar",
-
-		// Common additions
-		dismiss: "Descartar",
-
-		// Watchlist search
-		advancedSearch: "Pesquisa avançada",
-		hideAdvancedSearch: "Ocultar pesquisa avançada",
-		identifiersLabel: "Identificadores",
-		identifiersPlaceholder: "Passaporte, RFC, NIT... (separados por vírgula)",
-		birthDateLabel: "Data de nascimento",
-		countriesLabel: "Países",
-		countriesPlaceholder: "MX, US, CO... (códigos ISO separados por vírgula)",
-		matchesFound: "{count} coincidências encontradas",
-		noMatchesFound: "Nenhuma coincidência encontrada",
-		noMatchesDescription:
-			"Não foram encontrados registros que correspondam aos critérios de pesquisa nas bases de dados consultadas.",
-		highestScore: "Maior coincidência:",
-		score: "Pontuação",
-		scoreBreakdown: "Detalhamento da pontuação",
-		vectorScore: "Similaridade semântica",
-		nameScore: "Similaridade de nome",
-		metaScore: "Correspondência de metadados",
-		identifierMatch: "Correspondência exata de identificador",
-		highMatch: "Coincidência alta",
-		mediumMatch: "Coincidência média",
-		lowMatch: "Coincidência baixa",
-		viewDetails: "Ver detalhes",
-		hideDetails: "Ocultar detalhes",
-		matchDetails: "Detalhes da coincidência",
-		searchResultsFor: "Resultados de pesquisa para",
-		searchNotFound: "Pesquisa não encontrada",
-		searchFailed: "Erro ao realizar a pesquisa",
-
-		// PEP Results (Transparency Platform)
-		pepResultsTitle: "Resultados PEP (Plataforma de Transparência)",
-		pepSearching: "Pesquisando na Plataforma de Transparência...",
-		pepError: "Erro ao pesquisar em PEP:",
-		pepResultsCount: "Foram encontrados {count} resultados",
-		pepResultsCached: "Foram encontrados {count} resultados (em cache)",
-		pepNoResults:
-			"Não foram encontrados resultados na Plataforma de Transparência",
-		pepInstitution: "Instituição:",
-		pepPosition: "Cargo:",
-		pepArea: "Área:",
-		pepState: "Entidade Federativa:",
-		pepPeriod: "Período:",
-		ofacResultsTitle: "Resultados OFAC ({count})",
-		sat69bResultsTitle: "Resultados SAT 69-B ({count})",
-		noOfacResults: "Não foram encontradas coincidências na lista OFAC.",
-		noSat69bResults: "Não foram encontradas coincidências na lista SAT 69-B.",
-		unscResultsTitle: "Resultados ONU ({count})",
-		noUnscResults: "Não foram encontradas coincidências na lista da ONU.",
-		taxpayerStatus: "Status do Contribuinte",
-		unknownName: "Desconhecido",
-		showDetails: "Mostrar detalhes",
-		identifiers: "Identificadores",
-		addresses: "Endereços",
-		sanctions: "Sanções",
-	},
 	es: {
 		// Header
 		appName: "isPep",
@@ -207,6 +18,8 @@ export const translations = {
 		// Search Form
 		searchPlaceholder: "Ingrese el nombre completo del individuo...",
 		searchButton: "Verificar PEP",
+		searchIndividualPlaceholder: "BUSCAR INDIVIDUO...",
+		searchCompanyPlaceholder: "BUSCAR EMPRESA...",
 
 		// Recent Searches
 		recentSearches: "Búsquedas recientes",
@@ -228,7 +41,7 @@ export const translations = {
 		step1: "Conectando con bases de datos nacionales...",
 		step2: "Consultando registros internacionales...",
 		step3: "Verificando listas de sanciones...",
-		step4: "Analizando coincidências...",
+		step4: "Analizando coincidencias...",
 		step5: "Generando informe...",
 
 		// Result View
@@ -323,15 +136,23 @@ export const translations = {
 
 		// Common additions
 		dismiss: "Descartar",
+		privacy: "Privacidad",
+		terms: "Términos",
+		backToQueries: "Volver a consultas",
+		backToHome: "Volver al inicio",
+		openCalendar: "Abrir calendario",
 
-		// Watchlist search
+		// Search form advanced
 		advancedSearch: "Búsqueda avanzada",
 		hideAdvancedSearch: "Ocultar búsqueda avanzada",
-		identifiersLabel: "Identificadores",
-		identifiersPlaceholder: "Pasaporte, RFC, NIT... (separados por coma)",
-		birthDateLabel: "Fecha de nacimiento",
+		identifiersLabel: "Identificadores (separados por coma)",
+		identifiersPlaceholder: "RFC, CURP, etc.",
+		birthDateLabel: "Fecha de nacimiento (YYYY-MM-DD)",
+		dateOfCreationLabel: "Fecha de creación (YYYY-MM-DD)",
 		countriesLabel: "Países",
 		countriesPlaceholder: "MX, US, CO... (códigos ISO separados por coma)",
+
+		// Watchlist search results
 		matchesFound: "{count} coincidencias encontradas",
 		noMatchesFound: "No se encontraron coincidencias",
 		noMatchesDescription:
@@ -353,7 +174,7 @@ export const translations = {
 		searchNotFound: "Búsqueda no encontrada",
 		searchFailed: "Error al realizar la búsqueda",
 
-		// PEP Results (Transparency Platform)
+		// PEP Results
 		pepResultsTitle: "Resultados PEP (Plataforma de Transparencia)",
 		pepSearching: "Buscando en Plataforma de Transparencia...",
 		pepError: "Error al buscar en PEP:",
@@ -379,6 +200,119 @@ export const translations = {
 		identifiers: "Identificadores",
 		addresses: "Direcciones",
 		sanctions: "Sanciones",
+
+		// Query History page
+		queryHistoryTitle: "Historial de Consultas",
+		queryHistoryDescription: "Ver y administrar tus verificaciones anteriores",
+		searchQueriesPlaceholder: "Buscar consultas...",
+		filterAll: "Todos",
+		filterIndividual: "Individual",
+		filterCompany: "Empresa",
+		tableQuery: "Consulta",
+		tableType: "Tipo",
+		tableDate: "Fecha",
+		tableStatus: "Estado",
+		noQueriesFound: "No se encontraron consultas que coincidan con tus filtros",
+		noQueriesYet:
+			"Aún no hay consultas. Comienza buscando un individuo o empresa.",
+		showingQueries: "Mostrando {from} a {to} de {total} consultas",
+		previous: "Anterior",
+		next: "Siguiente",
+
+		// Status labels
+		statusPending: "Pendiente",
+		statusRunning: "Procesando",
+		statusCompleted: "Completado",
+		statusFailed: "Fallido",
+		statusPartial: "Parcial",
+
+		// Screening results
+		statusSearching: "Buscando...",
+		statusClean: "Limpio",
+		statusMatches: "Coincidencias",
+		statusError: "Error",
+		statusCompleted2: "Completado",
+		liveConnection: "En vivo",
+		processingAsync: "Procesando búsquedas asíncronas (PEP, Media Adversa)…",
+
+		// Screening section titles
+		ofacSanctionsList: "Lista de Sanciones OFAC",
+		unSanctionsList: "Lista de Sanciones ONU",
+		sat69bTitle: "SAT 69-B",
+		pepTitle: "Persona Políticamente Expuesta (PEP)",
+		adverseMediaTitle: "Media Adversa",
+
+		// Screening loading/result messages
+		verifyingOfac: "Verificando lista OFAC...",
+		noOfacMatches: "Sin coincidencias en la lista OFAC.",
+		verifyingUn: "Verificando lista ONU...",
+		noUnMatches: "Sin coincidencias en la lista de sanciones ONU.",
+		verifyingSat69b: "Verificando lista SAT 69-B...",
+		noSat69bMatches: "Sin coincidencias en la lista SAT 69-B.",
+
+		// PEP subsections
+		pepOfficialSubtitle: "Plataforma de Transparencia (Oficial)",
+		pepAiSubtitle: "Detección AI (Grok)",
+		searchingPepOfficial: "Buscando en la Plataforma de Transparencia...",
+		pepOfficialError: "Error al consultar la Plataforma de Transparencia",
+		pepOfficialNoMatch:
+			"No identificado como PEP en la Plataforma de Transparencia.",
+		analyzingAi: "Analizando con inteligencia artificial...",
+		pepAiError: "Error en la detección AI",
+		pepAiNoMatch: "No identificado como PEP por análisis AI.",
+		probability: "Probabilidad:",
+		sources: "Fuentes:",
+		institution: "Institución:",
+		position: "Cargo:",
+		area: "Área:",
+
+		// Adverse media
+		analyzingAdverseMedia: "Analizando medios y fuentes públicas...",
+		adverseMediaError: "Error al analizar medios adversos",
+		noAdverseMedia: "Sin indicios de medios adversos.",
+		riskLevel: "Nivel de riesgo:",
+
+		// Type switch
+		individual: "Individual",
+		company: "Empresa",
+		individuals: "Individuos",
+		companies: "Empresas",
+
+		// Info page
+		aboutWatchlist: "Acerca de Watchlist",
+		aboutWatchlistDescription:
+			"Plataforma de verificación de antecedentes y debida diligencia para oficiales de cumplimiento, equipos KYC y operadores de negocios en el mercado mexicano y la región USMCA.",
+		whatIsWatchlist: "¿Qué es Watchlist?",
+		whatIsWatchlistDescription:
+			"Watchlist es una herramienta de verificación de antecedentes diseñada para oficiales de cumplimiento y KYC dentro de organizaciones, así como operadores de negocios que necesitan verificar clientes o asociados antes de realizar negocios. La plataforma consolida múltiples fuentes de datos públicos en un solo flujo de consulta, permitiendo la toma de decisiones informada a velocidad.",
+		dataSources: "Fuentes de Datos",
+		howItWorks: "Cómo Funciona",
+		importantDisclaimer: "Aviso Importante",
+		disclaimerText1:
+			"Watchlist es una herramienta de verificación que agrega datos disponibles públicamente de fuentes gubernamentales oficiales. La información proporcionada es solo para fines informativos y no debe considerarse como asesoría legal o una determinación definitiva de riesgo.",
+		disclaimerText2:
+			"Los usuarios son responsables de realizar su propia debida diligencia y verificar la información a través de canales oficiales. Janovix no es responsable de las decisiones tomadas con base en la información proporcionada por esta plataforma.",
+
+		// Info page data sources
+		ofacSdnDescription:
+			"La Lista de Nacionales Especialmente Designados y Personas Bloqueadas (SDN) de la Oficina de Control de Activos Extranjeros (OFAC) del Departamento del Tesoro de EE.UU. Incluye individuos y entidades sancionados con quienes se prohíben transacciones comerciales bajo la ley estadounidense.",
+		sat69bDescription:
+			"Empresas que Facturan Operaciones Simuladas (EFOS), publicadas por el Servicio de Administración Tributaria (SAT) de México bajo el Artículo 69-B del Código Fiscal de la Federación. Identifica contribuyentes presuntamente involucrados en la emisión de facturas que amparan operaciones inexistentes.",
+		unSanctionsDescription:
+			"Lista Consolidada de Sanciones del Consejo de Seguridad de las Naciones Unidas. Incluye individuos y entidades sujetos a medidas de sanciones impuestas por el Consejo de Seguridad de la ONU.",
+		pepDatabaseDescription:
+			"Base de datos de Personas Políticamente Expuestas (PEP) de las plataformas de transparencia del gobierno mexicano. Identifica individuos que ocupan o han ocupado cargos públicos prominentes.",
+
+		// Info page how it works
+		howItWorksStep1Title: "1. Ingresar Consulta",
+		howItWorksStep1Description:
+			"Ingresa el nombre de un individuo o empresa que deseas verificar. Opcionalmente puedes proporcionar información adicional como fecha de nacimiento, identificadores (RFC, CURP) o país de origen para mejorar la precisión de coincidencia.",
+		howItWorksStep2Title: "2. Algoritmo de Búsqueda Híbrida",
+		howItWorksStep2Description:
+			"Nuestro sistema realiza una búsqueda híbrida que combina coincidencia exacta de identificadores, búsqueda semántica vectorial y puntuación de similitud de nombres Jaro-Winkler en todas las fuentes de datos simultáneamente. Esto asegura alta precisión mientras captura variaciones en nombres y ortografías.",
+		howItWorksStep3Title: "3. Revisar Resultados",
+		howItWorksStep3Description:
+			"Los resultados se organizan por fuente de datos (OFAC, SAT 69-B, UNSC, PEP) con puntuaciones de coincidencia e información detallada para cada resultado. Puedes revisar los detalles completos de cada coincidencia para tomar decisiones informadas sobre tu proceso de debida diligencia.",
 	},
 	en: {
 		// Header
@@ -397,6 +331,8 @@ export const translations = {
 		// Search Form
 		searchPlaceholder: "Enter the full name of the individual...",
 		searchButton: "Verify PEP",
+		searchIndividualPlaceholder: "SEARCH INDIVIDUAL...",
+		searchCompanyPlaceholder: "SEARCH COMPANY...",
 
 		// Recent Searches
 		recentSearches: "Recent searches",
@@ -511,15 +447,23 @@ export const translations = {
 
 		// Common additions
 		dismiss: "Dismiss",
+		privacy: "Privacy",
+		terms: "Terms",
+		backToQueries: "Back to Queries",
+		backToHome: "Back to Home",
+		openCalendar: "Open calendar",
 
-		// Watchlist search
+		// Search form advanced
 		advancedSearch: "Advanced search",
 		hideAdvancedSearch: "Hide advanced search",
-		identifiersLabel: "Identifiers",
-		identifiersPlaceholder: "Passport, RFC, NIT... (comma-separated)",
-		birthDateLabel: "Birth date",
+		identifiersLabel: "Identifiers (comma-separated)",
+		identifiersPlaceholder: "RFC, CURP, etc.",
+		birthDateLabel: "Birth date (YYYY-MM-DD)",
+		dateOfCreationLabel: "Date of creation (YYYY-MM-DD)",
 		countriesLabel: "Countries",
 		countriesPlaceholder: "MX, US, CO... (ISO codes comma-separated)",
+
+		// Watchlist search results
 		matchesFound: "{count} matches found",
 		noMatchesFound: "No matches found",
 		noMatchesDescription:
@@ -541,7 +485,7 @@ export const translations = {
 		searchNotFound: "Search not found",
 		searchFailed: "Search failed",
 
-		// PEP Results (Transparency Platform)
+		// PEP Results
 		pepResultsTitle: "PEP Results (Transparency Platform)",
 		pepSearching: "Searching Transparency Platform...",
 		pepError: "Error searching PEP:",
@@ -565,13 +509,123 @@ export const translations = {
 		identifiers: "Identifiers",
 		addresses: "Addresses",
 		sanctions: "Sanctions",
+
+		// Query History page
+		queryHistoryTitle: "Query History",
+		queryHistoryDescription: "View and manage your past background checks",
+		searchQueriesPlaceholder: "Search queries...",
+		filterAll: "All",
+		filterIndividual: "Individual",
+		filterCompany: "Company",
+		tableQuery: "Query",
+		tableType: "Type",
+		tableDate: "Date",
+		tableStatus: "Status",
+		noQueriesFound: "No queries found matching your filters",
+		noQueriesYet:
+			"No queries yet. Start by searching for an individual or company.",
+		showingQueries: "Showing {from} to {to} of {total} queries",
+		previous: "Previous",
+		next: "Next",
+
+		// Status labels
+		statusPending: "Pending",
+		statusRunning: "Processing",
+		statusCompleted: "Completed",
+		statusFailed: "Failed",
+		statusPartial: "Partial",
+
+		// Screening results
+		statusSearching: "Searching...",
+		statusClean: "Clean",
+		statusMatches: "Matches",
+		statusError: "Error",
+		statusCompleted2: "Completed",
+		liveConnection: "Live",
+		processingAsync: "Processing async searches (PEP, Adverse Media)…",
+
+		// Screening section titles
+		ofacSanctionsList: "OFAC Sanctions List",
+		unSanctionsList: "UN Sanctions List",
+		sat69bTitle: "SAT 69-B",
+		pepTitle: "Politically Exposed Person (PEP)",
+		adverseMediaTitle: "Adverse Media",
+
+		// Screening loading/result messages
+		verifyingOfac: "Verifying OFAC list...",
+		noOfacMatches: "No matches found in the OFAC list.",
+		verifyingUn: "Verifying UN list...",
+		noUnMatches: "No matches found in the UN sanctions list.",
+		verifyingSat69b: "Verifying SAT 69-B list...",
+		noSat69bMatches: "No matches found in the SAT 69-B list.",
+
+		// PEP subsections
+		pepOfficialSubtitle: "Transparency Platform (Official)",
+		pepAiSubtitle: "AI Detection (Grok)",
+		searchingPepOfficial: "Searching Transparency Platform...",
+		pepOfficialError: "Error querying the Transparency Platform",
+		pepOfficialNoMatch: "Not identified as PEP in the Transparency Platform.",
+		analyzingAi: "Analyzing with artificial intelligence...",
+		pepAiError: "AI detection error",
+		pepAiNoMatch: "Not identified as PEP by AI analysis.",
+		probability: "Probability:",
+		sources: "Sources:",
+		institution: "Institution:",
+		position: "Position:",
+		area: "Area:",
+
+		// Adverse media
+		analyzingAdverseMedia: "Analyzing media and public sources...",
+		adverseMediaError: "Error analyzing adverse media",
+		noAdverseMedia: "No adverse media indicators found.",
+		riskLevel: "Risk level:",
+
+		// Type switch
+		individual: "Individual",
+		company: "Company",
+		individuals: "Individuals",
+		companies: "Companies",
+
+		// Info page
+		aboutWatchlist: "About Watchlist",
+		aboutWatchlistDescription:
+			"Background screening and due diligence platform for compliance officers, KYC teams, and business operators in the Mexican market and the USMCA region.",
+		whatIsWatchlist: "What is Watchlist?",
+		whatIsWatchlistDescription:
+			"Watchlist is a background screening tool designed for compliance and KYC officers within organizations, as well as business operators who need to screen clients or associates before conducting business. The platform consolidates multiple public data sources into a single query workflow, enabling informed decision-making at speed.",
+		dataSources: "Data Sources",
+		howItWorks: "How It Works",
+		importantDisclaimer: "Important Disclaimer",
+		disclaimerText1:
+			"Watchlist is a screening tool that aggregates publicly available data from official government sources. The information provided is for informational purposes only and should not be considered as legal advice or a definitive determination of risk.",
+		disclaimerText2:
+			"Users are responsible for conducting their own due diligence and verifying information through official channels. Janovix is not liable for decisions made based on the information provided by this platform.",
+
+		// Info page data sources
+		ofacSdnDescription:
+			"The U.S. Department of the Treasury Office of Foreign Assets Control (OFAC) Specially Designated Nationals and Blocked Persons List (SDN). Includes sanctioned individuals and entities with whom commercial transactions are prohibited under U.S. law.",
+		sat69bDescription:
+			"Companies that Invoice Simulated Operations (EFOS), published by Mexico's Tax Administration Service (SAT) under Article 69-B of the Federal Fiscal Code. Identifies taxpayers presumed to be involved in issuing invoices covering non-existent operations.",
+		unSanctionsDescription:
+			"United Nations Security Council Consolidated Sanctions List. Includes individuals and entities subject to sanctions measures imposed by the UN Security Council.",
+		pepDatabaseDescription:
+			"Politically Exposed Persons (PEP) database from Mexican government transparency platforms. Identifies individuals holding or having held prominent public positions.",
+
+		// Info page how it works
+		howItWorksStep1Title: "1. Enter Search Query",
+		howItWorksStep1Description:
+			"Enter the name of an individual or company you want to screen. You can optionally provide additional information like birth date, identifiers (RFC, CURP), or country of origin to improve matching accuracy.",
+		howItWorksStep2Title: "2. Hybrid Search Algorithm",
+		howItWorksStep2Description:
+			"Our system performs a hybrid search combining exact identifier matching, semantic vector search, and Jaro-Winkler name similarity scoring across all data sources simultaneously. This ensures high accuracy while catching variations in names and spellings.",
+		howItWorksStep3Title: "3. Review Results",
+		howItWorksStep3Description:
+			"Results are organized by data source (OFAC, SAT 69-B, UNSC, PEP) with match scores and detailed information for each hit. You can review the full details of each match to make informed decisions about your due diligence process.",
 	},
 };
 
 export function getLocaleForLanguage(lang: Language): string {
 	switch (lang) {
-		case "pt":
-			return "pt-BR";
 		case "es":
 			return "es-ES";
 		case "en":
@@ -584,9 +638,8 @@ export function detectBrowserLanguage(): Language {
 
 	const browserLang = navigator.language.toLowerCase();
 
-	if (browserLang.startsWith("pt")) return "pt";
 	if (browserLang.startsWith("es")) return "es";
 	if (browserLang.startsWith("en")) return "en";
 
-	return "es"; // Default to Spanish
+	return "es";
 }

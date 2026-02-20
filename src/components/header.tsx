@@ -8,23 +8,21 @@ import { UserMenu } from "@/components/user-menu";
 
 export function Header() {
 	return (
-		<header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-			<div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3">
+		<header className="border-b border-border bg-background sticky top-0 z-50">
+			<div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 sm:py-3">
 				<div className="flex items-center justify-between gap-2 sm:gap-4">
-					{/* Left side: Logo + Watchlist */}
+					{/* Left side: Logo only */}
 					<Link
 						href="/"
 						className="flex items-center gap-2 sm:gap-3 flex-shrink-0 hover:opacity-80 transition-opacity"
 					>
 						<Logo
 							variant="icon"
-							width={28}
-							height={28}
-							className="sm:w-8 sm:h-8"
+							width={24}
+							height={24}
+							className="sm:w-6 sm:h-6"
 						/>
-						<span className="text-xs sm:text-sm font-medium text-foreground">
-							Watchlist
-						</span>
+						<h1 className="text-xl font-bold mt-1">Watchlist</h1>
 					</Link>
 
 					{/* Right side controls */}

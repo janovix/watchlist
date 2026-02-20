@@ -1,8 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Clock, User, Building2 } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+	Search,
+	Clock,
+	User,
+	Building2,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
 import { Logo } from "@/components/logo";
 import { listQueries, type QueryListItem } from "@/lib/api/queries";
 import { Input } from "@/components/ui/input";
@@ -22,19 +29,115 @@ import { useLanguage } from "@/components/language-provider";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
 import { NoWatchlistAccess } from "@/components/subscription";
 
+const LIMIT = 20;
+const VALID_FILTERS = ["all", "person", "organization"] as const;
+
+/**
+ * Sanitize and validate search params
+ */
+function sanitizeSearchParams(
+	search: string,
+	filter: string,
+	offset: string,
+): {
+	search: string;
+	filter: "all" | "person" | "organization";
+	offset: number;
+} {
+	// Sanitize search term (max 100 chars, basic alphanumeric + spaces)
+	const sanitizedSearch = (search || "").slice(0, 100).trim();
+
+	// Validate filter
+	const sanitizedFilter = VALID_FILTERS.includes(filter as any)
+		? (filter as "all" | "person" | "organization")
+		: "all";
+
+	// Validate offset (must be non-negative integer)
+	const parsedOffset = parseInt(offset || "0", 10);
+	const sanitizedOffset = Math.max(0, isNaN(parsedOffset) ? 0 : parsedOffset);
+
+	return {
+		search: sanitizedSearch,
+		filter: sanitizedFilter,
+		offset: sanitizedOffset,
+	};
+}
+
 export default function QueriesPage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const { t } = useLanguage();
 	const [queries, setQueries] = useState<QueryListItem[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
-	const [searchTerm, setSearchTerm] = useState("");
-	const [filterType, setFilterType] = useState<
-		"all" | "person" | "organization"
-	>("all");
+	const [localSearch, setLocalSearch] = useState("");
 	const { jwt, isLoading: jwtLoading } = useJwt();
 	const subscription = useSubscriptionSafe();
 
-	// Check watchlist product access
+	// Parse and sanitize search params
+	const {
+		search: paramSearch,
+		filter: paramFilter,
+		offset: paramOffset,
+	} = useMemo(() => {
+		return sanitizeSearchParams(
+			searchParams.get("search") || "",
+			searchParams.get("filter") || "all",
+			searchParams.get("offset") || "0",
+		);
+	}, [searchParams]);
+
+	// Update local search when URL params change
+	useEffect(() => {
+		setLocalSearch(paramSearch);
+	}, [paramSearch]);
+
+	// Update URL when state changes
+	const updateSearchParams = useCallback(
+		(newSearch?: string, newFilter?: string, newOffset?: number) => {
+			const params = new URLSearchParams();
+			const search = newSearch !== undefined ? newSearch : paramSearch;
+			const filter = newFilter !== undefined ? newFilter : paramFilter;
+			const offset = newOffset !== undefined ? newOffset : paramOffset;
+
+			if (search) params.set("search", search);
+			if (filter !== "all") params.set("filter", filter);
+			if (offset > 0) params.set("offset", offset.toString());
+
+			const queryString = params.toString();
+			router.push(queryString ? `/queries?${queryString}` : "/queries");
+		},
+		[router, paramSearch, paramFilter, paramOffset],
+	);
+
+	// Fetch queries with pagination
+	useEffect(() => {
+		const fetchQueries = async () => {
+			if (jwtLoading || !jwt) return;
+
+			setIsLoading(true);
+			try {
+				const response = await listQueries(
+					{
+						offset: paramOffset,
+						limit: LIMIT,
+					},
+					{ jwt },
+				);
+				setQueries(response.queries);
+				setTotalCount(response.pagination.total);
+			} catch (error) {
+				console.error("Failed to fetch queries:", error);
+				setQueries([]);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchQueries();
+	}, [jwt, jwtLoading, paramOffset]);
+
+	// Check watchlist product access - early return after all hooks
 	if (subscription?.isLoading) {
 		return <NoWatchlistAccess isLoading />;
 	}
@@ -43,33 +146,25 @@ export default function QueriesPage() {
 		return <NoWatchlistAccess />;
 	}
 
-	useEffect(() => {
-		const fetchQueries = async () => {
-			if (jwtLoading || !jwt) return;
-
-			try {
-				const response = await listQueries({}, { jwt });
-				setQueries(response.result.queries);
-			} catch (error) {
-				console.error("Failed to fetch queries:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchQueries();
-	}, [jwt, jwtLoading]);
-
+	// Local client-side filtering
 	const filteredQueries = queries.filter((q) => {
 		const matchesSearch = q.query
 			.toLowerCase()
-			.includes(searchTerm.toLowerCase());
+			.includes(paramSearch.toLowerCase());
 		const matchesType =
-			filterType === "all" ||
-			q.entityType === filterType ||
-			(filterType === "person" && !q.entityType);
+			paramFilter === "all" ||
+			q.entityType === paramFilter ||
+			(paramFilter === "person" && !q.entityType);
 		return matchesSearch && matchesType;
 	});
+
+	const statusLabels: Record<string, string> = {
+		pending: t("statusPending"),
+		running: t("statusRunning"),
+		completed: t("statusCompleted"),
+		failed: t("statusFailed"),
+		partial: t("statusPartial"),
+	};
 
 	const getStatusBadge = (status: string) => {
 		const variants: Record<
@@ -80,17 +175,21 @@ export default function QueriesPage() {
 			running: "default",
 			completed: "outline",
 			failed: "destructive",
+			partial: "secondary",
 		};
 		return (
 			<Badge variant={variants[status] || "default"} className="capitalize">
-				{status}
+				{statusLabels[status] || status}
 			</Badge>
 		);
 	};
 
+	const hasNextPage = paramOffset + LIMIT < totalCount;
+	const hasPrevPage = paramOffset > 0;
+
 	if (isLoading) {
 		return (
-			<main className="min-h-screen p-4 md:p-8 pt-20">
+			<main className="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
 				<div className="max-w-6xl mx-auto">
 					{/* Header skeleton */}
 					<div className="mb-8">
@@ -109,7 +208,7 @@ export default function QueriesPage() {
 					</div>
 
 					{/* Table skeleton */}
-					<div className="rounded-lg border bg-card/95 backdrop-blur-sm overflow-hidden">
+					<div className="rounded-lg border bg-card overflow-hidden">
 						<div className="border-b px-4 py-3 flex gap-4">
 							<Skeleton className="h-4 w-24" />
 							<Skeleton className="h-4 w-16" />
@@ -140,15 +239,17 @@ export default function QueriesPage() {
 	}
 
 	return (
-		<main className="min-h-screen p-4 md:p-8 pt-20">
+		<main className="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
 			<div className="max-w-6xl mx-auto">
 				{/* Header */}
 				<div className="mb-8">
 					<div className="flex items-center gap-3 mb-4">
-						<h1 className="text-2xl md:text-4xl font-bold">Query History</h1>
+						<h1 className="text-2xl md:text-4xl font-bold">
+							{t("queryHistoryTitle")}
+						</h1>
 					</div>
 					<p className="text-muted-foreground">
-						View and manage your past background checks
+						{t("queryHistoryDescription")}
 					</p>
 				</div>
 
@@ -157,47 +258,50 @@ export default function QueriesPage() {
 					<div className="relative flex-1">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/50" />
 						<Input
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-							placeholder="Search queries..."
-							className="pl-10 bg-card/80 backdrop-blur-sm border"
+							value={localSearch}
+							onChange={(e) => {
+								setLocalSearch(e.target.value);
+								updateSearchParams(e.target.value, undefined, 0);
+							}}
+							placeholder={t("searchQueriesPlaceholder")}
+							className="pl-10 bg-card border"
 						/>
 					</div>
 					<div className="flex gap-2">
 						<Button
-							variant={filterType === "all" ? "default" : "outline"}
-							onClick={() => setFilterType("all")}
+							variant={paramFilter === "all" ? "default" : "outline"}
+							onClick={() => updateSearchParams(undefined, "all", 0)}
 						>
-							All
+							{t("filterAll")}
 						</Button>
 						<Button
-							variant={filterType === "person" ? "default" : "outline"}
-							onClick={() => setFilterType("person")}
+							variant={paramFilter === "person" ? "default" : "outline"}
+							onClick={() => updateSearchParams(undefined, "person", 0)}
 							className="gap-2"
 						>
 							<User className="h-4 w-4" />
-							Individual
+							{t("filterIndividual")}
 						</Button>
 						<Button
-							variant={filterType === "organization" ? "default" : "outline"}
-							onClick={() => setFilterType("organization")}
+							variant={paramFilter === "organization" ? "default" : "outline"}
+							onClick={() => updateSearchParams(undefined, "organization", 0)}
 							className="gap-2"
 						>
 							<Building2 className="h-4 w-4" />
-							Company
+							{t("filterCompany")}
 						</Button>
 					</div>
 				</div>
 
 				{/* Table */}
-				<div className="rounded-lg border bg-card/95 backdrop-blur-sm overflow-hidden">
+				<div className="rounded-lg border bg-card overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>Query</TableHead>
-								<TableHead>Type</TableHead>
-								<TableHead>Date</TableHead>
-								<TableHead>Status</TableHead>
+								<TableHead>{t("tableQuery")}</TableHead>
+								<TableHead>{t("tableType")}</TableHead>
+								<TableHead>{t("tableDate")}</TableHead>
+								<TableHead>{t("tableStatus")}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -207,9 +311,9 @@ export default function QueriesPage() {
 										colSpan={4}
 										className="text-center py-12 text-muted-foreground"
 									>
-										{searchTerm || filterType !== "all"
-											? "No queries found matching your filters"
-											: "No queries yet. Start by searching for an individual or company."}
+										{paramSearch || paramFilter !== "all"
+											? t("noQueriesFound")
+											: t("noQueriesYet")}
 									</TableCell>
 								</TableRow>
 							) : (
@@ -229,8 +333,8 @@ export default function QueriesPage() {
 												)}
 												<span className="capitalize">
 													{query.entityType === "organization"
-														? "Company"
-														: "Individual"}
+														? t("filterCompany")
+														: t("filterIndividual")}
 												</span>
 											</div>
 										</TableCell>
@@ -248,6 +352,45 @@ export default function QueriesPage() {
 					</Table>
 				</div>
 
+				{/* Pagination */}
+				<div className="mt-6 flex items-center justify-between">
+					<div className="text-sm text-muted-foreground">
+						{t("showingQueries")
+							.replace("{from}", String(paramOffset + 1))
+							.replace(
+								"{to}",
+								String(Math.min(paramOffset + LIMIT, totalCount)),
+							)
+							.replace("{total}", String(totalCount))}
+					</div>
+					<div className="flex gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() =>
+								updateSearchParams(undefined, undefined, paramOffset - LIMIT)
+							}
+							disabled={!hasPrevPage}
+							className="gap-1"
+						>
+							<ChevronLeft className="h-4 w-4" />
+							{t("previous")}
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() =>
+								updateSearchParams(undefined, undefined, paramOffset + LIMIT)
+							}
+							disabled={!hasNextPage}
+							className="gap-1"
+						>
+							{t("next")}
+							<ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
+				</div>
+
 				{/* Footer */}
 				<footer className="mt-12 pt-6 border-t border-border/50">
 					<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
@@ -262,7 +405,7 @@ export default function QueriesPage() {
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
 							>
-								Privacy
+								{t("privacy")}
 							</a>
 							<a
 								href="https://janovix.com/terms"
@@ -270,7 +413,7 @@ export default function QueriesPage() {
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
 							>
-								Terms
+								{t("terms")}
 							</a>
 						</div>
 					</div>

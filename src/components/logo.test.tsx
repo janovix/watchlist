@@ -55,7 +55,7 @@ describe("Logo", () => {
 		);
 		const svg = container.querySelector("svg");
 		expect(svg).toBeInTheDocument();
-		expect(svg?.getAttribute("viewBox")).toBe("0 0 200 200");
+		expect(svg?.getAttribute("viewBox")).toBe("0 0 24 24");
 	});
 
 	it("should use custom width and height", () => {
@@ -154,6 +154,6 @@ describe("Logo", () => {
 		);
 		const svg = container.querySelector("svg");
 		expect(svg).toBeInTheDocument();
-		expect(svg?.getAttribute("viewBox")).toBe("0 0 200 200");
+		expect(svg?.getAttribute("viewBox")).toBe("0 0 24 24");
 	});
 });

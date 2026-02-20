@@ -79,32 +79,6 @@ describe("useTranslation", () => {
 		});
 	});
 
-	describe("with Portuguese settings", () => {
-		it("should return Portuguese translations", () => {
-			const serverSettings: ResolvedSettings = {
-				...DEFAULT_SETTINGS,
-				language: "pt",
-			};
-
-			render(
-				<SettingsProvider serverSettings={serverSettings}>
-					<TranslationConsumer />
-				</SettingsProvider>,
-			);
-
-			expect(screen.getByTestId("language")).toHaveTextContent("pt");
-			expect(screen.getByTestId("appName")).toHaveTextContent(
-				translations.pt.appName,
-			);
-			expect(screen.getByTestId("heroTitle")).toHaveTextContent(
-				translations.pt.heroTitle,
-			);
-			expect(screen.getByTestId("searchButton")).toHaveTextContent(
-				translations.pt.searchButton,
-			);
-		});
-	});
-
 	describe("without provider", () => {
 		it("should use default language (Spanish) when outside provider", () => {
 			render(<TranslationConsumer />);

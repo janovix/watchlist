@@ -18,7 +18,6 @@ import { useLanguage } from "@/components/language-provider";
 import type { Language } from "@/lib/translations";
 
 const languages: { code: Language; label: string }[] = [
-	{ code: "pt", label: "PT" },
 	{ code: "es", label: "ES" },
 	{ code: "en", label: "EN" },
 ];

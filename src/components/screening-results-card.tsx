@@ -46,12 +46,11 @@ interface ErrorResult {
  */
 function getBilingualText(
 	value: string | { es: string; en: string } | undefined,
-	language: "es" | "en" | "pt",
+	language: "es" | "en",
 ): string {
 	if (!value) return "";
 	if (typeof value === "string") return value;
-	// For Portuguese, fall back to Spanish
-	return value[language === "pt" ? "es" : language] || value.es || "";
+	return value[language] || value.es || "";
 }
 
 type ItemStatus = "loading" | "complete_clear" | "complete_match" | "failed";
@@ -87,27 +86,31 @@ function getStatusIcon(itemStatus: ItemStatus) {
 	}
 }
 
-function getBorderColor(itemStatus: ItemStatus): string {
+function getStatusBadgeColor(itemStatus: ItemStatus): string {
 	switch (itemStatus) {
 		case "loading":
-			return "border-muted/30";
+			return "bg-muted/20 text-muted-foreground";
 		case "complete_clear":
-			return "border-green-500/50";
+			return "bg-green-500/10 text-green-400";
 		case "complete_match":
-			return "border-red-500/50";
+			return "bg-yellow-500/10 text-yellow-400";
 		case "failed":
-			return "border-yellow-500/50";
+			return "bg-yellow-500/10 text-yellow-400";
 	}
 }
 
-function getMatchBadge(count: number | null | undefined, status: ItemStatus) {
-	if (status === "loading") return null;
-	if (status === "failed") return null;
-	const c = count ?? 0;
-	if (c === 0) return null;
+function StatusBadgeLabel({ itemStatus }: { itemStatus: ItemStatus }) {
+	const { t } = useLanguage();
+	const badgeText = {
+		loading: t("statusSearching"),
+		complete_clear: t("statusClean"),
+		complete_match: t("statusMatches"),
+		failed: t("statusError"),
+	};
+
 	return (
-		<Badge variant="destructive" className="ml-auto text-xs">
-			{c} {c === 1 ? "match" : "matches"}
+		<Badge className={`text-xs ${getStatusBadgeColor(itemStatus)}`}>
+			{badgeText[itemStatus]}
 		</Badge>
 	);
 }
@@ -117,11 +120,12 @@ function SubsectionBadge({
 }: {
 	status: QueryStatus | null | undefined;
 }) {
+	const { t } = useLanguage();
 	if (!status || status === "pending" || status === "running") {
 		return (
 			<Badge variant="outline" className="gap-1 text-xs">
 				<Loader2 className="h-3 w-3 animate-spin" />
-				Buscando...
+				{t("statusSearching")}
 			</Badge>
 		);
 	}
@@ -132,7 +136,7 @@ function SubsectionBadge({
 				className="gap-1 text-xs border-yellow-500/50 text-yellow-600"
 			>
 				<AlertTriangle className="h-3 w-3" />
-				Error
+				{t("statusError")}
 			</Badge>
 		);
 	}
@@ -142,7 +146,7 @@ function SubsectionBadge({
 			className="gap-1 text-xs border-green-500/50 text-green-600"
 		>
 			<CheckCircle2 className="h-3 w-3" />
-			Completado
+			{t("statusCompleted2")}
 		</Badge>
 	);
 }
@@ -164,7 +168,7 @@ export function ScreeningResultsCard({
 	data,
 	connectionStatus,
 }: ScreeningResultsCardProps) {
-	const { language } = useLanguage();
+	const { language, t } = useLanguage();
 
 	// Synchronous result statuses
 	const ofacStatus = resolveItemStatus(data.ofacStatus, data.ofacCount);
@@ -228,7 +232,7 @@ export function ScreeningResultsCard({
 	);
 
 	return (
-		<div className="space-y-2">
+		<div className="space-y-2 pb-4">
 			{/* Live connection badge */}
 			{connectionStatus === "connected" && (
 				<div className="flex justify-end">
@@ -237,7 +241,7 @@ export function ScreeningResultsCard({
 						className="gap-1 bg-blue-50 dark:bg-blue-950"
 					>
 						<Activity className="h-3 w-3 text-blue-500 animate-pulse" />
-						<span className="text-blue-500 text-xs">En vivo</span>
+						<span className="text-blue-500 text-xs">{t("liveConnection")}</span>
 					</Badge>
 				</div>
 			)}
@@ -246,27 +250,24 @@ export function ScreeningResultsCard({
 				{/* OFAC */}
 				<AccordionItem
 					value="ofac"
-					className={cn(
-						"rounded-lg border-2 px-4 overflow-hidden",
-						getBorderColor(ofacStatus),
-					)}
+					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
 							{getStatusIcon(ofacStatus)}
-							<span className="font-semibold">OFAC Sanctions List</span>
-							{getMatchBadge(data.ofacCount, ofacStatus)}
+							<span className="font-semibold">{t("ofacSanctionsList")}</span>
+							<div className="ml-auto">
+								<StatusBadgeLabel itemStatus={ofacStatus} />
+							</div>
 						</div>
 					</AccordionTrigger>
 					<AccordionContent>
 						{ofacStatus === "loading" ? (
 							<p className="text-muted-foreground text-sm">
-								Verificando lista OFAC...
+								{t("verifyingOfac")}
 							</p>
 						) : ofacStatus === "complete_clear" ? (
-							<p className="text-green-600 text-sm">
-								Sin coincidencias en la lista OFAC.
-							</p>
+							<p className="text-green-600 text-sm">{t("noOfacMatches")}</p>
 						) : (
 							data.ofacResult && (
 								<MatchResultsList
@@ -288,27 +289,24 @@ export function ScreeningResultsCard({
 				{/* UNSC */}
 				<AccordionItem
 					value="un"
-					className={cn(
-						"rounded-lg border-2 px-4 overflow-hidden",
-						getBorderColor(unStatus),
-					)}
+					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
 							{getStatusIcon(unStatus)}
-							<span className="font-semibold">UN Sanctions List</span>
-							{getMatchBadge(data.unCount, unStatus)}
+							<span className="font-semibold">{t("unSanctionsList")}</span>
+							<div className="ml-auto">
+								<StatusBadgeLabel itemStatus={unStatus} />
+							</div>
 						</div>
 					</AccordionTrigger>
 					<AccordionContent>
 						{unStatus === "loading" ? (
 							<p className="text-muted-foreground text-sm">
-								Verificando lista ONU...
+								{t("verifyingUn")}
 							</p>
 						) : unStatus === "complete_clear" ? (
-							<p className="text-green-600 text-sm">
-								Sin coincidencias en la lista de sanciones ONU.
-							</p>
+							<p className="text-green-600 text-sm">{t("noUnMatches")}</p>
 						) : (
 							data.unResult && (
 								<MatchResultsList
@@ -330,27 +328,24 @@ export function ScreeningResultsCard({
 				{/* SAT 69-B */}
 				<AccordionItem
 					value="sat69b"
-					className={cn(
-						"rounded-lg border-2 px-4 overflow-hidden",
-						getBorderColor(sat69bStatus),
-					)}
+					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
 							{getStatusIcon(sat69bStatus)}
-							<span className="font-semibold">SAT 69-B</span>
-							{getMatchBadge(data.sat69bCount, sat69bStatus)}
+							<span className="font-semibold">{t("sat69bTitle")}</span>
+							<div className="ml-auto">
+								<StatusBadgeLabel itemStatus={sat69bStatus} />
+							</div>
 						</div>
 					</AccordionTrigger>
 					<AccordionContent>
 						{sat69bStatus === "loading" ? (
 							<p className="text-muted-foreground text-sm">
-								Verificando lista SAT 69-B...
+								{t("verifyingSat69b")}
 							</p>
 						) : sat69bStatus === "complete_clear" ? (
-							<p className="text-green-600 text-sm">
-								Sin coincidencias en la lista SAT 69-B.
-							</p>
+							<p className="text-green-600 text-sm">{t("noSat69bMatches")}</p>
 						) : (
 							data.sat69bResult && (
 								<MatchResultsList
@@ -372,22 +367,15 @@ export function ScreeningResultsCard({
 				{/* PEP — merged accordion for Official + AI */}
 				<AccordionItem
 					value="pep"
-					className={cn(
-						"rounded-lg border-2 px-4 overflow-hidden",
-						getBorderColor(pepCombinedStatus),
-					)}
+					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
 							{getStatusIcon(pepCombinedStatus)}
-							<span className="font-semibold">
-								Persona Políticamente Expuesta (PEP)
-							</span>
-							{pepCombinedStatus === "complete_match" && (
-								<Badge variant="destructive" className="ml-auto text-xs">
-									Coincidencias encontradas
-								</Badge>
-							)}
+							<span className="font-semibold">{t("pepTitle")}</span>
+							<div className="ml-auto">
+								<StatusBadgeLabel itemStatus={pepCombinedStatus} />
+							</div>
 						</div>
 					</AccordionTrigger>
 					<AccordionContent>
@@ -396,24 +384,24 @@ export function ScreeningResultsCard({
 							<div className="space-y-2">
 								<div className="flex items-center justify-between">
 									<p className="text-sm font-medium text-muted-foreground">
-										Plataforma de Transparencia (Oficial)
+										{t("pepOfficialSubtitle")}
 									</p>
 									<SubsectionBadge status={data.pepOfficialStatus} />
 								</div>
 								{pepOfficialItemStatus === "loading" ? (
 									<p className="text-muted-foreground text-sm pl-2">
-										Buscando en la Plataforma de Transparencia...
+										{t("searchingPepOfficial")}
 									</p>
 								) : pepOfficialItemStatus === "failed" ? (
 									<Alert variant="destructive" className="py-2">
 										<AlertDescription className="text-xs">
 											{(pepOfficialRaw as ErrorResult)?.error ??
-												"Error al consultar la Plataforma de Transparencia"}
+												t("pepOfficialError")}
 										</AlertDescription>
 									</Alert>
 								) : !pepOfficialHasMatches ? (
 									<p className="text-green-600 text-sm pl-2">
-										No identificado como PEP en la Plataforma de Transparencia.
+										{t("pepOfficialNoMatch")}
 									</p>
 								) : (
 									<div className="space-y-2 pl-2">
@@ -425,19 +413,23 @@ export function ScreeningResultsCard({
 												<p className="font-semibold">{result.nombre}</p>
 												{result.informacionPrincipal?.institucion && (
 													<p className="text-muted-foreground mt-1">
-														<span className="font-medium">Institución: </span>
+														<span className="font-medium">
+															{t("institution")}{" "}
+														</span>
 														{result.informacionPrincipal.institucion}
 													</p>
 												)}
 												{result.informacionPrincipal?.cargo && (
 													<p className="text-muted-foreground">
-														<span className="font-medium">Cargo: </span>
+														<span className="font-medium">
+															{t("position")}{" "}
+														</span>
 														{result.informacionPrincipal.cargo}
 													</p>
 												)}
 												{result.informacionPrincipal?.area && (
 													<p className="text-muted-foreground">
-														<span className="font-medium">Área: </span>
+														<span className="font-medium">{t("area")} </span>
 														{result.informacionPrincipal.area}
 													</p>
 												)}
@@ -453,29 +445,28 @@ export function ScreeningResultsCard({
 							<div className="space-y-2">
 								<div className="flex items-center justify-between">
 									<p className="text-sm font-medium text-muted-foreground">
-										Detección AI (Grok)
+										{t("pepAiSubtitle")}
 									</p>
 									<SubsectionBadge status={data.pepAiStatus} />
 								</div>
 								{pepAiItemStatus === "loading" ? (
 									<p className="text-muted-foreground text-sm pl-2">
-										Analizando con inteligencia artificial...
+										{t("analyzingAi")}
 									</p>
 								) : pepAiItemStatus === "failed" ? (
 									<Alert variant="destructive" className="py-2">
 										<AlertDescription className="text-xs">
-											{(pepAiRaw as ErrorResult)?.error ??
-												"Error en la detección AI"}
+											{(pepAiRaw as ErrorResult)?.error ?? t("pepAiError")}
 										</AlertDescription>
 									</Alert>
 								) : !pepAiHasMatches ? (
 									<p className="text-green-600 text-sm pl-2">
-										No identificado como PEP por análisis AI.
+										{t("pepAiNoMatch")}
 									</p>
 								) : (
 									<div className="space-y-2 pl-2 text-sm">
 										<div className="flex items-center gap-2">
-											<span className="font-medium">Probabilidad:</span>
+											<span className="font-medium">{t("probability")}</span>
 											<Badge
 												variant={
 													(pepAiRaw as GrokPepResult).probability > 0.5
@@ -493,14 +484,14 @@ export function ScreeningResultsCard({
 											<p className="text-muted-foreground">
 												{getBilingualText(
 													(pepAiRaw as GrokPepResult).summary,
-													language as "es" | "en" | "pt",
+													language as "es" | "en",
 												)}
 											</p>
 										)}
 										{(pepAiRaw as GrokPepResult).sources &&
 											(pepAiRaw as GrokPepResult).sources!.length > 0 && (
 												<div>
-													<p className="font-medium mb-1">Fuentes:</p>
+													<p className="font-medium mb-1">{t("sources")}</p>
 													<ul className="list-disc list-inside space-y-1 text-muted-foreground">
 														{(pepAiRaw as GrokPepResult).sources!.map(
 															(src, i) => (
@@ -522,42 +513,35 @@ export function ScreeningResultsCard({
 				{/* Adverse Media */}
 				<AccordionItem
 					value="adverse-media"
-					className={cn(
-						"rounded-lg border-2 px-4 overflow-hidden",
-						getBorderColor(adverseMediaStatus),
-					)}
+					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
 							{getStatusIcon(adverseMediaStatus)}
-							<span className="font-semibold">Media Adversa</span>
-							{adverseMediaStatus === "complete_match" && (
-								<Badge variant="destructive" className="ml-auto text-xs">
-									Riesgo detectado
-								</Badge>
-							)}
+							<span className="font-semibold">{t("adverseMediaTitle")}</span>
+							<div className="ml-auto">
+								<StatusBadgeLabel itemStatus={adverseMediaStatus} />
+							</div>
 						</div>
 					</AccordionTrigger>
 					<AccordionContent>
 						{adverseMediaStatus === "loading" ? (
 							<p className="text-muted-foreground text-sm">
-								Analizando medios y fuentes públicas...
+								{t("analyzingAdverseMedia")}
 							</p>
 						) : adverseMediaStatus === "failed" ? (
 							<Alert variant="destructive" className="py-2">
 								<AlertDescription className="text-xs">
 									{(adverseMediaRaw as ErrorResult)?.error ??
-										"Error al analizar medios adversos"}
+										t("adverseMediaError")}
 								</AlertDescription>
 							</Alert>
 						) : !adverseMediaHasRisk ? (
-							<p className="text-green-600 text-sm">
-								Sin indicios de medios adversos.
-							</p>
+							<p className="text-green-600 text-sm">{t("noAdverseMedia")}</p>
 						) : (
 							<div className="space-y-2 text-sm">
 								<div className="flex items-center gap-2">
-									<span className="font-medium">Nivel de riesgo:</span>
+									<span className="font-medium">{t("riskLevel")}</span>
 									<Badge
 										variant={
 											(adverseMediaRaw as AdverseMediaResult).risk_level ===
@@ -573,7 +557,7 @@ export function ScreeningResultsCard({
 									<p className="text-muted-foreground">
 										{getBilingualText(
 											(adverseMediaRaw as AdverseMediaResult).findings,
-											language as "es" | "en" | "pt",
+											language as "es" | "en",
 										)}
 									</p>
 								)}
@@ -581,7 +565,7 @@ export function ScreeningResultsCard({
 									(adverseMediaRaw as AdverseMediaResult).sources!.length >
 										0 && (
 										<div>
-											<p className="font-medium mb-1">Fuentes:</p>
+											<p className="font-medium mb-1">{t("sources")}</p>
 											<ul className="list-disc list-inside space-y-1 text-muted-foreground">
 												{(adverseMediaRaw as AdverseMediaResult).sources!.map(
 													(src, i) => (

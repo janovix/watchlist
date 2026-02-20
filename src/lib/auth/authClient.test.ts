@@ -99,7 +99,10 @@ describe("authClient", () => {
 
 			expect(mockToken).toHaveBeenCalled();
 			expect(result).toBeNull();
-			expect(console.error).toHaveBeenCalledWith("Failed to get JWT:", null);
+			expect(console.error).toHaveBeenCalledWith(
+				"Failed to get JWT:",
+				"No token in response",
+			);
 		});
 
 		it("should return null when token data has no token property", async () => {
@@ -113,7 +116,10 @@ describe("authClient", () => {
 
 			expect(mockToken).toHaveBeenCalled();
 			expect(result).toBeNull();
-			expect(console.error).toHaveBeenCalledWith("Failed to get JWT:", null);
+			expect(console.error).toHaveBeenCalledWith(
+				"Failed to get JWT:",
+				"No token in response",
+			);
 		});
 
 		it("should handle errors thrown by token()", async () => {

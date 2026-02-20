@@ -21,7 +21,6 @@ function extractBrowserHints(requestHeaders: Headers): {
 	if (language) {
 		if (language.startsWith("es")) mappedLanguage = "es";
 		else if (language.startsWith("en")) mappedLanguage = "en";
-		else if (language.startsWith("pt")) mappedLanguage = "pt";
 	}
 
 	// Cloudflare provides timezone in CF-Timezone header

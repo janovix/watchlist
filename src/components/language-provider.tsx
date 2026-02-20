@@ -33,7 +33,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 );
 
 // Valid languages for this app
-const VALID_LANGUAGES = ["pt", "es", "en"] as const;
+const VALID_LANGUAGES = ["es", "en"] as const;
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
 	const [language, setLanguageState] = useState<Language>("es");
@@ -88,7 +88,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
 			// Update API in background (only if we've already synced with API)
 			if (settingsSynced) {
-				// Note: watchlist supports "pt" but auth-svc might not, so we handle errors gracefully
 				updateUserSettings({ language: lang as LanguageCode }).catch(
 					(error) => {
 						console.debug("Failed to update language in API:", error);

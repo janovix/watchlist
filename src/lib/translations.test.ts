@@ -8,10 +8,6 @@ import {
 
 describe("translations", () => {
 	describe("getLocaleForLanguage", () => {
-		it("should return pt-BR for Portuguese", () => {
-			expect(getLocaleForLanguage("pt")).toBe("pt-BR");
-		});
-
 		it("should return es-ES for Spanish", () => {
 			expect(getLocaleForLanguage("es")).toBe("es-ES");
 		});
@@ -44,18 +40,6 @@ describe("translations", () => {
 			});
 
 			expect(detectBrowserLanguage()).toBe("es");
-		});
-
-		it("should detect Portuguese language", () => {
-			Object.defineProperty(global, "navigator", {
-				value: {
-					language: "pt-BR",
-				},
-				writable: true,
-				configurable: true,
-			});
-
-			expect(detectBrowserLanguage()).toBe("pt");
 		});
 
 		it("should detect Spanish language", () => {
@@ -93,44 +77,27 @@ describe("translations", () => {
 
 			expect(detectBrowserLanguage()).toBe("es");
 		});
-
-		it("should handle lowercase language codes", () => {
-			Object.defineProperty(global, "navigator", {
-				value: {
-					language: "PT-BR",
-				},
-				writable: true,
-				configurable: true,
-			});
-
-			expect(detectBrowserLanguage()).toBe("pt");
-		});
 	});
 
 	describe("translations object", () => {
-		it("should have translations for all three languages", () => {
-			expect(translations.pt).toBeDefined();
+		it("should have translations for both languages", () => {
 			expect(translations.es).toBeDefined();
 			expect(translations.en).toBeDefined();
 		});
 
 		it("should have the same keys in all language objects", () => {
-			const ptKeys = Object.keys(translations.pt).sort();
 			const esKeys = Object.keys(translations.es).sort();
 			const enKeys = Object.keys(translations.en).sort();
 
-			expect(ptKeys).toEqual(esKeys);
 			expect(esKeys).toEqual(enKeys);
 		});
 
 		it("should have appName in all languages", () => {
-			expect(translations.pt.appName).toBe("isPep");
 			expect(translations.es.appName).toBe("isPep");
 			expect(translations.en.appName).toBe("isPep");
 		});
 
 		it("should have byJanovix in all languages", () => {
-			expect(translations.pt.byJanovix).toBe("Janovix");
 			expect(translations.es.byJanovix).toBe("Janovix");
 			expect(translations.en.byJanovix).toBe("Janovix");
 		});

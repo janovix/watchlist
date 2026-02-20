@@ -75,11 +75,11 @@ export interface QueryListItem {
  */
 export interface ListQueriesResponse {
 	success: boolean;
-	result: {
-		queries: QueryListItem[];
+	queries: QueryListItem[];
+	pagination: {
+		limit: number;
+		offset: number;
 		total: number;
-		page: number;
-		pageSize: number;
 		hasMore: boolean;
 	};
 }
@@ -96,8 +96,8 @@ export interface GetQueryResponse {
  * List queries parameters
  */
 export interface ListQueriesParams {
-	page?: number;
-	pageSize?: number;
+	limit?: number;
+	offset?: number;
 	status?: QueryStatus;
 }
 
@@ -143,9 +143,8 @@ export async function listQueries(
 	const baseUrl = getWatchlistApiBaseUrl();
 	const searchParams = new URLSearchParams();
 
-	if (params?.page) searchParams.set("page", params.page.toString());
-	if (params?.pageSize)
-		searchParams.set("pageSize", params.pageSize.toString());
+	if (params?.limit) searchParams.set("limit", params.limit.toString());
+	if (params?.offset) searchParams.set("offset", params.offset.toString());
 	if (params?.status) searchParams.set("status", params.status);
 
 	const url = `${baseUrl}/queries?${searchParams.toString()}`;

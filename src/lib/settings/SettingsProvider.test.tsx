@@ -97,7 +97,7 @@ describe("SettingsProvider", () => {
 		it("should return the current language", () => {
 			const serverSettings: ResolvedSettings = {
 				...DEFAULT_SETTINGS,
-				language: "pt",
+				language: "en",
 			};
 
 			render(
@@ -106,7 +106,7 @@ describe("SettingsProvider", () => {
 				</SettingsProvider>,
 			);
 
-			expect(screen.getByTestId("language")).toHaveTextContent("pt");
+			expect(screen.getByTestId("language")).toHaveTextContent("en");
 		});
 	});
 

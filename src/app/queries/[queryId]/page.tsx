@@ -30,11 +30,12 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		completed: "outline",
 		failed: "destructive",
 	};
+	const { t } = useLanguage();
 	const labels: Record<QueryStatus, string> = {
-		pending: "Pendiente",
-		running: "Procesando",
-		completed: "Completado",
-		failed: "Fallido",
+		pending: t("statusPending"),
+		running: t("statusRunning"),
+		completed: t("statusCompleted"),
+		failed: t("statusFailed"),
 	};
 	return (
 		<Badge variant={variants[status] ?? "default"} className="capitalize">
@@ -49,7 +50,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 
 function QueryDetailSkeleton() {
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4">
 			<div className="space-y-2">
 				<Skeleton className="h-9 w-36" />
 				<Skeleton className="h-8 w-64" />
@@ -59,7 +60,7 @@ function QueryDetailSkeleton() {
 				{Array.from({ length: 5 }).map((_, i) => (
 					<div
 						key={i}
-						className="rounded-lg border-2 border-muted/30 px-4 py-4"
+						className="rounded-xl border border-border bg-card px-5 py-4"
 					>
 						<div className="flex items-center gap-3">
 							<Skeleton className="h-5 w-5 rounded-full" />
@@ -107,7 +108,7 @@ export default function QueryDetailPage() {
 
 	if (!mounted) {
 		return (
-			<main className="min-h-screen bg-background flex items-center justify-center">
+			<main className="min-h-screen flex items-center justify-center">
 				<div className="flex items-center gap-3">
 					<Logo variant="icon" width={32} height={32} />
 					<span className="text-muted-foreground">{t("loading")}</span>
@@ -118,7 +119,7 @@ export default function QueryDetailPage() {
 
 	return (
 		<main className="min-h-screen flex flex-col">
-			<div className="flex-1 px-4 py-6 sm:py-8 max-w-4xl mx-auto w-full space-y-6">
+			<div className="flex-1 px-4 sm:px-6 py-6 sm:py-8 max-w-3xl mx-auto w-full space-y-6">
 				{/* Back + New Search */}
 				<div className="flex items-center justify-between">
 					<Button
@@ -127,7 +128,7 @@ export default function QueryDetailPage() {
 						onClick={() => router.push("/queries")}
 					>
 						<ArrowLeft className="h-4 w-4 mr-2" />
-						Back to Queries
+						{t("backToQueries")}
 					</Button>
 					<Button variant="outline" onClick={() => router.push("/")}>
 						{t("newSearch")}
@@ -182,10 +183,10 @@ export default function QueryDetailPage() {
 
 						{/* Running indicator */}
 						{data.status === "running" && (
-							<div className="flex items-center gap-3 p-4 rounded-lg border bg-muted/30">
+							<div className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card">
 								<Loader2 className="h-5 w-5 animate-spin text-primary" />
 								<span className="text-sm text-muted-foreground">
-									Procesando búsquedas asíncronas (PEP, Media Adversa)…
+									{t("processingAsync")}
 								</span>
 							</div>
 						)}

@@ -33,11 +33,11 @@ describe("queries API", () => {
 		it("calls GET /queries with correct URL", async () => {
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 0,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};
@@ -60,11 +60,11 @@ describe("queries API", () => {
 		it("includes JWT in request when provided", async () => {
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 0,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};
@@ -88,11 +88,11 @@ describe("queries API", () => {
 		it("passes pagination params as query string", async () => {
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 10,
+					offset: 10,
 					total: 0,
-					page: 2,
-					pageSize: 10,
 					hasMore: false,
 				},
 			};
@@ -103,18 +103,18 @@ describe("queries API", () => {
 			});
 
 			const params: ListQueriesParams = {
-				page: 2,
-				pageSize: 10,
+				offset: 10,
+				limit: 10,
 			};
 
 			await listQueries(params);
 
 			expect(httpModule.fetchJson).toHaveBeenCalledWith(
-				expect.stringContaining("page=2"),
+				expect.stringContaining("offset=10"),
 				expect.any(Object),
 			);
 			expect(httpModule.fetchJson).toHaveBeenCalledWith(
-				expect.stringContaining("pageSize=10"),
+				expect.stringContaining("limit=10"),
 				expect.any(Object),
 			);
 		});
@@ -122,11 +122,11 @@ describe("queries API", () => {
 		it("passes status filter as query string", async () => {
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 0,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};
@@ -176,11 +176,11 @@ describe("queries API", () => {
 
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: mockQueries,
+				queries: mockQueries,
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 1,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};
@@ -193,9 +193,9 @@ describe("queries API", () => {
 			const result = await listQueries();
 
 			expect(result.success).toBe(true);
-			expect(result.result.queries).toHaveLength(1);
-			expect(result.result.queries[0].id).toBe("query-1");
-			expect(result.result.total).toBe(1);
+			expect(result.queries).toHaveLength(1);
+			expect(result.queries[0].id).toBe("query-1");
+			expect(result.pagination.total).toBe(1);
 		});
 
 		it("throws ApiError on non-success response", async () => {
@@ -215,11 +215,11 @@ describe("queries API", () => {
 		it("handles empty query params", async () => {
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 0,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};
@@ -488,11 +488,11 @@ describe("queries API", () => {
 
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 0,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};
@@ -518,11 +518,11 @@ describe("queries API", () => {
 
 			const mockResponse: ListQueriesResponse = {
 				success: true,
-				result: {
-					queries: [],
+				queries: [],
+				pagination: {
+					limit: 20,
+					offset: 0,
 					total: 0,
-					page: 1,
-					pageSize: 20,
 					hasMore: false,
 				},
 			};

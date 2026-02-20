@@ -22,7 +22,10 @@ export async function getClientJwt(): Promise<string | null> {
 	try {
 		const result = await authClient.token();
 		if (result.error || !result.data?.token) {
-			console.error("Failed to get JWT:", result.error);
+			console.error(
+				"Failed to get JWT:",
+				result.error ?? "No token in response",
+			);
 			return null;
 		}
 		return result.data.token;
