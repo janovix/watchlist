@@ -1,3 +1,10 @@
+# [1.1.0-rc.16](https://github.com/janovix/watchlist/compare/v1.1.0-rc.15...v1.1.0-rc.16) (2026-02-20)
+
+
+### Features
+
+* enhance RecentSearches component with loading state and improve layout in QueryDetailSkeleton ([d06f585](https://github.com/janovix/watchlist/commit/d06f585f257fd43435a2ab9def67be097d2b2a05))
+
 # [1.1.0-rc.15](https://github.com/janovix/watchlist/compare/v1.1.0-rc.14...v1.1.0-rc.15) (2026-02-20)
 
 
