@@ -22,7 +22,7 @@ export default function UnauthorizedPage() {
 			: `${getAuthAppUrl()}/login`;
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-linear-to-br from-background to-muted/50 p-4">
+		<div className="flex flex-1 items-center justify-center bg-linear-to-br from-background to-muted/50 p-4">
 			<Card className="w-full max-w-md">
 				<CardHeader className="text-center">
 					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">

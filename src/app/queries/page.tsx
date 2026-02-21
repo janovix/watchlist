@@ -189,11 +189,13 @@ export default function QueriesPage() {
 
 	if (isLoading) {
 		return (
-			<main className="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
-				<div className="max-w-6xl mx-auto">
+			<main className="flex-1 flex flex-col px-4 sm:px-6 py-6 sm:py-8">
+				<div className="max-w-6xl mx-auto flex-1 w-full">
 					{/* Header skeleton */}
 					<div className="mb-8">
-						<Skeleton className="h-9 w-48 mb-4" />
+						<div className="flex items-center gap-3 mb-4">
+							<Skeleton className="h-8 md:h-10 w-64 md:w-96" />
+						</div>
 						<Skeleton className="h-4 w-72" />
 					</div>
 
@@ -201,21 +203,23 @@ export default function QueriesPage() {
 					<div className="mb-6 flex flex-col md:flex-row gap-4">
 						<Skeleton className="h-10 flex-1 rounded-md" />
 						<div className="flex gap-2">
-							<Skeleton className="h-10 w-16 rounded-md" />
-							<Skeleton className="h-10 w-28 rounded-md" />
-							<Skeleton className="h-10 w-28 rounded-md" />
+							<Skeleton className="h-10 w-20 rounded-md" />
+							<Skeleton className="h-10 w-32 rounded-md" />
+							<Skeleton className="h-10 w-32 rounded-md" />
 						</div>
 					</div>
 
 					{/* Table skeleton */}
 					<div className="rounded-lg border bg-card overflow-hidden">
-						<div className="border-b px-4 py-3 flex gap-4">
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-4 w-16" />
-							<Skeleton className="h-4 w-16" />
-							<Skeleton className="h-4 w-16" />
+						<div className="border-b px-4 py-3">
+							<div className="flex gap-4">
+								<Skeleton className="h-4 w-48 flex-1" />
+								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-4 w-24" />
+							</div>
 						</div>
-						{[...Array(5)].map((_, i) => (
+						{[...Array(20)].map((_, i) => (
 							<div
 								key={i}
 								className="border-b last:border-b-0 px-4 py-4 flex items-center gap-4"
@@ -226,20 +230,41 @@ export default function QueriesPage() {
 									<Skeleton className="h-4 w-20" />
 								</div>
 								<div className="flex items-center gap-2">
-									<Skeleton className="h-3 w-3 rounded" />
+									<Skeleton className="h-4 w-4 rounded" />
 									<Skeleton className="h-4 w-24" />
 								</div>
-								<Skeleton className="h-6 w-20 rounded-full" />
+								<Skeleton className="h-6 w-24 rounded-full" />
 							</div>
 						))}
 					</div>
+
+					{/* Pagination skeleton */}
+					<div className="mt-6 flex items-center justify-between">
+						<Skeleton className="h-4 w-48" />
+						<div className="flex gap-2">
+							<Skeleton className="h-9 w-24 rounded-md" />
+							<Skeleton className="h-9 w-24 rounded-md" />
+						</div>
+					</div>
+
+					{/* Footer skeleton */}
+					<footer className="mt-12 pt-6 border-t border-border/50">
+						<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
+							<Skeleton className="h-3 w-20" />
+							<div className="flex items-center gap-4">
+								<Skeleton className="h-4 w-32" />
+								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-4 w-24" />
+							</div>
+						</div>
+					</footer>
 				</div>
 			</main>
 		);
 	}
 
 	return (
-		<main className="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
+		<main className="flex-1 px-4 sm:px-6 py-6 sm:py-8">
 			<div className="max-w-6xl mx-auto">
 				{/* Header */}
 				<div className="mb-8">

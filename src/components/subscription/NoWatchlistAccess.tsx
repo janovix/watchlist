@@ -36,7 +36,7 @@ export function NoWatchlistAccess({
 
 	if (isLoading) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-background">
+			<div className="flex flex-1 items-center justify-center bg-background">
 				<div className="text-center">
 					<Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
 					<p className="mt-4 text-sm text-muted-foreground">{t("loading")}</p>
@@ -46,7 +46,7 @@ export function NoWatchlistAccess({
 	}
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+		<div className="flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
 			<Card className="max-w-md w-full text-center shadow-lg">
 				<CardHeader className="space-y-4">
 					<div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">

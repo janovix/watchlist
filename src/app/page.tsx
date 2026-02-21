@@ -133,8 +133,8 @@ export default function HomePage() {
 	const canSubmit = query.trim().length > 3 && !isSearching && !jwtLoading;
 
 	return (
-		<main className="min-h-[calc(100vh-3.25rem)] flex flex-col px-4 sm:px-6">
-			<div className="flex-1 flex flex-col items-center justify-center">
+		<main className="flex-1 flex flex-col px-4 sm:px-6">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-0">
 				<div className="w-full max-w-3xl flex flex-col gap-6">
 					{/* Search bar - pill shaped */}
 					<div className="flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2.5 transition-all duration-300 hover:border-muted-foreground/30">
@@ -149,6 +149,7 @@ export default function HomePage() {
 
 						<Input
 							value={query}
+							autoFocus
 							onChange={(e) => setQuery(e.target.value.toUpperCase())}
 							onKeyDown={(e) =>
 								e.key === "Enter" && canSubmit && handleSearch()
@@ -158,7 +159,7 @@ export default function HomePage() {
 									? t("searchIndividualPlaceholder")
 									: t("searchCompanyPlaceholder")
 							}
-							className="flex-1 border-0 bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 uppercase font-mono min-w-0 px-2"
+							className="flex-1 border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 uppercase font-mono min-w-0 px-2 bg-transparent p-0 shadow-none"
 						/>
 
 						{/* Advanced Search Toggle */}
@@ -254,8 +255,8 @@ export default function HomePage() {
 			</div>
 
 			{/* Footer */}
-			<footer className="w-full py-4 border-t border-border/50">
-				<div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-sm text-muted-foreground">
+			<footer className="w-full mt-auto py-4 border-t border-border/50 bg-background">
+				<div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-sm text-muted-foreground px-4 sm:px-6">
 					<div className="flex items-center gap-2 opacity-80">
 						<Logo variant="logo" width={80} height={14} />
 					</div>

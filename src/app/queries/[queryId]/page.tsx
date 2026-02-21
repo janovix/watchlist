@@ -117,7 +117,7 @@ export default function QueryDetailPage() {
 
 	if (!mounted) {
 		return (
-			<main className="min-h-screen flex items-center justify-center">
+			<main className="flex-1 flex items-center justify-center">
 				<div className="flex items-center gap-3">
 					<Logo variant="icon" width={32} height={32} />
 					<span className="text-muted-foreground">{t("loading")}</span>
@@ -127,7 +127,7 @@ export default function QueryDetailPage() {
 	}
 
 	return (
-		<main className="min-h-screen flex flex-col">
+		<main className="flex-1 flex flex-col">
 			<div className="flex-1 px-4 sm:px-6 py-6 sm:py-8 max-w-3xl mx-auto w-full space-y-6">
 				{/* Back + New Search */}
 				<div className="flex items-center justify-between">
@@ -208,6 +208,34 @@ export default function QueryDetailPage() {
 					</>
 				)}
 			</div>
+
+			{/* Footer */}
+			<footer className="w-full mt-auto py-4 border-t border-border/50 bg-background">
+				<div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-sm text-muted-foreground px-4 sm:px-6">
+					<div className="flex items-center gap-2 opacity-80">
+						<Logo variant="logo" width={80} height={14} />
+					</div>
+					<div className="flex items-center gap-4">
+						<span>&copy; {new Date().getFullYear()} Janovix</span>
+						<a
+							href="https://janovix.com/privacy"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="hover:text-foreground transition-colors"
+						>
+							{t("privacy")}
+						</a>
+						<a
+							href="https://janovix.com/terms"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="hover:text-foreground transition-colors"
+						>
+							{t("terms")}
+						</a>
+					</div>
+				</div>
+			</footer>
 		</main>
 	);
 }

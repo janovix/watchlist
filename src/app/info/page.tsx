@@ -27,7 +27,7 @@ export default function InfoPage() {
 	};
 
 	return (
-		<main className="min-h-screen px-4 md:px-8 py-8 pt-20">
+		<main className="flex-1 px-4 md:px-8 py-8">
 			<div className="max-w-4xl mx-auto">
 				{/* Header */}
 				<Button variant="ghost" onClick={navigateBack} className="mb-6 -ml-2">
