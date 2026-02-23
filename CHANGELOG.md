@@ -1,3 +1,10 @@
+# [1.1.0-rc.17](https://github.com/janovix/watchlist/compare/v1.1.0-rc.16...v1.1.0-rc.17) (2026-02-23)
+
+
+### Features
+
+* add external link dialog component and integrate with screening results card for improved user experience ([9bf39f0](https://github.com/janovix/watchlist/commit/9bf39f0d67720d06317a79f4a73cb0610ca67285))
+
 # [1.1.0-rc.16](https://github.com/janovix/watchlist/compare/v1.1.0-rc.15...v1.1.0-rc.16) (2026-02-20)
 
 
