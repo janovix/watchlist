@@ -311,6 +311,16 @@ export const translations = {
 		howItWorksStep3Title: "3. Revisar Resultados",
 		howItWorksStep3Description:
 			"Los resultados se organizan por fuente de datos (OFAC, SAT 69-B, UNSC, PEP) con puntuaciones de coincidencia e información detallada para cada resultado. Puedes revisar los detalles completos de cada coincidencia para tomar decisiones informadas sobre tu proceso de debida diligencia.",
+
+		// External link dialog
+		externalLinkTitle: "Redirección a sitio externo",
+		externalLinkDescription: "Serás redirigido a un sitio web de terceros.",
+		externalLinkBody:
+			"Este sitio no está bajo el control de Janovix y puede tener sus propias políticas de privacidad y términos de uso.",
+		externalLinkVisiting: "Estás a punto de visitar",
+		externalLinkDontShowAgain: "No volver a mostrar este aviso",
+		externalLinkCancel: "Cancelar",
+		externalLinkContinue: "Continuar",
 	},
 	en: {
 		// Header
@@ -619,6 +629,16 @@ export const translations = {
 		howItWorksStep3Title: "3. Review Results",
 		howItWorksStep3Description:
 			"Results are organized by data source (OFAC, SAT 69-B, UNSC, PEP) with match scores and detailed information for each hit. You can review the full details of each match to make informed decisions about your due diligence process.",
+
+		// External link dialog
+		externalLinkTitle: "Redirect to external site",
+		externalLinkDescription: "You will be redirected to a third-party website.",
+		externalLinkBody:
+			"This site is not under the control of Janovix and may have its own privacy policies and terms of use.",
+		externalLinkVisiting: "You are about to visit",
+		externalLinkDontShowAgain: "Don't show this warning again",
+		externalLinkCancel: "Cancel",
+		externalLinkContinue: "Continue",
 	},
 };
 

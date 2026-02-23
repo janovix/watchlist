@@ -1,6 +1,13 @@
 "use client";
 
-import { CheckCircle2, AlertTriangle, Loader2, Activity } from "lucide-react";
+import {
+	CheckCircle2,
+	AlertTriangle,
+	Loader2,
+	Activity,
+	ExternalLink,
+	Link2,
+} from "lucide-react";
 import {
 	Accordion,
 	AccordionContent,
@@ -12,6 +19,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { MatchResultsList } from "@/components/match-results-list";
 import { useLanguage } from "@/components/language-provider";
+import {
+	ExternalLinkDialog,
+	useExternalLinkRedirect,
+} from "@/components/external-link-dialog";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
 import type { ConnectionStatus } from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
@@ -169,6 +180,7 @@ export function ScreeningResultsCard({
 	connectionStatus,
 }: ScreeningResultsCardProps) {
 	const { language, t } = useLanguage();
+	const extLink = useExternalLinkRedirect();
 
 	// Synchronous result statuses
 	const ofacStatus = resolveItemStatus(data.ofacStatus, data.ofacCount);
@@ -494,11 +506,34 @@ export function ScreeningResultsCard({
 													<p className="font-medium mb-1">{t("sources")}</p>
 													<ul className="list-disc list-inside space-y-1 text-muted-foreground">
 														{(pepAiRaw as GrokPepResult).sources!.map(
-															(src, i) => (
-																<li key={i} className="text-xs truncate">
-																	{src}
-																</li>
-															),
+															(src, i) => {
+																const isUrl = /^https?:\/\//i.test(src);
+																return (
+																	<li key={i} className="text-xs truncate">
+																		{isUrl ? (
+																			<a
+																				href={src}
+																				onClick={(e) =>
+																					extLink.handleExternalLink(src, e)
+																				}
+																				className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
+																			>
+																				<Link2 className="h-3 w-3 shrink-0 inline" />
+																				{(() => {
+																					try {
+																						return new URL(src).hostname;
+																					} catch {
+																						return src;
+																					}
+																				})()}
+																				<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
+																			</a>
+																		) : (
+																			src
+																		)}
+																	</li>
+																);
+															},
 														)}
 													</ul>
 												</div>
@@ -568,11 +603,34 @@ export function ScreeningResultsCard({
 											<p className="font-medium mb-1">{t("sources")}</p>
 											<ul className="list-disc list-inside space-y-1 text-muted-foreground">
 												{(adverseMediaRaw as AdverseMediaResult).sources!.map(
-													(src, i) => (
-														<li key={i} className="text-xs truncate">
-															{src}
-														</li>
-													),
+													(src, i) => {
+														const isUrl = /^https?:\/\//i.test(src);
+														return (
+															<li key={i} className="text-xs truncate">
+																{isUrl ? (
+																	<a
+																		href={src}
+																		onClick={(e) =>
+																			extLink.handleExternalLink(src, e)
+																		}
+																		className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
+																	>
+																		<Link2 className="h-3 w-3 shrink-0 inline" />
+																		{(() => {
+																			try {
+																				return new URL(src).hostname;
+																			} catch {
+																				return src;
+																			}
+																		})()}
+																		<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
+																	</a>
+																) : (
+																	src
+																)}
+															</li>
+														);
+													},
 												)}
 											</ul>
 										</div>
@@ -582,6 +640,13 @@ export function ScreeningResultsCard({
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>
+
+			<ExternalLinkDialog
+				open={extLink.isOpen}
+				url={extLink.pendingUrl}
+				onConfirm={extLink.confirm}
+				onCancel={extLink.cancel}
+			/>
 		</div>
 	);
 }
