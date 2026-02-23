@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/client";
-import { jwtClient } from "better-auth/client/plugins";
+import { jwtClient, organizationClient } from "better-auth/client/plugins";
 import { getAuthCoreBaseUrl } from "./config";
 
 /**
@@ -9,9 +9,9 @@ import { getAuthCoreBaseUrl } from "./config";
 export const authClient = createAuthClient({
 	baseURL: getAuthCoreBaseUrl(),
 	fetchOptions: {
-		credentials: "include", // CRITICAL: Required for cookies
+		credentials: "include",
 	},
-	plugins: [jwtClient()],
+	plugins: [jwtClient(), organizationClient()],
 });
 
 /**

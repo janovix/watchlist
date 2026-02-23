@@ -22,10 +22,14 @@ import { useLanguage } from "@/components/language-provider";
 import {
 	ExternalLinkDialog,
 	useExternalLinkRedirect,
+	looksLikeUrl,
+	ensureProtocol,
+	extractHostname,
 } from "@/components/external-link-dialog";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
 import type { ConnectionStatus } from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
+import type { WatchlistFeatures } from "@/lib/api/watchlist-config";
 
 // ---------------------------------------------------------------------------
 // Shape types for async result payloads stored in the DB / received via SSE
@@ -169,6 +173,7 @@ function SubsectionBadge({
 interface ScreeningResultsCardProps {
 	data: SearchQuery;
 	connectionStatus: ConnectionStatus;
+	features?: WatchlistFeatures;
 }
 
 // ---------------------------------------------------------------------------
@@ -178,9 +183,15 @@ interface ScreeningResultsCardProps {
 export function ScreeningResultsCard({
 	data,
 	connectionStatus,
+	features,
 }: ScreeningResultsCardProps) {
 	const { language, t } = useLanguage();
 	const extLink = useExternalLinkRedirect();
+
+	const showPepSearch = features?.pepSearch ?? true;
+	const showPepGrok = features?.pepGrok ?? true;
+	const showAdverseMedia = features?.adverseMedia ?? true;
+	const showPepSection = showPepSearch || showPepGrok;
 
 	// Synchronous result statuses
 	const ofacStatus = resolveItemStatus(data.ofacStatus, data.ofacCount);
@@ -210,19 +221,18 @@ export function ScreeningResultsCard({
 		!!pepAiHasMatches,
 	);
 
-	// Combined PEP item status: loading if either is loading, match if either has a match,
-	// failed if either failed (and none has a match), clear only if both are clear
-	let pepCombinedStatus: ItemStatus = "loading";
-	if (pepOfficialItemStatus !== "loading" && pepAiItemStatus !== "loading") {
-		if (
-			pepOfficialItemStatus === "complete_match" ||
-			pepAiItemStatus === "complete_match"
-		) {
+	// Combined PEP item status: only consider enabled subsections
+	let pepCombinedStatus: ItemStatus = "complete_clear";
+	const pepStatuses: ItemStatus[] = [];
+	if (showPepSearch) pepStatuses.push(pepOfficialItemStatus);
+	if (showPepGrok) pepStatuses.push(pepAiItemStatus);
+
+	if (pepStatuses.length > 0) {
+		if (pepStatuses.some((s) => s === "loading")) {
+			pepCombinedStatus = "loading";
+		} else if (pepStatuses.some((s) => s === "complete_match")) {
 			pepCombinedStatus = "complete_match";
-		} else if (
-			pepOfficialItemStatus === "failed" ||
-			pepAiItemStatus === "failed"
-		) {
+		} else if (pepStatuses.some((s) => s === "failed")) {
 			pepCombinedStatus = "failed";
 		} else {
 			pepCombinedStatus = "complete_clear";
@@ -377,268 +387,294 @@ export function ScreeningResultsCard({
 				</AccordionItem>
 
 				{/* PEP — merged accordion for Official + AI */}
-				<AccordionItem
-					value="pep"
-					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
-				>
-					<AccordionTrigger className="hover:no-underline">
-						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(pepCombinedStatus)}
-							<span className="font-semibold">{t("pepTitle")}</span>
-							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={pepCombinedStatus} />
-							</div>
-						</div>
-					</AccordionTrigger>
-					<AccordionContent>
-						<div className="space-y-4">
-							{/* PEP Official subsection */}
-							<div className="space-y-2">
-								<div className="flex items-center justify-between">
-									<p className="text-sm font-medium text-muted-foreground">
-										{t("pepOfficialSubtitle")}
-									</p>
-									<SubsectionBadge status={data.pepOfficialStatus} />
+				{showPepSection && (
+					<AccordionItem
+						value="pep"
+						className="rounded-xl border border-border bg-card px-4 overflow-hidden"
+					>
+						<AccordionTrigger className="hover:no-underline">
+							<div className="flex items-center gap-3 w-full">
+								{getStatusIcon(pepCombinedStatus)}
+								<span className="font-semibold">{t("pepTitle")}</span>
+								<div className="ml-auto">
+									<StatusBadgeLabel itemStatus={pepCombinedStatus} />
 								</div>
-								{pepOfficialItemStatus === "loading" ? (
-									<p className="text-muted-foreground text-sm pl-2">
-										{t("searchingPepOfficial")}
-									</p>
-								) : pepOfficialItemStatus === "failed" ? (
-									<Alert variant="destructive" className="py-2">
-										<AlertDescription className="text-xs">
-											{(pepOfficialRaw as ErrorResult)?.error ??
-												t("pepOfficialError")}
-										</AlertDescription>
-									</Alert>
-								) : !pepOfficialHasMatches ? (
-									<p className="text-green-600 text-sm pl-2">
-										{t("pepOfficialNoMatch")}
-									</p>
-								) : (
-									<div className="space-y-2 pl-2">
-										{(pepOfficialRaw as PepRawResult[]).map((result) => (
-											<div
-												key={result.id}
-												className="border rounded-lg p-3 bg-card text-sm"
-											>
-												<p className="font-semibold">{result.nombre}</p>
-												{result.informacionPrincipal?.institucion && (
-													<p className="text-muted-foreground mt-1">
-														<span className="font-medium">
-															{t("institution")}{" "}
-														</span>
-														{result.informacionPrincipal.institucion}
-													</p>
-												)}
-												{result.informacionPrincipal?.cargo && (
-													<p className="text-muted-foreground">
-														<span className="font-medium">
-															{t("position")}{" "}
-														</span>
-														{result.informacionPrincipal.cargo}
-													</p>
-												)}
-												{result.informacionPrincipal?.area && (
-													<p className="text-muted-foreground">
-														<span className="font-medium">{t("area")} </span>
-														{result.informacionPrincipal.area}
-													</p>
-												)}
+							</div>
+						</AccordionTrigger>
+						<AccordionContent>
+							<div className="space-y-4">
+								{/* PEP Official subsection */}
+								{showPepSearch && (
+									<div className="space-y-2">
+										<div className="flex items-center justify-between">
+											<p className="text-sm font-medium text-muted-foreground">
+												{t("pepOfficialSubtitle")}
+											</p>
+											<SubsectionBadge status={data.pepOfficialStatus} />
+										</div>
+										{pepOfficialItemStatus === "loading" ? (
+											<p className="text-muted-foreground text-sm pl-2">
+												{t("searchingPepOfficial")}
+											</p>
+										) : pepOfficialItemStatus === "failed" ? (
+											<Alert variant="destructive" className="py-2">
+												<AlertDescription className="text-xs">
+													{(pepOfficialRaw as ErrorResult)?.error ??
+														t("pepOfficialError")}
+												</AlertDescription>
+											</Alert>
+										) : !pepOfficialHasMatches ? (
+											<p className="text-green-600 text-sm pl-2">
+												{t("pepOfficialNoMatch")}
+											</p>
+										) : (
+											<div className="space-y-2 pl-2">
+												{(pepOfficialRaw as PepRawResult[]).map((result) => (
+													<div
+														key={result.id}
+														className="border rounded-lg p-3 bg-card text-sm"
+													>
+														<p className="font-semibold">{result.nombre}</p>
+														{result.informacionPrincipal?.institucion && (
+															<p className="text-muted-foreground mt-1">
+																<span className="font-medium">
+																	{t("institution")}{" "}
+																</span>
+																{result.informacionPrincipal.institucion}
+															</p>
+														)}
+														{result.informacionPrincipal?.cargo && (
+															<p className="text-muted-foreground">
+																<span className="font-medium">
+																	{t("position")}{" "}
+																</span>
+																{result.informacionPrincipal.cargo}
+															</p>
+														)}
+														{result.informacionPrincipal?.area && (
+															<p className="text-muted-foreground">
+																<span className="font-medium">
+																	{t("area")}{" "}
+																</span>
+																{result.informacionPrincipal.area}
+															</p>
+														)}
+													</div>
+												))}
 											</div>
-										))}
+										)}
+									</div>
+								)}
+
+								{showPepSearch && showPepGrok && <div className="border-t" />}
+
+								{/* PEP AI subsection */}
+								{showPepGrok && (
+									<div className="space-y-2">
+										<div className="flex items-center justify-between">
+											<p className="text-sm font-medium text-muted-foreground">
+												{t("pepAiSubtitle")}
+											</p>
+											<SubsectionBadge status={data.pepAiStatus} />
+										</div>
+										{pepAiItemStatus === "loading" ? (
+											<p className="text-muted-foreground text-sm pl-2">
+												{t("analyzingAi")}
+											</p>
+										) : pepAiItemStatus === "failed" ? (
+											<Alert variant="destructive" className="py-2">
+												<AlertDescription className="text-xs">
+													{(pepAiRaw as ErrorResult)?.error ?? t("pepAiError")}
+												</AlertDescription>
+											</Alert>
+										) : (
+											<div className="space-y-2 pl-2 text-sm">
+												{!pepAiHasMatches && (
+													<p className="text-green-600 text-sm">
+														{t("pepAiNoMatch")}
+													</p>
+												)}
+												{pepAiRaw &&
+													!("error" in pepAiRaw) &&
+													typeof (pepAiRaw as GrokPepResult).probability ===
+														"number" && (
+														<div className="flex items-center gap-2">
+															<span className="font-medium">
+																{t("probability")}
+															</span>
+															<Badge
+																variant={
+																	(pepAiRaw as GrokPepResult).probability > 0.5
+																		? "destructive"
+																		: "default"
+																}
+															>
+																{Math.round(
+																	(pepAiRaw as GrokPepResult).probability * 100,
+																)}
+																%
+															</Badge>
+														</div>
+													)}
+												{pepAiRaw &&
+													!("error" in pepAiRaw) &&
+													(pepAiRaw as GrokPepResult).summary && (
+														<p className="text-muted-foreground">
+															{getBilingualText(
+																(pepAiRaw as GrokPepResult).summary,
+																language as "es" | "en",
+															)}
+														</p>
+													)}
+												{pepAiRaw &&
+													!("error" in pepAiRaw) &&
+													(pepAiRaw as GrokPepResult).sources &&
+													(pepAiRaw as GrokPepResult).sources!.length > 0 && (
+														<div>
+															<p className="font-medium mb-1">{t("sources")}</p>
+															<ul className="list-disc list-inside space-y-1 text-muted-foreground">
+																{(pepAiRaw as GrokPepResult).sources!.map(
+																	(src, i) => {
+																		const isLink = looksLikeUrl(src);
+																		const href = isLink
+																			? ensureProtocol(src)
+																			: null;
+																		return (
+																			<li key={i} className="text-xs truncate">
+																				{isLink && href ? (
+																					<a
+																						href={href}
+																						onClick={(e) =>
+																							extLink.handleExternalLink(
+																								href,
+																								e,
+																							)
+																						}
+																						className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
+																					>
+																						<Link2 className="h-3 w-3 shrink-0 inline" />
+																						{extractHostname(src)}
+																						<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
+																					</a>
+																				) : (
+																					src
+																				)}
+																			</li>
+																		);
+																	},
+																)}
+															</ul>
+														</div>
+													)}
+											</div>
+										)}
 									</div>
 								)}
 							</div>
+						</AccordionContent>
+					</AccordionItem>
+				)}
 
-							<div className="border-t" />
-
-							{/* PEP AI subsection */}
-							<div className="space-y-2">
-								<div className="flex items-center justify-between">
-									<p className="text-sm font-medium text-muted-foreground">
-										{t("pepAiSubtitle")}
-									</p>
-									<SubsectionBadge status={data.pepAiStatus} />
+				{/* Adverse Media */}
+				{showAdverseMedia && (
+					<AccordionItem
+						value="adverse-media"
+						className="rounded-xl border border-border bg-card px-4 overflow-hidden"
+					>
+						<AccordionTrigger className="hover:no-underline">
+							<div className="flex items-center gap-3 w-full">
+								{getStatusIcon(adverseMediaStatus)}
+								<span className="font-semibold">{t("adverseMediaTitle")}</span>
+								<div className="ml-auto">
+									<StatusBadgeLabel itemStatus={adverseMediaStatus} />
 								</div>
-								{pepAiItemStatus === "loading" ? (
-									<p className="text-muted-foreground text-sm pl-2">
-										{t("analyzingAi")}
-									</p>
-								) : pepAiItemStatus === "failed" ? (
-									<Alert variant="destructive" className="py-2">
-										<AlertDescription className="text-xs">
-											{(pepAiRaw as ErrorResult)?.error ?? t("pepAiError")}
-										</AlertDescription>
-									</Alert>
-								) : !pepAiHasMatches ? (
-									<p className="text-green-600 text-sm pl-2">
-										{t("pepAiNoMatch")}
-									</p>
-								) : (
-									<div className="space-y-2 pl-2 text-sm">
+							</div>
+						</AccordionTrigger>
+						<AccordionContent>
+							{adverseMediaStatus === "loading" ? (
+								<p className="text-muted-foreground text-sm">
+									{t("analyzingAdverseMedia")}
+								</p>
+							) : adverseMediaStatus === "failed" ? (
+								<Alert variant="destructive" className="py-2">
+									<AlertDescription className="text-xs">
+										{(adverseMediaRaw as ErrorResult)?.error ??
+											t("adverseMediaError")}
+									</AlertDescription>
+								</Alert>
+							) : (
+								<div className="space-y-2 text-sm">
+									{!adverseMediaHasRisk && (
+										<p className="text-green-600 text-sm">
+											{t("noAdverseMedia")}
+										</p>
+									)}
+									{adverseMediaRaw && !("error" in adverseMediaRaw) && (
 										<div className="flex items-center gap-2">
-											<span className="font-medium">{t("probability")}</span>
+											<span className="font-medium">{t("riskLevel")}</span>
 											<Badge
 												variant={
-													(pepAiRaw as GrokPepResult).probability > 0.5
+													(adverseMediaRaw as AdverseMediaResult).risk_level ===
+													"high"
 														? "destructive"
 														: "default"
 												}
 											>
-												{Math.round(
-													(pepAiRaw as GrokPepResult).probability * 100,
-												)}
-												%
+												{(adverseMediaRaw as AdverseMediaResult).risk_level}
 											</Badge>
 										</div>
-										{(pepAiRaw as GrokPepResult).summary && (
+									)}
+									{adverseMediaRaw &&
+										!("error" in adverseMediaRaw) &&
+										(adverseMediaRaw as AdverseMediaResult).findings && (
 											<p className="text-muted-foreground">
 												{getBilingualText(
-													(pepAiRaw as GrokPepResult).summary,
+													(adverseMediaRaw as AdverseMediaResult).findings,
 													language as "es" | "en",
 												)}
 											</p>
 										)}
-										{(pepAiRaw as GrokPepResult).sources &&
-											(pepAiRaw as GrokPepResult).sources!.length > 0 && (
-												<div>
-													<p className="font-medium mb-1">{t("sources")}</p>
-													<ul className="list-disc list-inside space-y-1 text-muted-foreground">
-														{(pepAiRaw as GrokPepResult).sources!.map(
-															(src, i) => {
-																const isUrl = /^https?:\/\//i.test(src);
-																return (
-																	<li key={i} className="text-xs truncate">
-																		{isUrl ? (
-																			<a
-																				href={src}
-																				onClick={(e) =>
-																					extLink.handleExternalLink(src, e)
-																				}
-																				className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
-																			>
-																				<Link2 className="h-3 w-3 shrink-0 inline" />
-																				{(() => {
-																					try {
-																						return new URL(src).hostname;
-																					} catch {
-																						return src;
-																					}
-																				})()}
-																				<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
-																			</a>
-																		) : (
-																			src
-																		)}
-																	</li>
-																);
-															},
-														)}
-													</ul>
-												</div>
-											)}
-									</div>
-								)}
-							</div>
-						</div>
-					</AccordionContent>
-				</AccordionItem>
-
-				{/* Adverse Media */}
-				<AccordionItem
-					value="adverse-media"
-					className="rounded-xl border border-border bg-card px-4 overflow-hidden"
-				>
-					<AccordionTrigger className="hover:no-underline">
-						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(adverseMediaStatus)}
-							<span className="font-semibold">{t("adverseMediaTitle")}</span>
-							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={adverseMediaStatus} />
-							</div>
-						</div>
-					</AccordionTrigger>
-					<AccordionContent>
-						{adverseMediaStatus === "loading" ? (
-							<p className="text-muted-foreground text-sm">
-								{t("analyzingAdverseMedia")}
-							</p>
-						) : adverseMediaStatus === "failed" ? (
-							<Alert variant="destructive" className="py-2">
-								<AlertDescription className="text-xs">
-									{(adverseMediaRaw as ErrorResult)?.error ??
-										t("adverseMediaError")}
-								</AlertDescription>
-							</Alert>
-						) : !adverseMediaHasRisk ? (
-							<p className="text-green-600 text-sm">{t("noAdverseMedia")}</p>
-						) : (
-							<div className="space-y-2 text-sm">
-								<div className="flex items-center gap-2">
-									<span className="font-medium">{t("riskLevel")}</span>
-									<Badge
-										variant={
-											(adverseMediaRaw as AdverseMediaResult).risk_level ===
-											"high"
-												? "destructive"
-												: "default"
-										}
-									>
-										{(adverseMediaRaw as AdverseMediaResult).risk_level}
-									</Badge>
-								</div>
-								{(adverseMediaRaw as AdverseMediaResult).findings && (
-									<p className="text-muted-foreground">
-										{getBilingualText(
-											(adverseMediaRaw as AdverseMediaResult).findings,
-											language as "es" | "en",
-										)}
-									</p>
-								)}
-								{(adverseMediaRaw as AdverseMediaResult).sources &&
-									(adverseMediaRaw as AdverseMediaResult).sources!.length >
-										0 && (
-										<div>
-											<p className="font-medium mb-1">{t("sources")}</p>
-											<ul className="list-disc list-inside space-y-1 text-muted-foreground">
-												{(adverseMediaRaw as AdverseMediaResult).sources!.map(
-													(src, i) => {
-														const isUrl = /^https?:\/\//i.test(src);
-														return (
-															<li key={i} className="text-xs truncate">
-																{isUrl ? (
-																	<a
-																		href={src}
-																		onClick={(e) =>
-																			extLink.handleExternalLink(src, e)
-																		}
-																		className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
-																	>
-																		<Link2 className="h-3 w-3 shrink-0 inline" />
-																		{(() => {
-																			try {
-																				return new URL(src).hostname;
-																			} catch {
-																				return src;
+									{adverseMediaRaw &&
+										!("error" in adverseMediaRaw) &&
+										(adverseMediaRaw as AdverseMediaResult).sources &&
+										(adverseMediaRaw as AdverseMediaResult).sources!.length >
+											0 && (
+											<div>
+												<p className="font-medium mb-1">{t("sources")}</p>
+												<ul className="list-disc list-inside space-y-1 text-muted-foreground">
+													{(adverseMediaRaw as AdverseMediaResult).sources!.map(
+														(src, i) => {
+															const isLink = looksLikeUrl(src);
+															const href = isLink ? ensureProtocol(src) : null;
+															return (
+																<li key={i} className="text-xs truncate">
+																	{isLink && href ? (
+																		<a
+																			href={href}
+																			onClick={(e) =>
+																				extLink.handleExternalLink(href, e)
 																			}
-																		})()}
-																		<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
-																	</a>
-																) : (
-																	src
-																)}
-															</li>
-														);
-													},
-												)}
-											</ul>
-										</div>
-									)}
-							</div>
-						)}
-					</AccordionContent>
-				</AccordionItem>
+																			className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
+																		>
+																			<Link2 className="h-3 w-3 shrink-0 inline" />
+																			{extractHostname(src)}
+																			<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
+																		</a>
+																	) : (
+																		src
+																	)}
+																</li>
+															);
+														},
+													)}
+												</ul>
+											</div>
+										)}
+								</div>
+							)}
+						</AccordionContent>
+					</AccordionItem>
+				)}
 			</Accordion>
 
 			<ExternalLinkDialog

@@ -52,6 +52,7 @@ export interface QueryListItem {
 	organizationId: string;
 	userId: string | null;
 	query: string;
+	source: string;
 	entityType: string | null;
 	birthDate: string | null;
 	countries: string[] | null;

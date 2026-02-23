@@ -26,9 +26,11 @@ export default defineConfig({
 				"**/types.ts",
 				// Sentry instrumentation files
 				"src/instrumentation*.ts",
-				// SSE hooks and real-time components require integration/E2E testing
-				"src/hooks/useSearchQuery.ts",
-				"src/components/screening-results-card.tsx",
+			// SSE hooks and real-time components require integration/E2E testing
+			"src/hooks/useSearchQuery.ts",
+			"src/components/screening-results-card.tsx",
+			// PDF generation uses jsPDF canvas rendering — requires integration/E2E testing
+			"src/lib/pdf/generate-screening-pdf.ts",
 			],
 			thresholds: {
 				lines: 85,

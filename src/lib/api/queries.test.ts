@@ -155,6 +155,7 @@ describe("queries API", () => {
 					organizationId: "org-1",
 					userId: "user-1",
 					query: "John Doe",
+					source: "manual",
 					entityType: "person",
 					birthDate: null,
 					countries: null,

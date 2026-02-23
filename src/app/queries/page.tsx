@@ -9,9 +9,11 @@ import {
 	Building2,
 	ChevronLeft,
 	ChevronRight,
+	Download,
+	Loader2,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { listQueries, type QueryListItem } from "@/lib/api/queries";
+import { listQueries, getQuery, type QueryListItem } from "@/lib/api/queries";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +30,15 @@ import { useJwt } from "@/hooks/useJwt";
 import { useLanguage } from "@/components/language-provider";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
 import { NoWatchlistAccess } from "@/components/subscription";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useOrgMembers } from "@/hooks/useOrgMembers";
+import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const LIMIT = 20;
 const VALID_FILTERS = ["all", "person", "organization"] as const;
@@ -66,13 +77,38 @@ function sanitizeSearchParams(
 export default function QueriesPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { t } = useLanguage();
+	const { language, t } = useLanguage();
 	const [queries, setQueries] = useState<QueryListItem[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
 	const [localSearch, setLocalSearch] = useState("");
+	const [exportingId, setExportingId] = useState<string | null>(null);
 	const { jwt, isLoading: jwtLoading } = useJwt();
 	const subscription = useSubscriptionSafe();
+	const { org } = useOrganization();
+	const { members } = useOrgMembers();
+
+	const handleExportPdf = useCallback(
+		async (queryId: string, e: React.MouseEvent) => {
+			e.stopPropagation();
+			if (!jwt) return;
+			setExportingId(queryId);
+			try {
+				const response = await getQuery(queryId, { jwt });
+				await generateScreeningPdf(
+					response.result,
+					{ name: org?.name ?? "Organization", logo: org?.logo },
+					language as "es" | "en",
+					t,
+				);
+			} catch (err) {
+				console.error("PDF generation failed:", err);
+			} finally {
+				setExportingId(null);
+			}
+		},
+		[jwt, org, language, t],
+	);
 
 	// Parse and sanitize search params
 	const {
@@ -166,6 +202,25 @@ export default function QueriesPage() {
 		partial: t("statusPartial"),
 	};
 
+	const sourceLabels: Record<string, string> = {
+		manual: t("sourceManual"),
+		"aml-screening": t("sourceAmlScreening"),
+	};
+
+	const getSourceLabel = (source: string) =>
+		sourceLabels[source] ?? t("sourceUnknown");
+
+	const formatFullDate = (iso: string) => {
+		const d = new Date(iso);
+		return d.toLocaleString(language === "es" ? "es-MX" : "en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	};
+
 	const getStatusBadge = (status: string) => {
 		const variants: Record<
 			string,
@@ -248,7 +303,7 @@ export default function QueriesPage() {
 					</div>
 
 					{/* Footer skeleton */}
-					<footer className="mt-12 pt-6 border-t border-border/50">
+					<footer className="mt-auto pt-6 border-t border-border/50">
 						<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
 							<Skeleton className="h-3 w-20" />
 							<div className="flex items-center gap-4">
@@ -264,8 +319,8 @@ export default function QueriesPage() {
 	}
 
 	return (
-		<main className="flex-1 px-4 sm:px-6 py-6 sm:py-8">
-			<div className="max-w-6xl mx-auto">
+		<main className="flex-1 flex flex-col px-4 sm:px-6 py-6 sm:py-8">
+			<div className="max-w-6xl mx-auto flex-1 flex flex-col w-full">
 				{/* Header */}
 				<div className="mb-8">
 					<div className="flex items-center gap-3 mb-4">
@@ -325,15 +380,18 @@ export default function QueriesPage() {
 							<TableRow>
 								<TableHead>{t("tableQuery")}</TableHead>
 								<TableHead>{t("tableType")}</TableHead>
+								<TableHead>{t("tableSource")}</TableHead>
+								<TableHead>{t("tableUser")}</TableHead>
 								<TableHead>{t("tableDate")}</TableHead>
 								<TableHead>{t("tableStatus")}</TableHead>
+								<TableHead className="w-10" />
 							</TableRow>
 						</TableHeader>
 						<TableBody>
 							{filteredQueries.length === 0 ? (
 								<TableRow>
 									<TableCell
-										colSpan={4}
+										colSpan={7}
 										className="text-center py-12 text-muted-foreground"
 									>
 										{paramSearch || paramFilter !== "all"
@@ -364,12 +422,55 @@ export default function QueriesPage() {
 											</div>
 										</TableCell>
 										<TableCell>
-											<div className="flex items-center gap-2 text-sm text-muted-foreground">
-												<Clock className="h-3 w-3" />
-												{new Date(query.createdAt).toLocaleDateString()}
+											<span className="text-sm text-muted-foreground">
+												{getSourceLabel(query.source ?? "manual")}
+											</span>
+										</TableCell>
+										<TableCell>
+											<TooltipProvider delayDuration={200}>
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
+															{query.userId
+																? (members[query.userId] ??
+																	query.userId.slice(0, 8) + "…")
+																: "—"}
+														</span>
+													</TooltipTrigger>
+													{query.userId && members[query.userId] && (
+														<TooltipContent>
+															{members[query.userId]}
+														</TooltipContent>
+													)}
+												</Tooltip>
+											</TooltipProvider>
+										</TableCell>
+										<TableCell>
+											<div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
+												<Clock className="h-3 w-3 shrink-0" />
+												{formatFullDate(query.createdAt)}
 											</div>
 										</TableCell>
 										<TableCell>{getStatusBadge(query.status)}</TableCell>
+										<TableCell>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8"
+												disabled={
+													query.status !== "completed" ||
+													exportingId === query.id
+												}
+												onClick={(e) => handleExportPdf(query.id, e)}
+												title={t("exportPdf")}
+											>
+												{exportingId === query.id ? (
+													<Loader2 className="h-4 w-4 animate-spin" />
+												) : (
+													<Download className="h-4 w-4" />
+												)}
+											</Button>
+										</TableCell>
 									</TableRow>
 								))
 							)}
@@ -417,7 +518,7 @@ export default function QueriesPage() {
 				</div>
 
 				{/* Footer */}
-				<footer className="mt-12 pt-6 border-t border-border/50">
+				<footer className="mt-auto pt-6 border-t border-border/50">
 					<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
 						<div className="flex items-center gap-2 opacity-80">
 							<Logo variant="logo" width={80} height={14} />

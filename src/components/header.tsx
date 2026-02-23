@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
+import { OrgPicker } from "@/components/org-picker";
 import { UserMenu } from "@/components/user-menu";
 
 export function Header() {
@@ -29,6 +30,7 @@ export function Header() {
 					<div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
 						<LanguageToggle />
 						<ThemeToggle />
+						<OrgPicker />
 						<UserMenu />
 					</div>
 				</div>

@@ -1,19 +1,29 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/logo";
-import { ArrowLeft, AlertCircle, Loader2, User, Building2 } from "lucide-react";
+import {
+	ArrowLeft,
+	AlertCircle,
+	Loader2,
+	User,
+	Building2,
+	Download,
+} from "lucide-react";
 import { useJwt } from "@/hooks/useJwt";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { ScreeningResultsCard } from "@/components/screening-results-card";
 import { useLanguage } from "@/components/language-provider";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
 import { NoWatchlistAccess } from "@/components/subscription";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useWatchlistConfig } from "@/hooks/useWatchlistConfig";
+import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
 import type { QueryStatus } from "@/lib/api/queries";
 
 // ---------------------------------------------------------------------------
@@ -90,10 +100,13 @@ function QueryDetailSkeleton() {
 export default function QueryDetailPage() {
 	const params = useParams();
 	const router = useRouter();
-	const { t } = useLanguage();
+	const { language, t } = useLanguage();
 	const [mounted, setMounted] = useState(false);
+	const [exporting, setExporting] = useState(false);
 	const { jwt, isLoading: jwtLoading } = useJwt();
 	const subscription = useSubscriptionSafe();
+	const { org } = useOrganization();
+	const { features } = useWatchlistConfig();
 
 	const queryId = params?.queryId as string;
 
@@ -106,6 +119,23 @@ export default function QueryDetailPage() {
 	useEffect(() => {
 		setMounted(true);
 	}, []);
+
+	const handleExportPdf = useCallback(async () => {
+		if (!data || data.status !== "completed") return;
+		setExporting(true);
+		try {
+			await generateScreeningPdf(
+				data,
+				{ name: org?.name ?? "Organization", logo: org?.logo },
+				language as "es" | "en",
+				t,
+			);
+		} catch (err) {
+			console.error("PDF generation failed:", err);
+		} finally {
+			setExporting(false);
+		}
+	}, [data, org, language, t]);
 
 	// Access control
 	if (subscription?.isLoading) {
@@ -139,9 +169,25 @@ export default function QueryDetailPage() {
 						<ArrowLeft className="h-4 w-4 mr-2" />
 						{t("backToQueries")}
 					</Button>
-					<Button variant="outline" onClick={() => router.push("/")}>
-						{t("newSearch")}
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							disabled={!data || data.status !== "completed" || exporting}
+							onClick={handleExportPdf}
+							className="gap-2"
+						>
+							{exporting ? (
+								<Loader2 className="h-4 w-4 animate-spin" />
+							) : (
+								<Download className="h-4 w-4" />
+							)}
+							{exporting ? t("exportingPdf") : t("exportPdf")}
+						</Button>
+						<Button variant="outline" onClick={() => router.push("/")}>
+							{t("newSearch")}
+						</Button>
+					</div>
 				</div>
 
 				{/* Loading state */}
@@ -204,6 +250,7 @@ export default function QueryDetailPage() {
 						<ScreeningResultsCard
 							data={data}
 							connectionStatus={connectionStatus}
+							features={features}
 						/>
 					</>
 				)}
