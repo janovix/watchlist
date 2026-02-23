@@ -4,7 +4,12 @@ import type { OfacMatch, UnscMatch, Sat69bMatch } from "./watchlist-search";
 /**
  * Query status enum
  */
-export type QueryStatus = "pending" | "running" | "completed" | "failed";
+export type QueryStatus =
+	| "pending"
+	| "running"
+	| "completed"
+	| "partial"
+	| "failed";
 
 /**
  * Search query from GET /queries/:queryId

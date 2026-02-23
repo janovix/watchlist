@@ -46,7 +46,7 @@ export function RecentSearches({
 				</div>
 				<Link href="/queries">
 					<Button variant="outline" size="sm">
-						Ver todas
+						{t("viewAllQueries")}
 					</Button>
 				</Link>
 			</div>

@@ -48,10 +48,11 @@ describe("authClient", () => {
 		// Type assertion needed because mock returns simplified structure
 		const client = authClient as unknown as {
 			baseURL: string;
-			fetchOptions: { credentials: string };
+			fetchOptions: { credentials: string; onError: unknown };
 		};
 		expect(client.baseURL).toBe("https://auth.example.com");
-		expect(client.fetchOptions).toEqual({ credentials: "include" });
+		expect(client.fetchOptions.credentials).toBe("include");
+		expect(client.fetchOptions.onError).toBeTypeOf("function");
 		// Note: getAuthCoreBaseUrl is called at module load time, so it may not be tracked
 		// by the mock. We verify the result instead.
 	});

@@ -1,10 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { useJwt } from "./useJwt";
-import * as authClient from "@/lib/auth/authClient";
+import { tokenCache } from "@/lib/auth/tokenCache";
 
-vi.mock("@/lib/auth/authClient", () => ({
-	getClientJwt: vi.fn(),
+vi.mock("@/lib/auth/tokenCache", () => ({
+	tokenCache: {
+		getToken: vi.fn(),
+		clear: vi.fn(),
+	},
 }));
 
 describe("useJwt", () => {
@@ -12,9 +15,9 @@ describe("useJwt", () => {
 		vi.clearAllMocks();
 	});
 
-	it("should fetch JWT on mount", async () => {
+	it("should fetch JWT on mount via tokenCache", async () => {
 		const mockJwt = "test-jwt-token";
-		vi.mocked(authClient.getClientJwt).mockResolvedValue(mockJwt);
+		vi.mocked(tokenCache.getToken).mockResolvedValue(mockJwt);
 
 		const { result } = renderHook(() => useJwt());
 
@@ -27,12 +30,13 @@ describe("useJwt", () => {
 
 		expect(result.current.jwt).toBe(mockJwt);
 		expect(result.current.error).toBe(null);
-		expect(authClient.getClientJwt).toHaveBeenCalledOnce();
+		expect(tokenCache.getToken).toHaveBeenCalledOnce();
+		expect(tokenCache.getToken).toHaveBeenCalledWith(false);
 	});
 
 	it("should handle JWT fetch error", async () => {
 		const mockError = new Error("Failed to fetch JWT");
-		vi.mocked(authClient.getClientJwt).mockRejectedValue(mockError);
+		vi.mocked(tokenCache.getToken).mockRejectedValue(mockError);
 
 		const { result } = renderHook(() => useJwt());
 
@@ -46,7 +50,7 @@ describe("useJwt", () => {
 	});
 
 	it("should handle null JWT response", async () => {
-		vi.mocked(authClient.getClientJwt).mockResolvedValue(null);
+		vi.mocked(tokenCache.getToken).mockResolvedValue(null);
 
 		const { result } = renderHook(() => useJwt());
 
@@ -59,7 +63,7 @@ describe("useJwt", () => {
 	});
 
 	it("should handle non-Error rejection", async () => {
-		vi.mocked(authClient.getClientJwt).mockRejectedValue("String error");
+		vi.mocked(tokenCache.getToken).mockRejectedValue("String error");
 
 		const { result } = renderHook(() => useJwt());
 
@@ -72,9 +76,9 @@ describe("useJwt", () => {
 		expect(result.current.error?.message).toBe("Failed to fetch JWT");
 	});
 
-	it("should refetch JWT when refetch is called", async () => {
+	it("should force-refresh when refetch is called", async () => {
 		const mockJwt = "test-jwt-token";
-		vi.mocked(authClient.getClientJwt).mockResolvedValue(mockJwt);
+		vi.mocked(tokenCache.getToken).mockResolvedValue(mockJwt);
 
 		const { result } = renderHook(() => useJwt());
 
@@ -82,10 +86,12 @@ describe("useJwt", () => {
 			expect(result.current.isLoading).toBe(false);
 		});
 
-		expect(authClient.getClientJwt).toHaveBeenCalledTimes(1);
+		expect(tokenCache.getToken).toHaveBeenCalledTimes(1);
+		expect(tokenCache.getToken).toHaveBeenLastCalledWith(false);
 
-		await result.current.refetch();
+		await act(() => result.current.refetch());
 
-		expect(authClient.getClientJwt).toHaveBeenCalledTimes(2);
+		expect(tokenCache.getToken).toHaveBeenCalledTimes(2);
+		expect(tokenCache.getToken).toHaveBeenLastCalledWith(true);
 	});
 });

@@ -21,12 +21,14 @@ export const translations = {
 		searchIndividualPlaceholder: "BUSCAR INDIVIDUO...",
 		searchCompanyPlaceholder: "BUSCAR EMPRESA...",
 
-		// Recent Searches
-		recentSearches: "Búsquedas recientes",
-		noRecentSearches: "No hay búsquedas recientes",
+		// Recent Searches / Queries
+		recentSearches: "Consultas recientes",
+		noRecentSearches: "No hay consultas recientes",
 		noRecentSearchesDescription:
-			"Realiza tu primera verificación PEP para ver tus búsquedas aquí.",
-		startFirstSearch: "Realizar primera búsqueda",
+			"Realiza tu primera verificación PEP para ver tus consultas aquí.",
+		startFirstSearch: "Realizar primera consulta",
+		newQuery: "Nueva Consulta",
+		viewAllQueries: "Ver todas las consultas",
 
 		// Loading View
 		verifyingIdentity: "Verificando identidad",
@@ -155,6 +157,11 @@ export const translations = {
 		errorHome: "Inicio",
 		errorTryAgain: "Intentar de nuevo",
 		errorSignIn: "Iniciar sesión",
+		errorRateLimitTitle: "Demasiadas solicitudes",
+		errorRateLimitDescription:
+			"Estamos recibiendo demasiadas solicitudes desde tu IP. Por favor espera {seconds} segundos.",
+		errorRateLimitDescriptionReady: "Ya puedes intentarlo de nuevo.",
+		errorRateLimitRetry: "Reintentar",
 
 		// Common additions
 		dismiss: "Descartar",
@@ -378,12 +385,14 @@ export const translations = {
 		searchIndividualPlaceholder: "SEARCH INDIVIDUAL...",
 		searchCompanyPlaceholder: "SEARCH COMPANY...",
 
-		// Recent Searches
-		recentSearches: "Recent searches",
-		noRecentSearches: "No recent searches",
+		// Recent Searches / Queries
+		recentSearches: "Recent queries",
+		noRecentSearches: "No recent queries",
 		noRecentSearchesDescription:
-			"Start your first PEP verification to see your searches here.",
-		startFirstSearch: "Start first search",
+			"Start your first PEP verification to see your queries here.",
+		startFirstSearch: "Start first query",
+		newQuery: "New Query",
+		viewAllQueries: "View all queries",
 
 		// Loading View
 		verifyingIdentity: "Verifying identity",
@@ -510,6 +519,11 @@ export const translations = {
 		errorHome: "Home",
 		errorTryAgain: "Try again",
 		errorSignIn: "Sign in",
+		errorRateLimitTitle: "Too many requests",
+		errorRateLimitDescription:
+			"We're receiving too many requests from your IP. Please wait {seconds} seconds.",
+		errorRateLimitDescriptionReady: "You can try again now.",
+		errorRateLimitRetry: "Retry",
 
 		// Common additions
 		dismiss: "Dismiss",

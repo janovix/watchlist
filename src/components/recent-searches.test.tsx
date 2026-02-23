@@ -214,7 +214,7 @@ describe("RecentSearches", () => {
 		expect(listContainer).toBeFalsy();
 	});
 
-	it("should render a 'Ver todas' link", () => {
+	it("should render a link to /queries", () => {
 		render(
 			<RecentSearches
 				searches={mockSearches}
@@ -223,7 +223,7 @@ describe("RecentSearches", () => {
 			/>,
 		);
 
-		const link = screen.getByRole("link", { name: /ver todas/i });
+		const link = screen.getByRole("link");
 		expect(link).toHaveAttribute("href", "/queries");
 	});
 });

@@ -11,6 +11,7 @@ import {
 	ChevronRight,
 	Download,
 	Loader2,
+	Plus,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { listQueries, getQuery, type QueryListItem } from "@/lib/api/queries";
@@ -323,10 +324,14 @@ export default function QueriesPage() {
 			<div className="max-w-6xl mx-auto flex-1 flex flex-col w-full">
 				{/* Header */}
 				<div className="mb-8">
-					<div className="flex items-center gap-3 mb-4">
+					<div className="flex items-start justify-between gap-4 mb-4">
 						<h1 className="text-2xl md:text-4xl font-bold">
 							{t("queryHistoryTitle")}
 						</h1>
+						<Button onClick={() => router.push("/")} className="shrink-0 gap-2">
+							<Plus className="h-4 w-4" />
+							{t("newQuery")}
+						</Button>
 					</div>
 					<p className="text-muted-foreground">
 						{t("queryHistoryDescription")}

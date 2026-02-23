@@ -38,6 +38,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		pending: "secondary",
 		running: "default",
 		completed: "outline",
+		partial: "secondary",
 		failed: "destructive",
 	};
 	const { t } = useLanguage();
@@ -45,6 +46,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		pending: t("statusPending"),
 		running: t("statusRunning"),
 		completed: t("statusCompleted"),
+		partial: t("statusPartial"),
 		failed: t("statusFailed"),
 	};
 	return (

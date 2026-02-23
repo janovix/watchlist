@@ -2,6 +2,13 @@ import { createAuthClient } from "better-auth/client";
 import { jwtClient, organizationClient } from "better-auth/client/plugins";
 import { getAuthCoreBaseUrl } from "./config";
 
+export interface RateLimitEventDetail {
+	retryAfter: number;
+	url?: string;
+}
+
+export const AUTH_RATE_LIMIT_EVENT = "auth:rate-limited";
+
 /**
  * Better Auth client instance
  * Configured with credentials: "include" to ensure cookies are sent/received
@@ -10,6 +17,27 @@ export const authClient = createAuthClient({
 	baseURL: getAuthCoreBaseUrl(),
 	fetchOptions: {
 		credentials: "include",
+		onError: async (context) => {
+			const { response } = context;
+
+			if (response.status === 429) {
+				const retryAfterHeader = response.headers.get("X-Retry-After");
+				if (!retryAfterHeader) return;
+
+				const retryAfter = parseInt(retryAfterHeader, 10);
+				if (isNaN(retryAfter) || retryAfter <= 0) return;
+
+				if (typeof window !== "undefined") {
+					const detail: RateLimitEventDetail = {
+						retryAfter,
+						url: response.url,
+					};
+					window.dispatchEvent(
+						new CustomEvent(AUTH_RATE_LIMIT_EVENT, { detail }),
+					);
+				}
+			}
+		},
 	},
 	plugins: [jwtClient(), organizationClient()],
 });

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { RateLimitBlocker } from "@/components/rate-limit-blocker";
 import { SessionHydrator } from "@/lib/auth/useAuthSession";
 import { getServerSession } from "@/lib/auth/getServerSession";
 import { SettingsProvider } from "@/lib/settings";
@@ -62,6 +63,7 @@ export default async function RootLayout({
 								</SubscriptionProvider>
 							</SessionHydrator>
 							<Toaster />
+							<RateLimitBlocker />
 						</ThemeProvider>
 					</LanguageProvider>
 				</SettingsProvider>
