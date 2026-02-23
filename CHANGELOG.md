@@ -1,3 +1,10 @@
+# [1.1.0-rc.19](https://github.com/janovix/watchlist/compare/v1.1.0-rc.18...v1.1.0-rc.19) (2026-02-23)
+
+
+### Features
+
+* integrate RateLimitBlocker component and enhance query status handling with partial state ([db5b8c4](https://github.com/janovix/watchlist/commit/db5b8c436d80d42e01b830f6b9c0e426faf68a5e))
+
 # [1.1.0-rc.18](https://github.com/janovix/watchlist/compare/v1.1.0-rc.17...v1.1.0-rc.18) (2026-02-23)
 
 
