@@ -162,7 +162,7 @@ export default function QueryDetailPage() {
 		<main className="flex-1 flex flex-col">
 			<div className="flex-1 px-4 sm:px-6 py-6 sm:py-8 max-w-3xl mx-auto w-full space-y-6">
 				{/* Back + New Search */}
-				<div className="flex items-center justify-between">
+				<div className="flex flex-wrap items-center justify-between gap-2">
 					<Button
 						variant="ghost"
 						className="-ml-2"
@@ -171,7 +171,7 @@ export default function QueryDetailPage() {
 						<ArrowLeft className="h-4 w-4 mr-2" />
 						{t("backToQueries")}
 					</Button>
-					<div className="flex items-center gap-2">
+					<div className="flex flex-wrap items-center gap-2">
 						<Button
 							variant="outline"
 							size="sm"
@@ -186,7 +186,11 @@ export default function QueryDetailPage() {
 							)}
 							{exporting ? t("exportingPdf") : t("exportPdf")}
 						</Button>
-						<Button variant="outline" onClick={() => router.push("/")}>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => router.push("/")}
+						>
 							{t("newSearch")}
 						</Button>
 					</div>
@@ -208,18 +212,18 @@ export default function QueryDetailPage() {
 					<>
 						{/* Header */}
 						<div className="flex items-start justify-between gap-4">
-							<div>
+							<div className="min-w-0 flex-1">
 								<div className="flex items-center gap-3 mb-1">
 									{data.entityType === "individual" ? (
-										<User className="h-5 w-5 text-muted-foreground" />
+										<User className="h-5 w-5 text-muted-foreground shrink-0" />
 									) : data.entityType === "company" ? (
-										<Building2 className="h-5 w-5 text-muted-foreground" />
+										<Building2 className="h-5 w-5 text-muted-foreground shrink-0" />
 									) : null}
-									<h1 className="text-2xl font-bold font-mono uppercase">
+									<h1 className="text-2xl font-bold font-mono uppercase wrap-break-word">
 										{data.query}
 									</h1>
 								</div>
-								<div className="flex items-center gap-3 text-sm text-muted-foreground">
+								<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
 									{data.entityType && (
 										<>
 											<span className="capitalize">{data.entityType}</span>
