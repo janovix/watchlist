@@ -1,3 +1,10 @@
+# [1.1.0-rc.18](https://github.com/janovix/watchlist/compare/v1.1.0-rc.17...v1.1.0-rc.18) (2026-02-23)
+
+
+### Features
+
+* enhance QueriesPage and QueryDetailPage with PDF export functionality and organization selection ([81e7e1f](https://github.com/janovix/watchlist/commit/81e7e1f9826a101d424e77c82d166a44e99f3aac))
+
 # [1.1.0-rc.17](https://github.com/janovix/watchlist/compare/v1.1.0-rc.16...v1.1.0-rc.17) (2026-02-23)
 
 
