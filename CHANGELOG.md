@@ -1,3 +1,10 @@
+# [1.1.0-rc.20](https://github.com/janovix/watchlist/compare/v1.1.0-rc.19...v1.1.0-rc.20) (2026-02-24)
+
+
+### Bug Fixes
+
+* update default values for topK and threshold in WatchlistSearchRequest ([10feefd](https://github.com/janovix/watchlist/commit/10feefd0eec476fecc1eafd3eda527149856d6cf))
+
 # [1.1.0-rc.19](https://github.com/janovix/watchlist/compare/v1.1.0-rc.18...v1.1.0-rc.19) (2026-02-23)
 
 
