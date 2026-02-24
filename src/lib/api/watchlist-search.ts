@@ -88,8 +88,8 @@ export interface WatchlistSearchRequest {
 	countries?: string[]; // Optional: country filter
 	birthDate?: string; // Optional: for meta scoring
 	identifiers?: string[]; // Optional: exact identifier lookup
-	topK?: number; // Default: 20
-	threshold?: number; // Default: 0.80
+	topK?: number; // Default: 50
+	threshold?: number; // Default: 0.70
 }
 
 /**
