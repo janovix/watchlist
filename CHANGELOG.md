@@ -1,3 +1,10 @@
+# [1.1.0-rc.21](https://github.com/janovix/watchlist/compare/v1.1.0-rc.20...v1.1.0-rc.21) (2026-02-25)
+
+
+### Features
+
+* add environment variable management and update landing page links ([f103683](https://github.com/janovix/watchlist/commit/f1036838adecd3b036902a197dea259ebced4fd2))
+
 # [1.1.0-rc.20](https://github.com/janovix/watchlist/compare/v1.1.0-rc.19...v1.1.0-rc.20) (2026-02-24)
 
 
