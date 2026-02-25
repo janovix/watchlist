@@ -120,21 +120,7 @@ export interface QueriesApiOptions {
  */
 function getWatchlistApiBaseUrl(): string {
 	return (
-		process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ??
-		"https://watchlist-svc.janovix.workers.dev"
-	);
-}
-
-/**
- * Base URL for the watchlist service API (server-side).
- * During local development, uses the internal URL (localhost).
- * For production, uses the public URL.
- */
-function getWatchlistApiServerUrl(): string {
-	return (
-		process.env.WATCHLIST_API_BASE_URL_INTERNAL ??
-		process.env.WATCHLIST_API_BASE_URL ??
-		process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ??
+		process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ||
 		"https://watchlist-svc.janovix.workers.dev"
 	);
 }

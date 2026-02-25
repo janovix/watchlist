@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { getPrivacyUrl, getTermsUrl } from "@/lib/config-urls";
 import { useLanguage } from "@/components/language-provider";
 import {
 	Accordion,
@@ -156,7 +157,7 @@ export default function InfoPage() {
 						<div className="flex items-center gap-4">
 							<span>&copy; {new Date().getFullYear()} Janovix</span>
 							<a
-								href="https://janovix.com/privacy"
+								href={getPrivacyUrl()}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
@@ -164,7 +165,7 @@ export default function InfoPage() {
 								{t("privacy")}
 							</a>
 							<a
-								href="https://janovix.com/terms"
+								href={getTermsUrl()}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"

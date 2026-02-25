@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/logo";
+import { getPrivacyUrl, getTermsUrl } from "@/lib/config-urls";
 import {
 	ArrowLeft,
 	AlertCircle,
@@ -271,7 +272,7 @@ export default function QueryDetailPage() {
 					<div className="flex items-center gap-4">
 						<span>&copy; {new Date().getFullYear()} Janovix</span>
 						<a
-							href="https://janovix.com/privacy"
+							href={getPrivacyUrl()}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="hover:text-foreground transition-colors"
@@ -279,7 +280,7 @@ export default function QueryDetailPage() {
 							{t("privacy")}
 						</a>
 						<a
-							href="https://janovix.com/terms"
+							href={getTermsUrl()}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="hover:text-foreground transition-colors"

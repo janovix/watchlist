@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TypeSwitch } from "@/components/type-switch";
 import { Label } from "@/components/ui/label";
+import { getPrivacyUrl, getTermsUrl } from "@/lib/config-urls";
 import { useLanguage } from "@/components/language-provider";
 import { RecentSearches } from "@/components/recent-searches";
 import {
@@ -263,7 +264,7 @@ export default function HomePage() {
 					<div className="flex items-center gap-4">
 						<span>&copy; {new Date().getFullYear()} Janovix</span>
 						<a
-							href="https://janovix.com/privacy"
+							href={getPrivacyUrl()}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="hover:text-foreground transition-colors"
@@ -271,7 +272,7 @@ export default function HomePage() {
 							{t("privacy")}
 						</a>
 						<a
-							href="https://janovix.com/terms"
+							href={getTermsUrl()}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="hover:text-foreground transition-colors"

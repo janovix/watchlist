@@ -13,7 +13,7 @@ interface ConfigResponse {
 
 function getWatchlistApiBaseUrl(): string {
 	return (
-		process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ??
+		process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ||
 		"https://watchlist-svc.janovix.workers.dev"
 	);
 }

@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { requireEnv } from "@/lib/env";
 import { getQuery, type SearchQuery } from "@/lib/api/queries";
 
 export type ConnectionStatus =
@@ -97,9 +98,10 @@ export function useSearchQuery({
 
 		disconnectSSE();
 
-		const baseUrl =
-			process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL ??
-			"https://watchlist-svc.janovix.workers.dev";
+		const baseUrl = requireEnv(
+			"NEXT_PUBLIC_WATCHLIST_API_BASE_URL",
+			process.env.NEXT_PUBLIC_WATCHLIST_API_BASE_URL,
+		);
 
 		const url = jwt
 			? `${baseUrl}/events/${queryId}?token=${encodeURIComponent(jwt)}`

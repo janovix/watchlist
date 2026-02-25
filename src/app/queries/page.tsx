@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { listQueries, getQuery, type QueryListItem } from "@/lib/api/queries";
+import { getPrivacyUrl, getTermsUrl } from "@/lib/config-urls";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -531,7 +532,7 @@ export default function QueriesPage() {
 						<div className="flex items-center gap-4">
 							<span>&copy; {new Date().getFullYear()} Janovix</span>
 							<a
-								href="https://janovix.com/privacy"
+								href={getPrivacyUrl()}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
@@ -539,7 +540,7 @@ export default function QueriesPage() {
 								{t("privacy")}
 							</a>
 							<a
-								href="https://janovix.com/terms"
+								href={getTermsUrl()}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="hover:text-foreground transition-colors"
