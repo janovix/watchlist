@@ -18,6 +18,9 @@ describe("middleware", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		process.env = { ...originalEnv };
+		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL =
+			"https://auth-svc.example.workers.dev";
+		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://auth.example.workers.dev";
 	});
 
 	afterEach(() => {
@@ -41,16 +44,13 @@ describe("middleware", () => {
 		);
 	});
 
-	it("should use fallback auth URL when env var is not set", async () => {
+	it("should throw when NEXT_PUBLIC_AUTH_APP_URL env var is not set", async () => {
 		mockGetSessionCookie.mockReturnValue(null);
 		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
 
 		const request = new NextRequest("https://example.com/page");
-		const response = await middleware(request);
-
-		expect(response.status).toBe(307);
-		expect(response.headers.get("location")).toContain(
-			"https://auth.example.workers.dev/login",
+		await expect(middleware(request)).rejects.toThrow(
+			"Missing required environment variable: NEXT_PUBLIC_AUTH_APP_URL",
 		);
 	});
 
@@ -232,47 +232,5 @@ describe("middleware", () => {
 			),
 		);
 		expect(location).not.toContain("localhost:3002");
-	});
-
-	it("should use internal auth service URL when NEXT_PUBLIC_AUTH_SERVICE_URL_INTERNAL is set", async () => {
-		mockGetSessionCookie.mockReturnValue("session-token-123");
-		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL_INTERNAL = "http://localhost:8787";
-		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL =
-			"https://auth-svc-local.janovix.workers.dev";
-
-		mockFetch
-			.mockResolvedValueOnce({
-				ok: true,
-				headers: {
-					getSetCookie: () => [],
-				},
-				json: () =>
-					Promise.resolve({
-						session: { id: "123" },
-						user: { id: "u1", name: "John Doe" },
-					}),
-			})
-			.mockResolvedValueOnce({
-				ok: true,
-				headers: {
-					getSetCookie: () => [],
-				},
-				json: () =>
-					Promise.resolve({
-						success: true,
-						data: [
-							{ id: "org1", slug: "acme", name: "Acme Inc", role: "owner" },
-						],
-					}),
-			});
-
-		const request = new NextRequest("https://example.com/dashboard");
-		await middleware(request);
-
-		// Should use internal URL for fetch
-		expect(mockFetch).toHaveBeenCalledWith(
-			"http://localhost:8787/api/auth/get-session",
-			expect.any(Object),
-		);
 	});
 });
