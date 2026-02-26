@@ -53,6 +53,13 @@
 * **watchlist:** add UNSC results section to search results page ([bd2c586](https://github.com/janovix/watchlist/commit/bd2c5867b027ca6e135f8febfda65459d6a1e70c))
 * **watchlist:** implement advanced search functionality with new API integration ([42f6406](https://github.com/janovix/watchlist/commit/42f6406557e91c99c459f2081b6bc5aa2743987a))
 
+# [1.1.0-rc.22](https://github.com/janovix/watchlist/compare/v1.1.0-rc.21...v1.1.0-rc.22) (2026-02-26)
+
+### Features
+
+* enhance organization fetching to include user membership role ([a59f3e3](https://github.com/janovix/watchlist/commit/a59f3e3b620f199a22e86afe85fcb4511c414942))
+
+
 # [1.1.0-rc.21](https://github.com/janovix/watchlist/compare/v1.1.0-rc.20...v1.1.0-rc.21) (2026-02-25)
 
 
