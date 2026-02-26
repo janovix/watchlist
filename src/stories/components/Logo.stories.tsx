@@ -35,7 +35,6 @@ export const LogoLight: Story = {
 		variant: "logo",
 		width: 102,
 		height: 16,
-		forceTheme: "light",
 	},
 	parameters: {
 		docs: {
@@ -52,7 +51,6 @@ export const LogoDark: Story = {
 		variant: "logo",
 		width: 102,
 		height: 16,
-		forceTheme: "dark",
 	},
 	parameters: {
 		docs: {
@@ -78,7 +76,6 @@ export const IconLight: Story = {
 		variant: "icon",
 		width: 200,
 		height: 200,
-		forceTheme: "light",
 	},
 	parameters: {
 		docs: {
@@ -95,7 +92,6 @@ export const IconDark: Story = {
 		variant: "icon",
 		width: 200,
 		height: 200,
-		forceTheme: "dark",
 	},
 	parameters: {
 		docs: {
@@ -153,7 +149,6 @@ export const LogoSmall: Story = {
 		variant: "logo",
 		width: 76,
 		height: 12,
-		forceTheme: "light",
 	},
 	parameters: {
 		docs: {
@@ -170,7 +165,6 @@ export const IconSmall: Story = {
 		variant: "icon",
 		width: 64,
 		height: 64,
-		forceTheme: "light",
 	},
 	parameters: {
 		docs: {

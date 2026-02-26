@@ -174,8 +174,7 @@ describe("UserMenu", () => {
 		});
 	});
 
-	it("should call action when menu item is clicked", async () => {
-		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+	it("should render profile as a link to auth app", async () => {
 		const { container } = renderWithProvider(<UserMenu />);
 
 		const button = container.querySelector(
@@ -186,26 +185,19 @@ describe("UserMenu", () => {
 		}
 
 		await waitFor(() => {
-			const profileButtons = screen.queryAllByText(/Profile|Perfil/i);
-			expect(profileButtons.length).toBeGreaterThan(0);
-			// Click the first profile button (should be in the menu)
-			const profileButton =
-				profileButtons.find((btn) => btn.closest(".absolute")) ||
-				profileButtons[0];
-			if (profileButton) {
-				fireEvent.click(profileButton);
-			}
+			const profileLinks = screen.queryAllByText(/Profile|Perfil/i);
+			expect(profileLinks.length).toBeGreaterThan(0);
+			// Profile should be a link to auth app settings
+			const profileLink =
+				profileLinks.find((el) => el.closest("a")) || profileLinks[0];
+			expect(profileLink?.closest("a")).toHaveAttribute(
+				"href",
+				expect.stringContaining("/settings"),
+			);
 		});
-
-		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith("Profile clicked");
-		});
-
-		consoleSpy.mockRestore();
 	});
 
-	it("should close menu after clicking a menu item", async () => {
-		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+	it("should render settings as a link to auth app", async () => {
 		const { container } = renderWithProvider(<UserMenu />);
 
 		const button = container.querySelector(
@@ -216,24 +208,16 @@ describe("UserMenu", () => {
 		}
 
 		await waitFor(() => {
-			const settingsButtons = screen.queryAllByText(/Settings|Configuración/i);
-			expect(settingsButtons.length).toBeGreaterThan(0);
-			// Click the first settings button (should be in the menu)
-			const settingsButton =
-				settingsButtons.find((btn) => btn.closest(".absolute")) ||
-				settingsButtons[0];
-			if (settingsButton) {
-				fireEvent.click(settingsButton);
-			}
+			const settingsLinks = screen.queryAllByText(/Settings|Configuración/i);
+			expect(settingsLinks.length).toBeGreaterThan(0);
+			// Settings should be a link to auth app settings
+			const settingsLink =
+				settingsLinks.find((el) => el.closest("a")) || settingsLinks[0];
+			expect(settingsLink?.closest("a")).toHaveAttribute(
+				"href",
+				expect.stringContaining("/settings"),
+			);
 		});
-
-		await waitFor(() => {
-			// Menu should close - check that dropdown is not visible
-			const menuDropdown = container.querySelector(".absolute.right-0.mt-2");
-			expect(menuDropdown).not.toBeInTheDocument();
-		});
-
-		consoleSpy.mockRestore();
 	});
 
 	it("should display logout button", async () => {

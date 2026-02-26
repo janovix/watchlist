@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getAuthCoreBaseUrl, getAuthAppUrl } from "./config";
+import { getAuthCoreServerUrl, getAuthAppUrl } from "./config";
 import type { Session } from "./types";
 
 /**
@@ -18,7 +18,7 @@ export async function getServerSession(): Promise<Session> {
 
 	try {
 		const response = await fetch(
-			`${getAuthCoreBaseUrl()}/api/auth/get-session`,
+			`${getAuthCoreServerUrl()}/api/auth/get-session`,
 			{
 				headers: {
 					Cookie: cookieHeader,

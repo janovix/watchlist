@@ -1,3 +1,182 @@
+# [1.1.0-rc.21](https://github.com/janovix/watchlist/compare/v1.1.0-rc.20...v1.1.0-rc.21) (2026-02-25)
+
+
+### Features
+
+* add environment variable management and update landing page links ([f103683](https://github.com/janovix/watchlist/commit/f1036838adecd3b036902a197dea259ebced4fd2))
+
+# [1.1.0-rc.20](https://github.com/janovix/watchlist/compare/v1.1.0-rc.19...v1.1.0-rc.20) (2026-02-24)
+
+
+### Bug Fixes
+
+* update default values for topK and threshold in WatchlistSearchRequest ([10feefd](https://github.com/janovix/watchlist/commit/10feefd0eec476fecc1eafd3eda527149856d6cf))
+
+# [1.1.0-rc.19](https://github.com/janovix/watchlist/compare/v1.1.0-rc.18...v1.1.0-rc.19) (2026-02-23)
+
+
+### Features
+
+* integrate RateLimitBlocker component and enhance query status handling with partial state ([db5b8c4](https://github.com/janovix/watchlist/commit/db5b8c436d80d42e01b830f6b9c0e426faf68a5e))
+
+# [1.1.0-rc.18](https://github.com/janovix/watchlist/compare/v1.1.0-rc.17...v1.1.0-rc.18) (2026-02-23)
+
+
+### Features
+
+* enhance QueriesPage and QueryDetailPage with PDF export functionality and organization selection ([81e7e1f](https://github.com/janovix/watchlist/commit/81e7e1f9826a101d424e77c82d166a44e99f3aac))
+
+# [1.1.0-rc.17](https://github.com/janovix/watchlist/compare/v1.1.0-rc.16...v1.1.0-rc.17) (2026-02-23)
+
+
+### Features
+
+* add external link dialog component and integrate with screening results card for improved user experience ([9bf39f0](https://github.com/janovix/watchlist/commit/9bf39f0d67720d06317a79f4a73cb0610ca67285))
+
+# [1.1.0-rc.16](https://github.com/janovix/watchlist/compare/v1.1.0-rc.15...v1.1.0-rc.16) (2026-02-20)
+
+
+### Features
+
+* enhance RecentSearches component with loading state and improve layout in QueryDetailSkeleton ([d06f585](https://github.com/janovix/watchlist/commit/d06f585f257fd43435a2ab9def67be097d2b2a05))
+
+# [1.1.0-rc.15](https://github.com/janovix/watchlist/compare/v1.1.0-rc.14...v1.1.0-rc.15) (2026-02-20)
+
+
+### Features
+
+* update styles and layout for improved UI and user experience ([bc12b77](https://github.com/janovix/watchlist/commit/bc12b77eabdcb577e99cde3c4983533b4022c850))
+
+# [1.1.0-rc.14](https://github.com/janovix/watchlist/compare/v1.1.0-rc.13...v1.1.0-rc.14) (2026-02-19)
+
+
+### Features
+
+* update logo component to use CSS custom properties for theming ([3956f26](https://github.com/janovix/watchlist/commit/3956f26b7d62aad915f955b4424110454a289abd))
+
+# [1.1.0-rc.13](https://github.com/janovix/watchlist/compare/v1.1.0-rc.12...v1.1.0-rc.13) (2026-02-17)
+
+
+### Features
+
+* implement real-time search query updates with useSearchQuery hook and add ScreeningResultsCard component ([b607867](https://github.com/janovix/watchlist/commit/b607867f96f4834b85151fcde3249eb56e5e5237))
+
+# [1.1.0-rc.12](https://github.com/janovix/watchlist/compare/v1.1.0-rc.11...v1.1.0-rc.12) (2026-02-17)
+
+
+### Bug Fixes
+
+* update canSubmit condition to include jwtLoading state ([a3281b6](https://github.com/janovix/watchlist/commit/a3281b6eb8829db53eda83f95b018b9d7a4ce2ac))
+
+# [1.1.0-rc.11](https://github.com/janovix/watchlist/compare/v1.1.0-rc.10...v1.1.0-rc.11) (2026-02-17)
+
+
+### Bug Fixes
+
+* **middleware:** enhance session cookie handling in middleware to prevent premature session expiration ([4a35396](https://github.com/janovix/watchlist/commit/4a3539659688d5d4242594fc27d77fb2f99adaa9))
+
+# [1.1.0-rc.10](https://github.com/janovix/watchlist/compare/v1.1.0-rc.9...v1.1.0-rc.10) (2026-02-16)
+
+
+### Features
+
+* add LanguageProvider and update auth service URL handling ([9c1f67f](https://github.com/janovix/watchlist/commit/9c1f67f42a2476576b43614c635bd4d594a5d8e1))
+
+# [1.1.0-rc.9](https://github.com/janovix/watchlist/compare/v1.1.0-rc.8...v1.1.0-rc.9) (2026-02-16)
+
+
+### Features
+
+* add background animation and new info and queries pages ([ad63c94](https://github.com/janovix/watchlist/commit/ad63c9488012e6855ce76a8ac49b86f63b63631c))
+
+# [1.1.0-rc.8](https://github.com/janovix/watchlist/compare/v1.1.0-rc.7...v1.1.0-rc.8) (2026-02-13)
+
+
+### Features
+
+* **watchlist:** add UNSC results section to search results page ([bd2c586](https://github.com/janovix/watchlist/commit/bd2c5867b027ca6e135f8febfda65459d6a1e70c))
+
+# [1.1.0-rc.7](https://github.com/janovix/watchlist/compare/v1.1.0-rc.6...v1.1.0-rc.7) (2026-02-13)
+
+
+### Features
+
+* **ResultPage:** add SAT 69-B results section and update translations ([ff91d50](https://github.com/janovix/watchlist/commit/ff91d50b8cc43698066f481c3ea51c0ff9ba1d71))
+
+# [1.1.0-rc.6](https://github.com/janovix/watchlist/compare/v1.1.0-rc.5...v1.1.0-rc.6) (2026-02-12)
+
+
+### Features
+
+* **subscription:** add SubscriptionProvider to layout and enhance usage limit error handling in watchlist search ([bc1f66f](https://github.com/janovix/watchlist/commit/bc1f66f4535d009fa95bb2b58093f7b85179f13a))
+
+# [1.1.0-rc.5](https://github.com/janovix/watchlist/compare/v1.1.0-rc.4...v1.1.0-rc.5) (2026-02-12)
+
+
+### Features
+
+* **ResultPage:** integrate PEP search functionality with SSE support and display results ([17635b8](https://github.com/janovix/watchlist/commit/17635b86330a0e7688ee1dd86ced48c57c81ad9f))
+
+# [1.1.0-rc.4](https://github.com/janovix/watchlist/compare/v1.1.0-rc.3...v1.1.0-rc.4) (2026-02-11)
+
+
+### Bug Fixes
+
+* **middleware:** update matcher to exclude 'monitoring' from route handling ([6a55ad5](https://github.com/janovix/watchlist/commit/6a55ad524de5c8a6aa349f4e0014f214f1583546))
+
+# [1.1.0-rc.3](https://github.com/janovix/watchlist/compare/v1.1.0-rc.2...v1.1.0-rc.3) (2026-02-11)
+
+
+### Bug Fixes
+
+* **ResultPage:** prevent search execution until JWT is fully loaded ([8f63438](https://github.com/janovix/watchlist/commit/8f6343853a5d013919dca96369c3883cb158c329))
+
+
+### Features
+
+* **watchlist:** implement advanced search functionality with new API integration ([42f6406](https://github.com/janovix/watchlist/commit/42f6406557e91c99c459f2081b6bc5aa2743987a))
+
+# [1.1.0-rc.2](https://github.com/janovix/watchlist/compare/v1.1.0-rc.1...v1.1.0-rc.2) (2026-01-16)
+
+
+### Features
+
+* **middleware:** add onboarding redirection for users without a name or organization ([2daff26](https://github.com/janovix/watchlist/commit/2daff2648d95ef3a863db8743c5981c27488269e))
+* **middleware:** enhance session validation and add external URL handling for redirects ([e2f3f8e](https://github.com/janovix/watchlist/commit/e2f3f8e7da52a9b059fdfbac7e952a9582d4182d))
+* **subscription:** add SubscriptionBanner component and related functionality for subscription status notifications ([4cf6577](https://github.com/janovix/watchlist/commit/4cf65770a35d1199d7fbb0e1b9a056e156f76da0))
+
+# [1.1.0-rc.1](https://github.com/janovix/watchlist/compare/v1.0.0...v1.1.0-rc.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* **auth:** align logout logic with aml project ([566a7ee](https://github.com/janovix/watchlist/commit/566a7ee157b30542a2cb935c713674b2696b9919))
+* **auth:** align logout with aml - same function and better-auth v1.4.5 ([d13172a](https://github.com/janovix/watchlist/commit/d13172acb69ce706841fa7112ca9333ea25f12dc))
+* **auth:** prevent duplicate search requests by waiting for JWT to load ([6c9c0b6](https://github.com/janovix/watchlist/commit/6c9c0b662637d81985fdad208f11cee6e0640d50))
+* **auth:** remove SessionGuard to match aml middleware-only approach ([460d560](https://github.com/janovix/watchlist/commit/460d5601958f419821c1aa16cdad0866ebb89407))
+* **auth:** remove state update before logout to match aml ([4dcca67](https://github.com/janovix/watchlist/commit/4dcca678e484db8dfdd5d183ece4ec807bb86840))
+* **auth:** use authClient.signOut and redirect to /login path ([16fdb3e](https://github.com/janovix/watchlist/commit/16fdb3e41632a1b6045bc5559a779e446b431d4e))
+* **auth:** use authClient.signOut instead of manual fetch ([e47a480](https://github.com/janovix/watchlist/commit/e47a480c501d32601c9d06ee111c816dc944e2b0))
+* **auth:** use direct fetch with redirect manual on logout ([b39beae](https://github.com/janovix/watchlist/commit/b39beaebe6ebcb6e0e2033f9d60464d3555b81fd))
+* **auth:** use direct fetch with redirect manual to prevent auto-redirect ([3560853](https://github.com/janovix/watchlist/commit/3560853b61fdd1df97b0bd32712ed2a1e64ce7cc))
+* **auth:** use onSuccess callback in signOut to control redirect ([9855dea](https://github.com/janovix/watchlist/commit/9855deafeb6181a68fb45065e33cbc39f8caf472))
+* **middleware:** validate session with auth service ([6e175a1](https://github.com/janovix/watchlist/commit/6e175a18047659e5f05b59277b5afd47a2d65d37))
+
+
+### Features
+
+* Add auth module tests and utilities ([7f4999c](https://github.com/janovix/watchlist/commit/7f4999c22bbf6eb52b6faaf0d54fe2f000d0d729))
+* Add favicon ([b9cd8ce](https://github.com/janovix/watchlist/commit/b9cd8ce7448376df1d508bdc871cbca5d4bbdbb4))
+* Add PDF export functionality for search results ([9f17e4a](https://github.com/janovix/watchlist/commit/9f17e4ace09e436bed933c43c5593efe0a7439c5))
+* Add session guard and integrate auth ([262cb6e](https://github.com/janovix/watchlist/commit/262cb6e14fc7d95fab9d5de4ce994799314353f7))
+* Add tests for pep API and UI components ([5830183](https://github.com/janovix/watchlist/commit/5830183b2ffa7d9912312f8f7d6e9170a30ae931))
+* **auth:** add JWT authentication support for watchlist-svc API calls ([01a3eb9](https://github.com/janovix/watchlist/commit/01a3eb99142449e7759e0997195c40a442632a49))
+* Implement Better Auth integration ([1a76944](https://github.com/janovix/watchlist/commit/1a76944005e71b984f7159f48e64217a28f1c12d))
+* Integrate Sentry for error monitoring and tracing ([de433e7](https://github.com/janovix/watchlist/commit/de433e78c47daa8107d464ad5ff3eaf745aeb856))
+* **settings:** implement server settings management and context provider ([a06c6e8](https://github.com/janovix/watchlist/commit/a06c6e8cad51915c3076c2a32b48fcf1277a80f6))
+* **stories:** update LanguageToggle to support Portuguese and wrap components in ThemeProvider ([df3b0a9](https://github.com/janovix/watchlist/commit/df3b0a96b2389e962edf8a93f219aff8e8b2f3ed))
+* Use environment variables for Sentry config ([a7b1c38](https://github.com/janovix/watchlist/commit/a7b1c38abf1ee8c4609a32962b1599845d89d86f))
+
 # [1.1.0](https://github.com/janovix/watchlist/compare/v1.0.0...v1.1.0) (2026-01-10)
 
 

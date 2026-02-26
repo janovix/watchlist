@@ -2,109 +2,286 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { SearchForm } from "@/components/search-form";
-import { RecentSearches } from "@/components/recent-searches";
+import { ChevronRight, CalendarDays, Settings2 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { LanguageProvider, useLanguage } from "@/components/language-provider";
-import { type PEPResult } from "@/lib/mock-data";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { TypeSwitch } from "@/components/type-switch";
+import { Label } from "@/components/ui/label";
+import { getPrivacyUrl, getTermsUrl } from "@/lib/config-urls";
+import { useLanguage } from "@/components/language-provider";
+import { RecentSearches } from "@/components/recent-searches";
+import {
+	searchWatchlist,
+	type WatchlistSearchRequest,
+} from "@/lib/api/watchlist-search";
+import { listQueries } from "@/lib/api/queries";
+import { useJwt } from "@/hooks/useJwt";
+import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
+import { NoWatchlistAccess } from "@/components/subscription";
 
-function HomeContent() {
+export default function HomePage() {
 	const router = useRouter();
-	const [recentSearches, setRecentSearches] = useState<PEPResult[]>([]);
-	const [mounted, setMounted] = useState(false);
 	const { t } = useLanguage();
+	const [searchType, setSearchType] = useState<"individual" | "company">(
+		"individual",
+	);
+	const [query, setQuery] = useState("");
+	const [advancedOpen, setAdvancedOpen] = useState(false);
+	const [birthDate, setBirthDate] = useState("");
+	const [identifiers, setIdentifiers] = useState("");
+	const [isSearching, setIsSearching] = useState(false);
+	const [recentSearches, setRecentSearches] = useState<
+		{
+			id: string;
+			name: string;
+			entityType: "person" | "organization";
+			date: string;
+		}[]
+	>([]);
+	const [showRecent, setShowRecent] = useState(true);
+	const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
+	const { jwt, isLoading: jwtLoading } = useJwt();
+	const subscription = useSubscriptionSafe();
 
+	// Fetch recent searches on mount
 	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	// Cargar búsquedas recientes del sessionStorage
-	useEffect(() => {
-		if (!mounted) return;
-		try {
-			const stored = sessionStorage.getItem("pep-recent-searches");
-			if (stored) {
-				const parsed = JSON.parse(stored);
-				const restored = parsed.map((s: PEPResult) => ({
-					...s,
-					timestamp: new Date(s.timestamp),
-				}));
-				setRecentSearches(restored);
+		if (!jwt) return;
+		const fetchRecent = async () => {
+			setIsLoadingRecentSearches(true);
+			try {
+				const response = await listQueries({}, { jwt });
+				const recent = response.queries
+					.sort(
+						(a, b) =>
+							new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+					)
+					.slice(0, 5)
+					.map((q) => ({
+						id: q.id,
+						name: q.query,
+						entityType: q.entityType as "person" | "organization",
+						date: new Date(q.createdAt).toLocaleString(),
+					}));
+				setRecentSearches(recent);
+			} catch (error) {
+				console.error("Error fetching recent searches:", error);
+			} finally {
+				setIsLoadingRecentSearches(false);
 			}
-		} catch (e) {
-			console.log("[v0] Error loading recent searches:", e);
-		}
-	}, [mounted]);
+		};
+		fetchRecent();
+	}, [jwt]);
 
-	const handleSearch = (name: string) => {
-		// Generate a query ID
-		const queryId = crypto.randomUUID();
-
-		// Store pending search in sessionStorage
-		try {
-			sessionStorage.setItem(
-				`pep-pending-${queryId}`,
-				JSON.stringify({ searchName: name }),
-			);
-		} catch (e) {
-			console.log("[v0] Error saving pending search:", e);
-		}
-
-		// Redirect to the query page
-		router.push(`/${queryId}`);
-	};
-
-	const handleStartSearch = () => {
-		// Focus the search input on the page
-		const searchInput = document.getElementById(
-			"pep-search-input",
-		) as HTMLInputElement;
-		if (searchInput) {
-			searchInput.focus();
-		}
-	};
-
-	if (!mounted) {
-		return (
-			<main className="min-h-screen bg-background flex items-center justify-center">
-				<div className="flex items-center gap-3">
-					<Logo variant="icon" width={32} height={32} />
-					<span className="text-muted-foreground">{t("loading")}</span>
-				</div>
-			</main>
-		);
+	// Check watchlist product access
+	if (subscription?.isLoading) {
+		return <NoWatchlistAccess isLoading />;
 	}
 
-	return (
-		<main className="min-h-screen bg-background flex flex-col">
-			<Header />
+	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
+		return <NoWatchlistAccess />;
+	}
 
-			{/* Main Content */}
-			<div className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] py-6 sm:py-8 px-4">
-				<div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 sm:gap-8">
-					{/* Search Input - Centered */}
-					<div className="w-full">
-						<SearchForm onSearch={handleSearch} isLoading={false} />
+	const handleSearch = async (searchQuery?: string) => {
+		const queryToSearch = searchQuery || query;
+		if (!queryToSearch.trim() || isSearching) return;
+
+		setIsSearching(true);
+		setShowRecent(false);
+
+		try {
+			const entityType =
+				searchType === "individual" ? "person" : "organization";
+
+			const searchParams: WatchlistSearchRequest = {
+				q: queryToSearch.trim(),
+				entityType,
+			};
+
+			if (birthDate.trim()) {
+				searchParams.birthDate = birthDate.trim();
+			}
+
+			if (identifiers.trim()) {
+				searchParams.identifiers = identifiers
+					.split(",")
+					.map((id) => id.trim())
+					.filter((id) => id.length > 0);
+			}
+
+			const response = await searchWatchlist(searchParams, {
+				jwt: jwt || "",
+			});
+
+			const queryId = response.result.queryId;
+
+			sessionStorage.setItem(
+				`watchlist-pending-${queryId}`,
+				JSON.stringify({ searchParams }),
+			);
+			sessionStorage.setItem(
+				`watchlist-result-${queryId}`,
+				JSON.stringify(response),
+			);
+
+			router.push(`/queries/${queryId}`);
+		} catch (error) {
+			console.error("Search error:", error);
+			setIsSearching(false);
+		}
+	};
+
+	const canSubmit = query.trim().length > 3 && !isSearching && !jwtLoading;
+
+	return (
+		<main className="flex-1 flex flex-col px-4 sm:px-6">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-0">
+				<div className="w-full max-w-3xl flex flex-col gap-6">
+					{/* Search bar - pill shaped */}
+					<div className="flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2.5 transition-all duration-300 hover:border-muted-foreground/30">
+						{/* Entity Type Toggle */}
+						<TypeSwitch
+							compact
+							checked={searchType === "company"}
+							onCheckedChange={(checked) =>
+								setSearchType(checked ? "company" : "individual")
+							}
+						/>
+
+						<Input
+							value={query}
+							autoFocus
+							onChange={(e) => setQuery(e.target.value.toUpperCase())}
+							onKeyDown={(e) =>
+								e.key === "Enter" && canSubmit && handleSearch()
+							}
+							placeholder={
+								searchType === "individual"
+									? t("searchIndividualPlaceholder")
+									: t("searchCompanyPlaceholder")
+							}
+							className="flex-1 border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 uppercase font-mono min-w-0 px-2 bg-transparent p-0 shadow-none"
+						/>
+
+						{/* Advanced Search Toggle */}
+						<Button
+							onClick={() => setAdvancedOpen(!advancedOpen)}
+							variant="ghost"
+							size="icon"
+							className={`shrink-0 rounded-full h-9 w-9 p-0 flex items-center justify-center transition-colors ${advancedOpen ? "bg-primary/15 text-primary" : ""}`}
+						>
+							<Settings2 className="h-4 w-4" />
+						</Button>
+
+						{/* Submit Button */}
+						<Button
+							onClick={() => handleSearch()}
+							disabled={!canSubmit}
+							size="icon"
+							className="shrink-0 rounded-full h-9 w-9 p-0 flex items-center justify-center"
+						>
+							<ChevronRight className="h-4 w-4" />
+						</Button>
 					</div>
 
-					{/* Recent Searches - Centered with scroll support */}
-					<div className="w-full overflow-y-auto max-h-[50vh] sm:max-h-[60vh]">
+					{/* Advanced Settings - animated expand/collapse */}
+					<div
+						className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+						style={{ gridTemplateRows: advancedOpen ? "1fr" : "0fr" }}
+					>
+						<div className="overflow-hidden">
+							<div
+								className="transition-opacity duration-300 ease-in-out"
+								style={{ opacity: advancedOpen ? 1 : 0 }}
+							>
+								<div className="rounded-xl border border-dashed border-border bg-card p-5 flex flex-col gap-5">
+									{/* Identifiers */}
+									<div className="flex flex-col gap-2">
+										<Label className="text-sm font-medium">
+											{t("identifiersLabel")}
+										</Label>
+										<Input
+											value={identifiers}
+											onChange={(e) => setIdentifiers(e.target.value)}
+											placeholder={t("identifiersPlaceholder")}
+											className="bg-secondary border-0 focus-visible:ring-2 focus-visible:ring-ring"
+										/>
+									</div>
+
+									{/* Birth Date / Date of Creation */}
+									<div className="flex flex-col gap-2">
+										<Label className="text-sm font-medium">
+											{searchType === "individual"
+												? t("birthDateLabel")
+												: t("dateOfCreationLabel")}
+										</Label>
+										<div className="relative">
+											<Input
+												type="date"
+												value={birthDate}
+												onChange={(e) => setBirthDate(e.target.value)}
+												placeholder="YYYY-MM-DD"
+												className="bg-secondary border-0 focus-visible:ring-2 focus-visible:ring-ring [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+											/>
+											<button
+												type="button"
+												onClick={(e) => {
+													const input = (e.currentTarget as HTMLElement)
+														.previousElementSibling as HTMLInputElement;
+													input?.showPicker?.();
+												}}
+												className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors duration-200 hover:text-foreground"
+												aria-label={t("openCalendar")}
+											>
+												<CalendarDays className="h-4 w-4" />
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{/* Recent Searches */}
+					{showRecent && (
 						<RecentSearches
 							searches={recentSearches}
-							onStartSearch={handleStartSearch}
+							isLoading={isLoadingRecentSearches}
+							onSelect={(search) => {
+								router.push(`/queries/${search.id}`);
+							}}
+							onFocusSearch={() => {}}
 						/>
-					</div>
+					)}
 				</div>
 			</div>
-		</main>
-	);
-}
 
-export default function Home() {
-	return (
-		<LanguageProvider>
-			<HomeContent />
-		</LanguageProvider>
+			{/* Footer */}
+			<footer className="w-full mt-auto py-4 border-t border-border/50 bg-background">
+				<div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-sm text-muted-foreground px-4 sm:px-6">
+					<div className="flex items-center gap-2 opacity-80">
+						<Logo variant="logo" width={80} height={14} />
+					</div>
+					<div className="flex items-center gap-4">
+						<span>&copy; {new Date().getFullYear()} Janovix</span>
+						<a
+							href={getPrivacyUrl()}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="hover:text-foreground transition-colors"
+						>
+							{t("privacy")}
+						</a>
+						<a
+							href={getTermsUrl()}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="hover:text-foreground transition-colors"
+						>
+							{t("terms")}
+						</a>
+					</div>
+				</div>
+			</footer>
+		</main>
 	);
 }

@@ -9,7 +9,7 @@ const meta: Meta<typeof LanguageToggle> = {
 		docs: {
 			description: {
 				component:
-					"A language toggle button that allows users to switch between available languages (Spanish and English). Displays the current language and provides a dropdown to select a different language.",
+					"A language toggle button that allows users to switch between available languages (Portuguese, Spanish, and English). Displays the current language and provides a dropdown to select a different language.",
 			},
 		},
 	},
