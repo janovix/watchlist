@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { authClient } from "@/lib/auth/authClient";
+import { getAuthCoreBaseUrl } from "@/lib/auth/config";
 
 interface OrganizationInfo {
 	name: string;
 	logo: string | null;
+	role: string | null;
 }
 
 let cachedOrg: OrganizationInfo | null = null;
@@ -24,11 +25,31 @@ export function useOrganization(): {
 
 		(async () => {
 			try {
-				const listResult = await authClient.organization.list();
+				const response = await fetch(
+					`${getAuthCoreBaseUrl()}/api/organization/list-with-role`,
+					{ credentials: "include" },
+				);
 				if (cancelled) return;
 
-				const orgs = listResult.data;
-				if (!orgs || orgs.length === 0) {
+				if (!response.ok) {
+					setIsLoading(false);
+					return;
+				}
+
+				const payload = (await response.json()) as {
+					success: boolean;
+					data: Array<{
+						id: string;
+						name: string;
+						logo?: string | null;
+						role?: string;
+					}>;
+				} | null;
+
+				if (cancelled) return;
+
+				const orgs = payload?.data ?? [];
+				if (orgs.length === 0) {
 					setIsLoading(false);
 					return;
 				}
@@ -37,6 +58,7 @@ export function useOrganization(): {
 				const info: OrganizationInfo = {
 					name: activeOrg.name,
 					logo: activeOrg.logo ?? null,
+					role: activeOrg.role ?? null,
 				};
 
 				cachedOrg = info;

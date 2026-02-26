@@ -76,8 +76,10 @@ describe("middleware", () => {
 				},
 				json: () =>
 					Promise.resolve({
-						organizations: [{ id: "org1", slug: "acme", name: "Acme Inc" }],
-						activeOrganizationId: "org1",
+						success: true,
+						data: [
+							{ id: "org1", slug: "acme", name: "Acme Inc", role: "owner" },
+						],
 					}),
 			});
 
@@ -257,7 +259,10 @@ describe("middleware", () => {
 				},
 				json: () =>
 					Promise.resolve({
-						organizations: [{ id: "org1", slug: "acme", name: "Acme Inc" }],
+						success: true,
+						data: [
+							{ id: "org1", slug: "acme", name: "Acme Inc", role: "owner" },
+						],
 					}),
 			});
 
