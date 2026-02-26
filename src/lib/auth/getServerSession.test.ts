@@ -186,7 +186,7 @@ describe("getServerSession", () => {
 		expect(result?.user.image).toBeNull();
 	});
 
-	it("should use fallback when NEXT_PUBLIC_AUTH_APP_URL is not set", async () => {
+	it("should return null when NEXT_PUBLIC_AUTH_APP_URL is not set", async () => {
 		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
 
 		const mockCookieStore = {
@@ -194,33 +194,12 @@ describe("getServerSession", () => {
 		};
 		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
 
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				user: {
-					...mockSession.user,
-					createdAt: mockSession.user.createdAt.toISOString(),
-					updatedAt: mockSession.user.updatedAt.toISOString(),
-				},
-				session: {
-					...mockSession.session,
-					expiresAt: mockSession.session.expiresAt.toISOString(),
-					createdAt: mockSession.session.createdAt.toISOString(),
-					updatedAt: mockSession.session.updatedAt.toISOString(),
-				},
-			}),
-		});
+		global.fetch = vi.fn();
 
-		await getServerSession();
+		const result = await getServerSession();
 
-		expect(global.fetch).toHaveBeenCalledWith(
-			expect.any(String),
-			expect.objectContaining({
-				headers: expect.objectContaining({
-					Origin: "https://auth.example.workers.dev",
-				}),
-			}),
-		);
+		expect(result).toBeNull();
+		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
 	it("should handle Date objects in response (not just ISO strings)", async () => {
