@@ -273,7 +273,7 @@ describe("watchlist-search", () => {
 			vi.mocked(httpModule.fetchJson).mockRejectedValue(apiError);
 
 			await expect(searchWatchlist({ q: "test" })).rejects.toThrow(
-				/Daily watchlist query limit reached/,
+				/Monthly watchlist query limit reached/,
 			);
 		});
 
