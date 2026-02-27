@@ -1,3 +1,10 @@
+# [1.1.0-rc.23](https://github.com/janovix/watchlist/compare/v1.1.0-rc.22...v1.1.0-rc.23) (2026-02-27)
+
+
+### Bug Fixes
+
+* update error message for watchlist query limit and clarify subscription access for AML and Watchlist plans ([3572664](https://github.com/janovix/watchlist/commit/3572664d0916d07621974b67f049aed35ecf9a01))
+
 # [1.1.0](https://github.com/janovix/watchlist/compare/v1.0.0...v1.1.0) (2026-02-26)
 
 

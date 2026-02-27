@@ -249,7 +249,7 @@ export async function searchWatchlist(
 				// Re-throw with usage limit details preserved in the body
 				throw new ApiError(
 					error.body.message ||
-						"Daily watchlist query limit reached. Please upgrade or try again tomorrow.",
+						"Monthly watchlist query limit reached. Please upgrade your plan.",
 					{
 						status: 403,
 						body: error.body,
