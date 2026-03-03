@@ -1,3 +1,10 @@
+# [1.1.0-rc.24](https://github.com/janovix/watchlist/compare/v1.1.0-rc.23...v1.1.0-rc.24) (2026-03-03)
+
+
+### Features
+
+* enhance Storybook configuration with environment variable injection for authentication URLs ([f8dbb18](https://github.com/janovix/watchlist/commit/f8dbb1833a9d7dd2206df004fe82277eaf035cc4))
+
 # [1.1.0-rc.23](https://github.com/janovix/watchlist/compare/v1.1.0-rc.22...v1.1.0-rc.23) (2026-02-27)
 
 
