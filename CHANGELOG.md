@@ -1,3 +1,10 @@
+# [1.1.0-rc.25](https://github.com/janovix/watchlist/compare/v1.1.0-rc.24...v1.1.0-rc.25) (2026-03-06)
+
+
+### Features
+
+* implement server-side Better Auth client and enhance JWT handling in hooks ([8dafbef](https://github.com/janovix/watchlist/commit/8dafbef931c906884637d3de840d113956994ffe))
+
 # [1.1.0-rc.24](https://github.com/janovix/watchlist/compare/v1.1.0-rc.23...v1.1.0-rc.24) (2026-03-03)
 
 
