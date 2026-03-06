@@ -10,6 +10,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { requireEnv } from "@/lib/env";
 import { getQuery, type SearchQuery } from "@/lib/api/queries";
+import { ApiError } from "@/lib/api/http";
+import { tokenCache } from "@/lib/auth/tokenCache";
 
 export type ConnectionStatus =
 	| "disconnected"
@@ -79,14 +81,34 @@ export function useSearchQuery({
 	/** Fetch the current query state from REST API */
 	const fetchData = useCallback(async () => {
 		if (!queryId) return;
-		try {
-			const response = await getQuery(queryId, { jwt });
-			setData(response.result);
+
+		const applyResult = (result: SearchQuery) => {
+			setData(result);
 			setError(null);
-			if (checkIfComplete(response.result)) {
+			if (checkIfComplete(result)) {
 				setIsComplete(true);
 			}
+		};
+
+		try {
+			const response = await getQuery(queryId, { jwt });
+			applyResult(response.result);
 		} catch (err) {
+			// On 401 silently force-refresh the token and retry once.
+			// This acts as a safety net when the JWT expires while the hook
+			// is still polling (e.g. the tab was in the background).
+			if (err instanceof ApiError && err.status === 401) {
+				try {
+					const freshToken = await tokenCache.getToken(true);
+					const response = await getQuery(queryId, {
+						jwt: freshToken ?? undefined,
+					});
+					applyResult(response.result);
+					return;
+				} catch {
+					// Retry also failed — fall through to normal error handling.
+				}
+			}
 			console.error("[useSearchQuery] fetch error:", err);
 			setError(err instanceof Error ? err.message : "Failed to load query");
 		}
