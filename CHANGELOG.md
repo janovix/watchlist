@@ -1,3 +1,10 @@
+# [1.1.0-rc.26](https://github.com/janovix/watchlist/compare/v1.1.0-rc.25...v1.1.0-rc.26) (2026-03-10)
+
+
+### Features
+
+* add polyfill for esbuild's __name helper in RootLayout ([c8982c4](https://github.com/janovix/watchlist/commit/c8982c48e69b75788bd418d2aa7c3a63525e694f))
+
 # [1.1.0-rc.25](https://github.com/janovix/watchlist/compare/v1.1.0-rc.24...v1.1.0-rc.25) (2026-03-06)
 
 
