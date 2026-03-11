@@ -41,8 +41,20 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const LIMIT = 20;
+
+function getInitials(name: string): string {
+	const parts = name.trim().split(/\s+/).filter(Boolean);
+	if (parts.length >= 2) {
+		return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+	}
+	if (parts[0]?.length >= 2) {
+		return parts[0].slice(0, 2).toUpperCase();
+	}
+	return parts[0]?.[0]?.toUpperCase() ?? "?";
+}
 const VALID_FILTERS = ["all", "person", "organization"] as const;
 
 /**
@@ -296,7 +308,7 @@ export default function QueriesPage() {
 					</div>
 
 					{/* Pagination skeleton */}
-					<div className="mt-6 flex items-center justify-between">
+					<div className="mt-6 mb-6 flex items-center justify-between">
 						<Skeleton className="h-4 w-48" />
 						<div className="flex gap-2">
 							<Skeleton className="h-9 w-24 rounded-md" />
@@ -385,7 +397,6 @@ export default function QueriesPage() {
 						<TableHeader>
 							<TableRow>
 								<TableHead>{t("tableQuery")}</TableHead>
-								<TableHead>{t("tableType")}</TableHead>
 								<TableHead>{t("tableSource")}</TableHead>
 								<TableHead>{t("tableUser")}</TableHead>
 								<TableHead>{t("tableDate")}</TableHead>
@@ -397,7 +408,7 @@ export default function QueriesPage() {
 							{filteredQueries.length === 0 ? (
 								<TableRow>
 									<TableCell
-										colSpan={7}
+										colSpan={6}
 										className="text-center py-12 text-muted-foreground"
 									>
 										{paramSearch || paramFilter !== "all"
@@ -412,19 +423,14 @@ export default function QueriesPage() {
 										className="cursor-pointer hover:bg-muted/50"
 										onClick={() => router.push(`/queries/${query.id}`)}
 									>
-										<TableCell className="font-medium">{query.query}</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2">
 												{query.entityType === "organization" ? (
-													<Building2 className="h-4 w-4 text-muted-foreground" />
+													<Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
 												) : (
-													<User className="h-4 w-4 text-muted-foreground" />
+													<User className="h-4 w-4 text-muted-foreground shrink-0" />
 												)}
-												<span className="capitalize">
-													{query.entityType === "organization"
-														? t("filterCompany")
-														: t("filterIndividual")}
-												</span>
+												<span className="font-medium">{query.query}</span>
 											</div>
 										</TableCell>
 										<TableCell>
@@ -433,23 +439,41 @@ export default function QueriesPage() {
 											</span>
 										</TableCell>
 										<TableCell>
-											<TooltipProvider delayDuration={200}>
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
-															{query.userId
-																? (members[query.userId] ??
-																	query.userId.slice(0, 8) + "…")
-																: "—"}
-														</span>
-													</TooltipTrigger>
-													{query.userId && members[query.userId] && (
-														<TooltipContent>
-															{members[query.userId]}
-														</TooltipContent>
-													)}
-												</Tooltip>
-											</TooltipProvider>
+											{query.userId ? (
+												members[query.userId] ? (
+													<TooltipProvider delayDuration={200}>
+														<Tooltip>
+															<TooltipTrigger asChild>
+																<div className="flex items-center gap-2 min-w-0 max-w-[180px]">
+																	<Avatar className="h-7 w-7 shrink-0">
+																		{members[query.userId].image ? (
+																			<AvatarImage
+																				src={members[query.userId].image!}
+																				alt={members[query.userId].name}
+																			/>
+																		) : null}
+																		<AvatarFallback className="text-xs">
+																			{getInitials(members[query.userId].name)}
+																		</AvatarFallback>
+																	</Avatar>
+																	<span className="text-sm text-muted-foreground truncate">
+																		{members[query.userId].name}
+																	</span>
+																</div>
+															</TooltipTrigger>
+															<TooltipContent>
+																{members[query.userId].name}
+															</TooltipContent>
+														</Tooltip>
+													</TooltipProvider>
+												) : (
+													<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
+														{query.userId.slice(0, 8)}…
+													</span>
+												)
+											) : (
+												<span className="text-sm text-muted-foreground">—</span>
+											)}
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
@@ -485,7 +509,7 @@ export default function QueriesPage() {
 				</div>
 
 				{/* Pagination */}
-				<div className="mt-6 flex items-center justify-between">
+				<div className="mt-6 mb-6 flex items-center justify-between">
 					<div className="text-sm text-muted-foreground">
 						{t("showingQueries")
 							.replace("{from}", String(paramOffset + 1))

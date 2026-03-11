@@ -41,6 +41,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		completed: "outline",
 		partial: "secondary",
 		failed: "destructive",
+		skipped: "secondary",
 	};
 	const { t } = useLanguage();
 	const labels: Record<QueryStatus, string> = {
@@ -49,6 +50,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		completed: t("statusCompleted"),
 		partial: t("statusPartial"),
 		failed: t("statusFailed"),
+		skipped: t("statusSkipped"),
 	};
 	return (
 		<Badge variant={variants[status] ?? "default"} className="capitalize">

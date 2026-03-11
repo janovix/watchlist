@@ -9,7 +9,8 @@ export type QueryStatus =
 	| "running"
 	| "completed"
 	| "partial"
-	| "failed";
+	| "failed"
+	| "skipped";
 
 /**
  * Search query from GET /queries/:queryId

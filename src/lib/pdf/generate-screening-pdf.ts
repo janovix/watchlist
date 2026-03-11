@@ -353,6 +353,8 @@ export async function generateScreeningPdf(
 		],
 	];
 
+	// Left column value X: after longest label (e.g. "Fecha de nacimiento:") to avoid overlap
+	const metaLeftValueX = 72;
 	const metaRows = Math.max(metaLeft.length, metaRight.length);
 	for (let i = 0; i < metaRows; i++) {
 		y = ensureSpace(doc, y, 6);
@@ -362,7 +364,7 @@ export async function generateScreeningPdf(
 			doc.text(`${metaLeft[i][0]}:`, MARGIN, y);
 			doc.setFont("helvetica", "normal");
 			doc.setTextColor(...COLORS.primary);
-			doc.text(metaLeft[i][1], MARGIN + 30, y);
+			doc.text(metaLeft[i][1], metaLeftValueX, y);
 		}
 		if (metaRight[i]) {
 			doc.setFont("helvetica", "bold");
@@ -461,45 +463,47 @@ export async function generateScreeningPdf(
 		y = drawMatchTable(doc, y, sat69bMatches, t);
 	}
 
-	// --- PEP Official ---
-	const pepOfficialRaw = data.pepOfficialResult as PepRawResult[] | null;
-	const pepOfficialHas =
-		Array.isArray(pepOfficialRaw) && pepOfficialRaw.length > 0;
-	const pepOfficialStatusColor =
-		data.pepOfficialStatus === "completed" && pepOfficialHas
-			? COLORS.red
-			: data.pepOfficialStatus === "completed"
-				? COLORS.green
-				: data.pepOfficialStatus === "failed"
-					? COLORS.yellow
-					: COLORS.gray;
-	const pepOfficialStatusText =
-		data.pepOfficialStatus === "completed" && pepOfficialHas
-			? `${pepOfficialRaw!.length} ${t("pdfMatchesFound")}`
-			: getStatusLabel(data.pepOfficialStatus, t);
+	// --- PEP Official (omit section when skipped) ---
+	if (data.pepOfficialStatus !== "skipped") {
+		const pepOfficialRaw = data.pepOfficialResult as PepRawResult[] | null;
+		const pepOfficialHas =
+			Array.isArray(pepOfficialRaw) && pepOfficialRaw.length > 0;
+		const pepOfficialStatusColor =
+			data.pepOfficialStatus === "completed" && pepOfficialHas
+				? COLORS.red
+				: data.pepOfficialStatus === "completed"
+					? COLORS.green
+					: data.pepOfficialStatus === "failed"
+						? COLORS.yellow
+						: COLORS.gray;
+		const pepOfficialStatusText =
+			data.pepOfficialStatus === "completed" && pepOfficialHas
+				? `${pepOfficialRaw!.length} ${t("pdfMatchesFound")}`
+				: getStatusLabel(data.pepOfficialStatus, t);
 
-	y = drawSectionHeader(
-		doc,
-		y,
-		`PEP – ${language === "es" ? "Oficial" : "Official"}`,
-		pepOfficialStatusText,
-		pepOfficialStatusColor,
-	);
+		y = drawSectionHeader(
+			doc,
+			y,
+			`PEP – ${language === "es" ? "Oficial" : "Official"}`,
+			pepOfficialStatusText,
+			pepOfficialStatusColor,
+		);
 
-	if (pepOfficialHas) {
-		for (const result of pepOfficialRaw!.slice(0, 15)) {
-			y = ensureSpace(doc, y, 12);
-			doc.setFont("helvetica", "bold");
-			doc.setFontSize(8);
-			doc.setTextColor(...COLORS.primary);
-			doc.text(result.nombre, MARGIN + 4, y + 4);
+		if (pepOfficialHas) {
+			for (const result of pepOfficialRaw!.slice(0, 15)) {
+				y = ensureSpace(doc, y, 12);
+				doc.setFont("helvetica", "bold");
+				doc.setFontSize(8);
+				doc.setTextColor(...COLORS.primary);
+				doc.text(result.nombre, MARGIN + 4, y + 4);
 
-			if (result.informacionPrincipal?.cargo) {
-				doc.setFont("helvetica", "normal");
-				doc.setTextColor(...COLORS.gray);
-				doc.text(result.informacionPrincipal.cargo, MARGIN + 4, y + 8);
+				if (result.informacionPrincipal?.cargo) {
+					doc.setFont("helvetica", "normal");
+					doc.setTextColor(...COLORS.gray);
+					doc.text(result.informacionPrincipal.cargo, MARGIN + 4, y + 8);
+				}
+				y += 10;
 			}
-			y += 10;
 		}
 	}
 

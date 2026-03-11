@@ -267,6 +267,7 @@ export const translations = {
 		statusCompleted: "Completado",
 		statusFailed: "Fallido",
 		statusPartial: "Parcial",
+		statusSkipped: "Omitido",
 
 		// Screening results
 		statusSearching: "Buscando...",
@@ -628,6 +629,7 @@ export const translations = {
 		statusCompleted: "Completed",
 		statusFailed: "Failed",
 		statusPartial: "Partial",
+		statusSkipped: "Skipped",
 
 		// Screening results
 		statusSearching: "Searching...",
