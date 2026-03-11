@@ -334,7 +334,16 @@ export async function generateScreeningPdf(
 					? "Persona"
 					: "Person",
 		],
-		...(data.birthDate ? [[t("pdfBirthDate"), data.birthDate]] : []),
+		...(data.birthDate
+			? [
+					[
+						t("pdfBirthDate"),
+						data.birthDate.includes("T")
+							? data.birthDate.slice(0, 10)
+							: data.birthDate,
+					],
+				]
+			: []),
 	];
 	const metaRight = [
 		[t("pdfDate"), new Date(data.createdAt).toLocaleDateString()],

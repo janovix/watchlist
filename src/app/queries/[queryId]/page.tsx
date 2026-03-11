@@ -233,7 +233,11 @@ export default function QueryDetailPage() {
 									)}
 									{data.birthDate && (
 										<>
-											<span>{data.birthDate}</span>
+											<span>
+												{data.birthDate.includes("T")
+													? data.birthDate.slice(0, 10)
+													: data.birthDate}
+											</span>
 											<span>•</span>
 										</>
 									)}

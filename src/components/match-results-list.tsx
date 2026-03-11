@@ -215,7 +215,9 @@ function MatchCard({ match }: MatchCardProps) {
 								<div>
 									<span className="font-medium">{t("birthDate")}: </span>
 									<span className="text-muted-foreground">
-										{match.target.birthDate}
+										{match.target.birthDate.includes("T")
+											? match.target.birthDate.slice(0, 10)
+											: match.target.birthDate}
 									</span>
 								</div>
 							)}
