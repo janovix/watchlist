@@ -1,3 +1,10 @@
+# [1.1.0-rc.27](https://github.com/janovix/watchlist/compare/v1.1.0-rc.26...v1.1.0-rc.27) (2026-03-11)
+
+
+### Bug Fixes
+
+* format birthDate display in QueryDetailPage and MatchCard components ([16823d2](https://github.com/janovix/watchlist/commit/16823d26afc92b40af007fdf8ecbd25544f6bd65))
+
 # [1.1.0-rc.26](https://github.com/janovix/watchlist/compare/v1.1.0-rc.25...v1.1.0-rc.26) (2026-03-10)
 
 
