@@ -1,3 +1,10 @@
+# [1.1.0-rc.28](https://github.com/janovix/watchlist/compare/v1.1.0-rc.27...v1.1.0-rc.28) (2026-03-11)
+
+
+### Features
+
+* enhance QueriesPage with user avatars and initials, update status handling for skipped queries ([2de5d03](https://github.com/janovix/watchlist/commit/2de5d036e612c5d402421aa4d478083697b187ae))
+
 # [1.1.0-rc.27](https://github.com/janovix/watchlist/compare/v1.1.0-rc.26...v1.1.0-rc.27) (2026-03-11)
 
 
