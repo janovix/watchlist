@@ -1,3 +1,10 @@
+# [1.1.0-rc.31](https://github.com/janovix/watchlist/compare/v1.1.0-rc.30...v1.1.0-rc.31) (2026-03-12)
+
+
+### Features
+
+* implement country multi-select component and integrate into home and query detail pages ([8f8b4ee](https://github.com/janovix/watchlist/commit/8f8b4ee608c1851dd37aaedaaf9151732e648359))
+
 # [1.1.0-rc.30](https://github.com/janovix/watchlist/compare/v1.1.0-rc.29...v1.1.0-rc.30) (2026-03-12)
 
 
