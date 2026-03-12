@@ -1,3 +1,10 @@
+# [1.1.0-rc.30](https://github.com/janovix/watchlist/compare/v1.1.0-rc.29...v1.1.0-rc.30) (2026-03-12)
+
+
+### Features
+
+* add risk indicators to QueriesPage and update watchlist search threshold ([6c28225](https://github.com/janovix/watchlist/commit/6c282253c6d51748d4fef57527f752dfc51b9f53))
+
 # [1.1.0-rc.29](https://github.com/janovix/watchlist/compare/v1.1.0-rc.28...v1.1.0-rc.29) (2026-03-12)
 
 
