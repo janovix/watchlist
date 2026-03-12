@@ -115,11 +115,12 @@ export default function QueryDetailPage() {
 
 	const queryId = params?.queryId as string;
 
-	const { data, isLoading, error, connectionStatus } = useSearchQuery({
-		queryId,
-		jwt: jwt ?? undefined,
-		enabled: mounted && !jwtLoading && !!queryId,
-	});
+	const { data, isLoading, error, connectionStatus, progressMessages } =
+		useSearchQuery({
+			queryId,
+			jwt: jwt ?? undefined,
+			enabled: mounted && !jwtLoading && !!queryId,
+		});
 
 	useEffect(() => {
 		setMounted(true);
@@ -243,6 +244,14 @@ export default function QueryDetailPage() {
 											<span>•</span>
 										</>
 									)}
+									{data.countries && data.countries.length > 0 && (
+										<>
+											<span>
+												{t("countries")}: {data.countries.join(", ")}
+											</span>
+											<span>•</span>
+										</>
+									)}
 									<span>{new Date(data.createdAt).toLocaleString()}</span>
 								</div>
 							</div>
@@ -263,6 +272,7 @@ export default function QueryDetailPage() {
 						<ScreeningResultsCard
 							data={data}
 							connectionStatus={connectionStatus}
+							progressMessages={progressMessages}
 							features={features}
 						/>
 					</>

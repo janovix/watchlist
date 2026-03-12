@@ -27,7 +27,10 @@ import {
 	extractHostname,
 } from "@/components/external-link-dialog";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
-import type { ConnectionStatus } from "@/hooks/useSearchQuery";
+import type {
+	ConnectionStatus,
+	ProgressMessages,
+} from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
 import type { WatchlistFeatures } from "@/lib/api/watchlist-config";
 
@@ -102,6 +105,65 @@ function getStatusIcon(itemStatus: ItemStatus) {
 		case "failed":
 			return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
 	}
+}
+
+/** Max coincidence score (0–1) across matches; used for OFAC/UNSC/SAT 69-B semaphore icon */
+function getMaxScoreFromMatches(
+	matches: Array<{ score?: number }> | undefined,
+): number {
+	if (!Array.isArray(matches) || matches.length === 0) return 0;
+	const scores = matches
+		.map((m) => (typeof m.score === "number" ? m.score : 0))
+		.filter((s) => s > 0);
+	return scores.length === 0 ? 0 : Math.max(...scores);
+}
+
+/** Map max score to risk level for section icon: low = yellow, medium = orange, high = red */
+function watchlistScoreToRiskLevel(score: number): RiskLevel {
+	if (score > 0.75) return "high";
+	if (score > 0.5) return "medium";
+	return "low";
+}
+
+/** Icon for OFAC/UNSC/SAT 69-B: semaphore by max coincidence when there are matches, else status icon */
+function getWatchlistSectionIcon(
+	itemStatus: ItemStatus,
+	matches: Array<{ score?: number }> | undefined,
+) {
+	if (
+		itemStatus !== "complete_match" ||
+		!Array.isArray(matches) ||
+		matches.length === 0
+	) {
+		return getStatusIcon(itemStatus);
+	}
+	const maxScore = getMaxScoreFromMatches(matches);
+	return getRiskLevelIcon(watchlistScoreToRiskLevel(maxScore));
+}
+
+/** Badge for OFAC/UNSC/SAT 69-B: "Coincidencias" with semaphore color when matches exist, else standard status badge */
+function WatchlistSectionBadge({
+	itemStatus,
+	matches,
+}: {
+	itemStatus: ItemStatus;
+	matches: Array<{ score?: number }> | undefined;
+}) {
+	const { t } = useLanguage();
+	if (
+		itemStatus === "complete_match" &&
+		Array.isArray(matches) &&
+		matches.length > 0
+	) {
+		const maxScore = getMaxScoreFromMatches(matches);
+		const riskLevel = watchlistScoreToRiskLevel(maxScore);
+		return (
+			<Badge className={cn("text-xs", getRiskLevelBadgeColor(riskLevel))}>
+				{t("statusMatches")}
+			</Badge>
+		);
+	}
+	return <StatusBadgeLabel itemStatus={itemStatus} />;
 }
 
 function getStatusBadgeColor(itemStatus: ItemStatus): string {
@@ -244,6 +306,7 @@ function SubsectionBadge({
 interface ScreeningResultsCardProps {
 	data: SearchQuery;
 	connectionStatus: ConnectionStatus;
+	progressMessages?: ProgressMessages;
 	features?: WatchlistFeatures;
 }
 
@@ -254,6 +317,7 @@ interface ScreeningResultsCardProps {
 export function ScreeningResultsCard({
 	data,
 	connectionStatus,
+	progressMessages,
 	features,
 }: ScreeningResultsCardProps) {
 	const { language, t } = useLanguage();
@@ -360,10 +424,26 @@ export function ScreeningResultsCard({
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(ofacStatus)}
+							{getWatchlistSectionIcon(
+								ofacStatus,
+								(
+									data.ofacResult as
+										| { matches: Array<{ score: number }> }
+										| undefined
+								)?.matches,
+							)}
 							<span className="font-semibold">{t("ofacSanctionsList")}</span>
 							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={ofacStatus} />
+								<WatchlistSectionBadge
+									itemStatus={ofacStatus}
+									matches={
+										(
+											data.ofacResult as
+												| { matches: Array<{ score?: number }> }
+												| undefined
+										)?.matches
+									}
+								/>
 							</div>
 						</div>
 					</AccordionTrigger>
@@ -399,10 +479,26 @@ export function ScreeningResultsCard({
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(unStatus)}
+							{getWatchlistSectionIcon(
+								unStatus,
+								(
+									data.unResult as
+										| { matches: Array<{ score: number }> }
+										| undefined
+								)?.matches,
+							)}
 							<span className="font-semibold">{t("unSanctionsList")}</span>
 							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={unStatus} />
+								<WatchlistSectionBadge
+									itemStatus={unStatus}
+									matches={
+										(
+											data.unResult as
+												| { matches: Array<{ score?: number }> }
+												| undefined
+										)?.matches
+									}
+								/>
 							</div>
 						</div>
 					</AccordionTrigger>
@@ -438,10 +534,26 @@ export function ScreeningResultsCard({
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(sat69bStatus)}
+							{getWatchlistSectionIcon(
+								sat69bStatus,
+								(
+									data.sat69bResult as
+										| { matches: Array<{ score: number }> }
+										| undefined
+								)?.matches,
+							)}
 							<span className="font-semibold">{t("sat69bTitle")}</span>
 							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={sat69bStatus} />
+								<WatchlistSectionBadge
+									itemStatus={sat69bStatus}
+									matches={
+										(
+											data.sat69bResult as
+												| { matches: Array<{ score?: number }> }
+												| undefined
+										)?.matches
+									}
+								/>
 							</div>
 						</div>
 					</AccordionTrigger>
@@ -571,7 +683,7 @@ export function ScreeningResultsCard({
 										</div>
 										{pepAiItemStatus === "loading" ? (
 											<p className="text-muted-foreground text-sm pl-2">
-												{t("analyzingAi")}
+												{progressMessages?.pepGrok ?? t("analyzingAi")}
 											</p>
 										) : pepAiItemStatus === "failed" ? (
 											<Alert variant="destructive" className="py-2">
@@ -693,7 +805,7 @@ export function ScreeningResultsCard({
 						<AccordionContent>
 							{adverseMediaStatus === "loading" ? (
 								<p className="text-muted-foreground text-sm">
-									{t("analyzingAdverseMedia")}
+									{progressMessages?.adverseMedia ?? t("analyzingAdverseMedia")}
 								</p>
 							) : adverseMediaStatus === "failed" ? (
 								<Alert variant="destructive" className="py-2">

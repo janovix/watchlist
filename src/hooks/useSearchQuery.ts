@@ -25,12 +25,20 @@ export interface UseSearchQueryOptions {
 	enabled?: boolean;
 }
 
+/** Last progress message per stream (from SSE progress events) */
+export interface ProgressMessages {
+	pepGrok: string | null;
+	adverseMedia: string | null;
+	pepOfficial: string | null;
+}
+
 export interface UseSearchQueryResult {
 	data: SearchQuery | null;
 	isLoading: boolean;
 	error: string | null;
 	connectionStatus: ConnectionStatus;
 	isComplete: boolean;
+	progressMessages: ProgressMessages;
 	refetch: () => Promise<void>;
 }
 
@@ -58,6 +66,11 @@ export function useSearchQuery({
 	const [connectionStatus, setConnectionStatus] =
 		useState<ConnectionStatus>("disconnected");
 	const [isComplete, setIsComplete] = useState(false);
+	const [progressMessages, setProgressMessages] = useState<ProgressMessages>({
+		pepGrok: null,
+		adverseMedia: null,
+		pepOfficial: null,
+	});
 
 	const eventSourceRef = useRef<EventSource | null>(null);
 	const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
@@ -167,9 +180,26 @@ export function useSearchQuery({
 				});
 			});
 
+			// PEP AI (Grok) progress
+			es.addEventListener("pep_grok_progress", (event) => {
+				try {
+					const payload = JSON.parse((event as MessageEvent).data) as {
+						message?: string;
+						phase?: string;
+					};
+					const text = payload.message ?? payload.phase ?? null;
+					setProgressMessages((prev) =>
+						text ? { ...prev, pepGrok: text } : prev,
+					);
+				} catch {
+					// ignore parse errors
+				}
+			});
+
 			// PEP AI (Grok) results
 			es.addEventListener("pep_grok_results", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, pepGrok: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -183,6 +213,7 @@ export function useSearchQuery({
 			// PEP AI error
 			es.addEventListener("pep_grok_error", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, pepGrok: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -193,9 +224,26 @@ export function useSearchQuery({
 				});
 			});
 
+			// Adverse media progress
+			es.addEventListener("adverse_media_progress", (event) => {
+				try {
+					const payload = JSON.parse((event as MessageEvent).data) as {
+						message?: string;
+						phase?: string;
+					};
+					const text = payload.message ?? payload.phase ?? null;
+					setProgressMessages((prev) =>
+						text ? { ...prev, adverseMedia: text } : prev,
+					);
+				} catch {
+					// ignore parse errors
+				}
+			});
+
 			// Adverse media results
 			es.addEventListener("adverse_media_results", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, adverseMedia: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -209,6 +257,7 @@ export function useSearchQuery({
 			// Adverse media error
 			es.addEventListener("adverse_media_error", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, adverseMedia: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -243,6 +292,11 @@ export function useSearchQuery({
 		if (!queryId || !enabled) {
 			setConnectionStatus("disconnected");
 			setData(null);
+			setProgressMessages({
+				pepGrok: null,
+				adverseMedia: null,
+				pepOfficial: null,
+			});
 			setIsLoading(false);
 			return;
 		}
@@ -293,6 +347,7 @@ export function useSearchQuery({
 		error,
 		connectionStatus,
 		isComplete,
+		progressMessages,
 		refetch: fetchData,
 	};
 }

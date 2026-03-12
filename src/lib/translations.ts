@@ -180,6 +180,7 @@ export const translations = {
 		dateOfCreationLabel: "Fecha de creación (YYYY-MM-DD)",
 		countriesLabel: "Países",
 		countriesPlaceholder: "MX, US, CO... (códigos ISO separados por coma)",
+		countriesPlaceholderSelect: "Seleccionar países...",
 
 		// Watchlist search results
 		matchesFound: "{count} coincidencias encontradas",
@@ -555,6 +556,7 @@ export const translations = {
 		dateOfCreationLabel: "Date of creation (YYYY-MM-DD)",
 		countriesLabel: "Countries",
 		countriesPlaceholder: "MX, US, CO... (ISO codes comma-separated)",
+		countriesPlaceholderSelect: "Select countries...",
 
 		// Watchlist search results
 		matchesFound: "{count} matches found",

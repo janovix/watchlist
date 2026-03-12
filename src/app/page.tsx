@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, CalendarDays, Settings2 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { CountryMultiSelect } from "@/components/country-multi-select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TypeSwitch } from "@/components/type-switch";
@@ -30,6 +31,7 @@ export default function HomePage() {
 	const [advancedOpen, setAdvancedOpen] = useState(false);
 	const [birthDate, setBirthDate] = useState("");
 	const [identifiers, setIdentifiers] = useState("");
+	const [countries, setCountries] = useState<string[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
 	const [recentSearches, setRecentSearches] = useState<
 		{
@@ -108,6 +110,10 @@ export default function HomePage() {
 					.split(",")
 					.map((id) => id.trim())
 					.filter((id) => id.length > 0);
+			}
+
+			if (countries.length > 0) {
+				searchParams.countries = countries;
 			}
 
 			const response = await searchWatchlist(searchParams, {
@@ -208,6 +214,14 @@ export default function HomePage() {
 											className="bg-secondary border-0 focus-visible:ring-2 focus-visible:ring-ring"
 										/>
 									</div>
+
+									{/* Countries */}
+									<CountryMultiSelect
+										value={countries}
+										onChange={setCountries}
+										label={t("countriesLabel")}
+										placeholder={t("countriesPlaceholderSelect")}
+									/>
 
 									{/* Birth Date / Date of Creation */}
 									<div className="flex flex-col gap-2">

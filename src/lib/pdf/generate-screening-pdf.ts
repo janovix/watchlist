@@ -344,6 +344,9 @@ export async function generateScreeningPdf(
 					],
 				]
 			: []),
+		...(data.countries && data.countries.length > 0
+			? [[t("countries"), data.countries.join(", ")]]
+			: []),
 	];
 	const metaRight = [
 		[t("pdfDate"), new Date(data.createdAt).toLocaleDateString()],
