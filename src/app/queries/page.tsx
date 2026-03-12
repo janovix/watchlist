@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import debounce from "lodash.debounce";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
 	Search,
@@ -44,6 +45,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const LIMIT = 20;
+/** Delay (ms) before pushing search term to URL to avoid race with rapid typing */
+const SEARCH_DEBOUNCE_MS = 300;
 
 function getInitials(name: string): string {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -137,9 +140,9 @@ export default function QueriesPage() {
 		);
 	}, [searchParams]);
 
-	// Update local search when URL params change
+	// Update local search when URL params change (normalize to uppercase)
 	useEffect(() => {
-		setLocalSearch(paramSearch);
+		setLocalSearch(paramSearch.toUpperCase());
 	}, [paramSearch]);
 
 	// Update URL when state changes
@@ -159,6 +162,23 @@ export default function QueriesPage() {
 		},
 		[router, paramSearch, paramFilter, paramOffset],
 	);
+
+	const updateSearchParamsRef = useRef(updateSearchParams);
+	updateSearchParamsRef.current = updateSearchParams;
+
+	const debouncedSetSearchInUrl = useMemo(
+		() =>
+			debounce((value: string) => {
+				updateSearchParamsRef.current(value, undefined, 0);
+			}, SEARCH_DEBOUNCE_MS),
+		[],
+	);
+
+	useEffect(() => {
+		return () => {
+			debouncedSetSearchInUrl.cancel();
+		};
+	}, [debouncedSetSearchInUrl]);
 
 	// Fetch queries with pagination
 	useEffect(() => {
@@ -217,8 +237,16 @@ export default function QueriesPage() {
 	};
 
 	const sourceLabels: Record<string, string> = {
-		manual: t("sourceManual"),
-		"aml-screening": t("sourceAmlScreening"),
+		// Canonical values
+		watchlist_query: t("sourceWatchlistQuery"),
+		aml: t("sourceAml"),
+		csv_import: t("sourceCsvImport"),
+		api: t("sourceApi"),
+		// Backward compatibility
+		manual: t("sourceWatchlistQuery"),
+		"aml-screening": t("sourceAml"),
+		"aml:client": t("sourceAml"),
+		"aml:bc": t("sourceAml"),
 	};
 
 	const getSourceLabel = (source: string) =>
@@ -358,11 +386,12 @@ export default function QueriesPage() {
 						<Input
 							value={localSearch}
 							onChange={(e) => {
-								setLocalSearch(e.target.value);
-								updateSearchParams(e.target.value, undefined, 0);
+								const value = e.target.value.toUpperCase();
+								setLocalSearch(value);
+								debouncedSetSearchInUrl(value);
 							}}
 							placeholder={t("searchQueriesPlaceholder")}
-							className="pl-10 bg-card border"
+							className="pl-10 bg-card border uppercase"
 						/>
 					</div>
 					<div className="flex gap-2">
@@ -439,41 +468,55 @@ export default function QueriesPage() {
 											</span>
 										</TableCell>
 										<TableCell>
-											{query.userId ? (
-												members[query.userId] ? (
-													<TooltipProvider delayDuration={200}>
-														<Tooltip>
-															<TooltipTrigger asChild>
-																<div className="flex items-center gap-2 min-w-0 max-w-[180px]">
-																	<Avatar className="h-7 w-7 shrink-0">
-																		{members[query.userId].image ? (
-																			<AvatarImage
-																				src={members[query.userId].image!}
-																				alt={members[query.userId].name}
-																			/>
-																		) : null}
-																		<AvatarFallback className="text-xs">
-																			{getInitials(members[query.userId].name)}
-																		</AvatarFallback>
-																	</Avatar>
-																	<span className="text-sm text-muted-foreground truncate">
-																		{members[query.userId].name}
-																	</span>
-																</div>
-															</TooltipTrigger>
-															<TooltipContent>
-																{members[query.userId].name}
-															</TooltipContent>
-														</Tooltip>
-													</TooltipProvider>
-												) : (
-													<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
-														{query.userId.slice(0, 8)}…
+											{(() => {
+												const display =
+													query.userDisplay ??
+													(query.userId && members[query.userId]
+														? {
+																name: members[query.userId].name,
+																image: members[query.userId].image ?? null,
+															}
+														: null);
+												if (display) {
+													return (
+														<TooltipProvider delayDuration={200}>
+															<Tooltip>
+																<TooltipTrigger asChild>
+																	<div className="flex items-center gap-2 min-w-0 max-w-[180px]">
+																		<Avatar className="h-7 w-7 shrink-0">
+																			{display.image ? (
+																				<AvatarImage
+																					src={display.image}
+																					alt={display.name}
+																				/>
+																			) : null}
+																			<AvatarFallback className="text-xs">
+																				{getInitials(display.name)}
+																			</AvatarFallback>
+																		</Avatar>
+																		<span className="text-sm text-muted-foreground truncate">
+																			{display.name}
+																		</span>
+																	</div>
+																</TooltipTrigger>
+																<TooltipContent>{display.name}</TooltipContent>
+															</Tooltip>
+														</TooltipProvider>
+													);
+												}
+												if (query.userId) {
+													return (
+														<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
+															{query.userId.slice(0, 8)}…
+														</span>
+													);
+												}
+												return (
+													<span className="text-sm text-muted-foreground">
+														—
 													</span>
-												)
-											) : (
-												<span className="text-sm text-muted-foreground">—</span>
-											)}
+												);
+											})()}
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">

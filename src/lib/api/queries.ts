@@ -59,6 +59,8 @@ export interface QueryListItem {
 	userId: string | null;
 	query: string;
 	source: string;
+	/** Resolved user display (name + avatar) when userId is an org member */
+	userDisplay?: { name: string; image: string | null } | null;
 	entityType: string | null;
 	birthDate: string | null;
 	countries: string[] | null;

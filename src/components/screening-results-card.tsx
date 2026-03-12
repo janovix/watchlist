@@ -70,6 +70,9 @@ function getBilingualText(
 
 type ItemStatus = "loading" | "complete_clear" | "complete_match" | "failed";
 
+/** Risk level for PEP and Adverse Media: low = yellow, medium = orange, high = red */
+type RiskLevel = "none" | "low" | "medium" | "high";
+
 function resolveItemStatus(
 	status: QueryStatus | null | undefined,
 	count: number | null | undefined,
@@ -114,6 +117,41 @@ function getStatusBadgeColor(itemStatus: ItemStatus): string {
 	}
 }
 
+/** Map risk level to icon and badge styling: low = yellow, medium = orange, high = red */
+function getRiskLevelIcon(risk: RiskLevel) {
+	switch (risk) {
+		case "none":
+			return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+		case "low":
+			return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+		case "medium":
+			return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+		case "high":
+			return <AlertTriangle className="h-5 w-5 text-red-500" />;
+	}
+}
+
+function getRiskLevelBadgeColor(risk: RiskLevel): string {
+	switch (risk) {
+		case "none":
+			return "bg-green-500/10 text-green-400";
+		case "low":
+			return "bg-yellow-500/10 text-yellow-400";
+		case "medium":
+			return "bg-orange-500/10 text-orange-400";
+		case "high":
+			return "bg-red-500/10 text-red-400";
+	}
+}
+
+/** Map PEP probability (0–1) to risk level for coloring */
+function pepProbabilityToRiskLevel(probability: number): RiskLevel {
+	if (probability <= 0) return "none";
+	if (probability <= 1 / 3) return "low";
+	if (probability <= 2 / 3) return "medium";
+	return "high";
+}
+
 function StatusBadgeLabel({ itemStatus }: { itemStatus: ItemStatus }) {
 	const { t } = useLanguage();
 	const badgeText = {
@@ -126,6 +164,39 @@ function StatusBadgeLabel({ itemStatus }: { itemStatus: ItemStatus }) {
 	return (
 		<Badge className={`text-xs ${getStatusBadgeColor(itemStatus)}`}>
 			{badgeText[itemStatus]}
+		</Badge>
+	);
+}
+
+/** Badge for risk-based sections (PEP, Adverse Media): Limpio vs Coincidencias with risk color */
+function RiskSectionBadge({
+	riskLevel,
+	isLoading,
+	isFailed,
+}: {
+	riskLevel: RiskLevel;
+	isLoading: boolean;
+	isFailed: boolean;
+}) {
+	const { t } = useLanguage();
+	if (isLoading) {
+		return (
+			<Badge className="text-xs bg-muted/20 text-muted-foreground">
+				{t("statusSearching")}
+			</Badge>
+		);
+	}
+	if (isFailed) {
+		return (
+			<Badge className="text-xs bg-yellow-500/10 text-yellow-400">
+				{t("statusError")}
+			</Badge>
+		);
+	}
+	const label = riskLevel === "none" ? t("statusClean") : t("statusMatches");
+	return (
+		<Badge className={cn("text-xs", getRiskLevelBadgeColor(riskLevel))}>
+			{label}
 		</Badge>
 	);
 }
@@ -252,6 +323,19 @@ export function ScreeningResultsCard({
 		data.adverseMediaStatus,
 		!!adverseMediaHasRisk,
 	);
+	const adverseMediaRiskLevel: RiskLevel =
+		adverseMediaRaw && !("error" in adverseMediaRaw)
+			? (adverseMediaRaw as AdverseMediaResult).risk_level
+			: "none";
+
+	// PEP combined risk for section header: official match = high, else AI probability
+	const pepCombinedRiskLevel: RiskLevel = pepOfficialHasMatches
+		? "high"
+		: pepAiRaw &&
+			  !("error" in pepAiRaw) &&
+			  typeof (pepAiRaw as GrokPepResult).probability === "number"
+			? pepProbabilityToRiskLevel((pepAiRaw as GrokPepResult).probability)
+			: "none";
 
 	return (
 		<div className="space-y-2 pb-4">
@@ -394,10 +478,18 @@ export function ScreeningResultsCard({
 					>
 						<AccordionTrigger className="hover:no-underline">
 							<div className="flex items-center gap-3 w-full">
-								{getStatusIcon(pepCombinedStatus)}
+								{pepCombinedStatus === "loading"
+									? getStatusIcon("loading")
+									: pepCombinedStatus === "failed"
+										? getStatusIcon("failed")
+										: getRiskLevelIcon(pepCombinedRiskLevel)}
 								<span className="font-semibold">{t("pepTitle")}</span>
 								<div className="ml-auto">
-									<StatusBadgeLabel itemStatus={pepCombinedStatus} />
+									<RiskSectionBadge
+										riskLevel={pepCombinedRiskLevel}
+										isLoading={pepCombinedStatus === "loading"}
+										isFailed={pepCombinedStatus === "failed"}
+									/>
 								</div>
 							</div>
 						</AccordionTrigger>
@@ -503,11 +595,11 @@ export function ScreeningResultsCard({
 																{t("probability")}
 															</span>
 															<Badge
-																variant={
-																	(pepAiRaw as GrokPepResult).probability > 0.5
-																		? "destructive"
-																		: "default"
-																}
+																className={getRiskLevelBadgeColor(
+																	pepProbabilityToRiskLevel(
+																		(pepAiRaw as GrokPepResult).probability,
+																	),
+																)}
 															>
 																{Math.round(
 																	(pepAiRaw as GrokPepResult).probability * 100,
@@ -583,10 +675,18 @@ export function ScreeningResultsCard({
 					>
 						<AccordionTrigger className="hover:no-underline">
 							<div className="flex items-center gap-3 w-full">
-								{getStatusIcon(adverseMediaStatus)}
+								{adverseMediaStatus === "loading"
+									? getStatusIcon("loading")
+									: adverseMediaStatus === "failed"
+										? getStatusIcon("failed")
+										: getRiskLevelIcon(adverseMediaRiskLevel)}
 								<span className="font-semibold">{t("adverseMediaTitle")}</span>
 								<div className="ml-auto">
-									<StatusBadgeLabel itemStatus={adverseMediaStatus} />
+									<RiskSectionBadge
+										riskLevel={adverseMediaRiskLevel}
+										isLoading={adverseMediaStatus === "loading"}
+										isFailed={adverseMediaStatus === "failed"}
+									/>
 								</div>
 							</div>
 						</AccordionTrigger>
@@ -613,12 +713,9 @@ export function ScreeningResultsCard({
 										<div className="flex items-center gap-2">
 											<span className="font-medium">{t("riskLevel")}</span>
 											<Badge
-												variant={
-													(adverseMediaRaw as AdverseMediaResult).risk_level ===
-													"high"
-														? "destructive"
-														: "default"
-												}
+												className={getRiskLevelBadgeColor(
+													(adverseMediaRaw as AdverseMediaResult).risk_level,
+												)}
 											>
 												{(adverseMediaRaw as AdverseMediaResult).risk_level}
 											</Badge>

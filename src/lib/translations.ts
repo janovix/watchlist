@@ -244,6 +244,10 @@ export const translations = {
 		tableStatus: "Estado",
 		sourceManual: "Búsqueda",
 		sourceAmlScreening: "Screening AML",
+		sourceWatchlistQuery: "Consulta en listas",
+		sourceAml: "AML",
+		sourceCsvImport: "Importación CSV",
+		sourceApi: "API",
 		sourceUnknown: "Desconocido",
 		noQueriesFound: "No se encontraron consultas que coincidan con tus filtros",
 		noQueriesYet:
@@ -606,6 +610,10 @@ export const translations = {
 		tableStatus: "Status",
 		sourceManual: "Search",
 		sourceAmlScreening: "AML Screening",
+		sourceWatchlistQuery: "Watchlist query",
+		sourceAml: "AML",
+		sourceCsvImport: "CSV import",
+		sourceApi: "API",
 		sourceUnknown: "Unknown",
 		noQueriesFound: "No queries found matching your filters",
 		noQueriesYet:
