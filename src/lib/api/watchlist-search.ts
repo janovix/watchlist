@@ -89,7 +89,7 @@ export interface WatchlistSearchRequest {
 	birthDate?: string; // Optional: for meta scoring
 	identifiers?: string[]; // Optional: exact identifier lookup
 	topK?: number; // Default: 50
-	threshold?: number; // Default: 0.70
+	threshold?: number; // Default: 0.875
 }
 
 /**

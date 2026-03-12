@@ -96,6 +96,7 @@ export default function HomePage() {
 			const searchParams: WatchlistSearchRequest = {
 				q: queryToSearch.trim(),
 				entityType,
+				threshold: 0.875,
 			};
 
 			if (birthDate.trim()) {

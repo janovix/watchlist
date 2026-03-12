@@ -247,6 +247,7 @@ export default function QueriesPage() {
 		"aml-screening": t("sourceAml"),
 		"aml:client": t("sourceAml"),
 		"aml:bc": t("sourceAml"),
+		import: t("sourceCsvImport"), // legacy CSV import source
 	};
 
 	const getSourceLabel = (source: string) =>
@@ -279,6 +280,31 @@ export default function QueriesPage() {
 				{statusLabels[status] || status}
 			</Badge>
 		);
+	};
+
+	type RiskIndicator = "ofac" | "unsc" | "sat69b" | "pep" | "adverseMedia";
+	const getRiskIndicators = (q: QueryListItem): RiskIndicator[] => {
+		const out: RiskIndicator[] = [];
+		if ((q.ofacCount ?? 0) > 0) out.push("ofac");
+		if ((q.unCount ?? 0) > 0) out.push("unsc");
+		if ((q.sat69bCount ?? 0) > 0) out.push("sat69b");
+		if ((q.pepOfficialCount ?? 0) > 0) out.push("pep");
+		if (q.adverseMediaHasRisk === true) out.push("adverseMedia");
+		return out;
+	};
+	const riskIndicatorLabels: Record<RiskIndicator, string> = {
+		ofac: t("riskIndicatorOfac"),
+		unsc: t("riskIndicatorUnsc"),
+		sat69b: t("riskIndicatorSat69b"),
+		pep: t("riskIndicatorPep"),
+		adverseMedia: t("riskIndicatorAdverseMedia"),
+	};
+	const riskIndicatorBadgeText: Record<RiskIndicator, string> = {
+		ofac: "OFAC",
+		unsc: "UNSC",
+		sat69b: "SAT 69-B",
+		pep: "PEP",
+		adverseMedia: t("adverseMediaTitle"),
 	};
 
 	const hasNextPage = paramOffset + LIMIT < totalCount;
@@ -430,14 +456,15 @@ export default function QueriesPage() {
 								<TableHead>{t("tableUser")}</TableHead>
 								<TableHead>{t("tableDate")}</TableHead>
 								<TableHead>{t("tableStatus")}</TableHead>
-								<TableHead className="w-10" />
+								<TableHead>{t("tableRiskIndicators")}</TableHead>
+								<TableHead className="w-10" aria-label={t("exportPdf")} />
 							</TableRow>
 						</TableHeader>
 						<TableBody>
 							{filteredQueries.length === 0 ? (
 								<TableRow>
 									<TableCell
-										colSpan={6}
+										colSpan={7}
 										className="text-center py-12 text-muted-foreground"
 									>
 										{paramSearch || paramFilter !== "all"
@@ -505,6 +532,14 @@ export default function QueriesPage() {
 													);
 												}
 												if (query.userId) {
+													// Legacy import-worker (or similar) — show friendly label
+													if (query.userId.startsWith("import-")) {
+														return (
+															<span className="text-sm text-muted-foreground">
+																{t("userImportLabel")}
+															</span>
+														);
+													}
 													return (
 														<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
 															{query.userId.slice(0, 8)}…
@@ -525,6 +560,47 @@ export default function QueriesPage() {
 											</div>
 										</TableCell>
 										<TableCell>{getStatusBadge(query.status)}</TableCell>
+										<TableCell>
+											{(() => {
+												const indicators = getRiskIndicators(query);
+												if (indicators.length === 0) {
+													return (
+														<span
+															className="text-sm text-muted-foreground"
+															aria-label={t("riskIndicatorNone")}
+														>
+															—
+														</span>
+													);
+												}
+												return (
+													<div
+														className="flex flex-wrap gap-1"
+														role="list"
+														aria-label={t("tableRiskIndicators")}
+													>
+														{indicators.map((key) => (
+															<TooltipProvider key={key} delayDuration={200}>
+																<Tooltip>
+																	<TooltipTrigger asChild>
+																		<Badge
+																			variant="destructive"
+																			className="text-xs font-normal"
+																			role="listitem"
+																		>
+																			{riskIndicatorBadgeText[key]}
+																		</Badge>
+																	</TooltipTrigger>
+																	<TooltipContent>
+																		{riskIndicatorLabels[key]}
+																	</TooltipContent>
+																</Tooltip>
+															</TooltipProvider>
+														))}
+													</div>
+												);
+											})()}
+										</TableCell>
 										<TableCell>
 											<Button
 												variant="ghost"

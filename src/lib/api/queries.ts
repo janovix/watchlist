@@ -75,6 +75,8 @@ export interface QueryListItem {
 	pepOfficialCount: number | null;
 	pepAiStatus: QueryStatus | null;
 	adverseMediaStatus: QueryStatus | null;
+	/** Set when adverse media result has risk_level !== "none" (optional for backward compatibility) */
+	adverseMediaHasRisk?: boolean | null;
 	createdAt: string;
 	updatedAt: string;
 }
