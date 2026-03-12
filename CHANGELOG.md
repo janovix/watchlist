@@ -1,3 +1,10 @@
+# [1.1.0-rc.29](https://github.com/janovix/watchlist/compare/v1.1.0-rc.28...v1.1.0-rc.29) (2026-03-12)
+
+
+### Features
+
+* add lodash.debounce for search term debouncing in QueriesPage ([ef7399e](https://github.com/janovix/watchlist/commit/ef7399ee80231e076ea17ec71485d849e27bfed7))
+
 # [1.1.0-rc.28](https://github.com/janovix/watchlist/compare/v1.1.0-rc.27...v1.1.0-rc.28) (2026-03-11)
 
 
