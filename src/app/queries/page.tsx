@@ -43,6 +43,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 const LIMIT = 20;
 /** Delay (ms) before pushing search term to URL to avoid race with rapid typing */
@@ -283,6 +284,7 @@ export default function QueriesPage() {
 	};
 
 	type RiskIndicator = "ofac" | "unsc" | "sat69b" | "pep" | "adverseMedia";
+	type RiskLevel = "low" | "medium" | "high";
 	const getRiskIndicators = (q: QueryListItem): RiskIndicator[] => {
 		const out: RiskIndicator[] = [];
 		if ((q.ofacCount ?? 0) > 0) out.push("ofac");
@@ -291,6 +293,27 @@ export default function QueriesPage() {
 		if ((q.pepOfficialCount ?? 0) > 0) out.push("pep");
 		if (q.adverseMediaHasRisk === true) out.push("adverseMedia");
 		return out;
+	};
+	/** Badge color by risk level: low = yellow, medium = orange, high = red */
+	const getRiskLevelBadgeColor = (level: RiskLevel): string => {
+		switch (level) {
+			case "low":
+				return "bg-yellow-500/10 text-yellow-400";
+			case "medium":
+				return "bg-orange-500/10 text-orange-400";
+			case "high":
+				return "bg-red-500/10 text-red-400";
+		}
+	};
+	/** Risk level per indicator: adverse media from API, others are high (sanctions/PEP match) */
+	const getIndicatorRiskLevel = (
+		key: RiskIndicator,
+		q: QueryListItem,
+	): RiskLevel => {
+		if (key === "adverseMedia" && q.adverseMediaRiskLevel) {
+			return q.adverseMediaRiskLevel;
+		}
+		return "high";
 	};
 	const riskIndicatorLabels: Record<RiskIndicator, string> = {
 		ofac: t("riskIndicatorOfac"),
@@ -579,24 +602,29 @@ export default function QueriesPage() {
 														role="list"
 														aria-label={t("tableRiskIndicators")}
 													>
-														{indicators.map((key) => (
-															<TooltipProvider key={key} delayDuration={200}>
-																<Tooltip>
-																	<TooltipTrigger asChild>
-																		<Badge
-																			variant="destructive"
-																			className="text-xs font-normal"
-																			role="listitem"
-																		>
-																			{riskIndicatorBadgeText[key]}
-																		</Badge>
-																	</TooltipTrigger>
-																	<TooltipContent>
-																		{riskIndicatorLabels[key]}
-																	</TooltipContent>
-																</Tooltip>
-															</TooltipProvider>
-														))}
+														{indicators.map((key) => {
+															const level = getIndicatorRiskLevel(key, query);
+															return (
+																<TooltipProvider key={key} delayDuration={200}>
+																	<Tooltip>
+																		<TooltipTrigger asChild>
+																			<Badge
+																				className={cn(
+																					"text-xs font-normal",
+																					getRiskLevelBadgeColor(level),
+																				)}
+																				role="listitem"
+																			>
+																				{riskIndicatorBadgeText[key]}
+																			</Badge>
+																		</TooltipTrigger>
+																		<TooltipContent>
+																			{riskIndicatorLabels[key]}
+																		</TooltipContent>
+																	</Tooltip>
+																</TooltipProvider>
+															);
+														})}
 													</div>
 												);
 											})()}
