@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth/authClient";
 
-type MemberMap = Record<string, string>;
+export interface MemberInfo {
+	name: string;
+	image?: string | null;
+}
+
+export type MemberMap = Record<string, MemberInfo>;
 
 let cachedMembers: MemberMap | null = null;
 
@@ -45,7 +50,10 @@ export function useOrgMembers(): {
 				if (data && Array.isArray(data)) {
 					for (const m of data) {
 						if (m.user?.id && m.user?.name) {
-							map[m.user.id] = m.user.name;
+							map[m.user.id] = {
+								name: m.user.name,
+								image: m.user.image ?? null,
+							};
 						}
 					}
 				}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import debounce from "lodash.debounce";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
 	Search,
@@ -41,8 +42,22 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const LIMIT = 20;
+/** Delay (ms) before pushing search term to URL to avoid race with rapid typing */
+const SEARCH_DEBOUNCE_MS = 300;
+
+function getInitials(name: string): string {
+	const parts = name.trim().split(/\s+/).filter(Boolean);
+	if (parts.length >= 2) {
+		return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+	}
+	if (parts[0]?.length >= 2) {
+		return parts[0].slice(0, 2).toUpperCase();
+	}
+	return parts[0]?.[0]?.toUpperCase() ?? "?";
+}
 const VALID_FILTERS = ["all", "person", "organization"] as const;
 
 /**
@@ -125,9 +140,9 @@ export default function QueriesPage() {
 		);
 	}, [searchParams]);
 
-	// Update local search when URL params change
+	// Update local search when URL params change (normalize to uppercase)
 	useEffect(() => {
-		setLocalSearch(paramSearch);
+		setLocalSearch(paramSearch.toUpperCase());
 	}, [paramSearch]);
 
 	// Update URL when state changes
@@ -147,6 +162,23 @@ export default function QueriesPage() {
 		},
 		[router, paramSearch, paramFilter, paramOffset],
 	);
+
+	const updateSearchParamsRef = useRef(updateSearchParams);
+	updateSearchParamsRef.current = updateSearchParams;
+
+	const debouncedSetSearchInUrl = useMemo(
+		() =>
+			debounce((value: string) => {
+				updateSearchParamsRef.current(value, undefined, 0);
+			}, SEARCH_DEBOUNCE_MS),
+		[],
+	);
+
+	useEffect(() => {
+		return () => {
+			debouncedSetSearchInUrl.cancel();
+		};
+	}, [debouncedSetSearchInUrl]);
 
 	// Fetch queries with pagination
 	useEffect(() => {
@@ -205,8 +237,17 @@ export default function QueriesPage() {
 	};
 
 	const sourceLabels: Record<string, string> = {
-		manual: t("sourceManual"),
-		"aml-screening": t("sourceAmlScreening"),
+		// Canonical values
+		watchlist_query: t("sourceWatchlistQuery"),
+		aml: t("sourceAml"),
+		csv_import: t("sourceCsvImport"),
+		api: t("sourceApi"),
+		// Backward compatibility
+		manual: t("sourceWatchlistQuery"),
+		"aml-screening": t("sourceAml"),
+		"aml:client": t("sourceAml"),
+		"aml:bc": t("sourceAml"),
+		import: t("sourceCsvImport"), // legacy CSV import source
 	};
 
 	const getSourceLabel = (source: string) =>
@@ -239,6 +280,31 @@ export default function QueriesPage() {
 				{statusLabels[status] || status}
 			</Badge>
 		);
+	};
+
+	type RiskIndicator = "ofac" | "unsc" | "sat69b" | "pep" | "adverseMedia";
+	const getRiskIndicators = (q: QueryListItem): RiskIndicator[] => {
+		const out: RiskIndicator[] = [];
+		if ((q.ofacCount ?? 0) > 0) out.push("ofac");
+		if ((q.unCount ?? 0) > 0) out.push("unsc");
+		if ((q.sat69bCount ?? 0) > 0) out.push("sat69b");
+		if ((q.pepOfficialCount ?? 0) > 0) out.push("pep");
+		if (q.adverseMediaHasRisk === true) out.push("adverseMedia");
+		return out;
+	};
+	const riskIndicatorLabels: Record<RiskIndicator, string> = {
+		ofac: t("riskIndicatorOfac"),
+		unsc: t("riskIndicatorUnsc"),
+		sat69b: t("riskIndicatorSat69b"),
+		pep: t("riskIndicatorPep"),
+		adverseMedia: t("riskIndicatorAdverseMedia"),
+	};
+	const riskIndicatorBadgeText: Record<RiskIndicator, string> = {
+		ofac: "OFAC",
+		unsc: "UNSC",
+		sat69b: "SAT 69-B",
+		pep: "PEP",
+		adverseMedia: t("adverseMediaTitle"),
 	};
 
 	const hasNextPage = paramOffset + LIMIT < totalCount;
@@ -296,7 +362,7 @@ export default function QueriesPage() {
 					</div>
 
 					{/* Pagination skeleton */}
-					<div className="mt-6 flex items-center justify-between">
+					<div className="mt-6 mb-6 flex items-center justify-between">
 						<Skeleton className="h-4 w-48" />
 						<div className="flex gap-2">
 							<Skeleton className="h-9 w-24 rounded-md" />
@@ -346,11 +412,12 @@ export default function QueriesPage() {
 						<Input
 							value={localSearch}
 							onChange={(e) => {
-								setLocalSearch(e.target.value);
-								updateSearchParams(e.target.value, undefined, 0);
+								const value = e.target.value.toUpperCase();
+								setLocalSearch(value);
+								debouncedSetSearchInUrl(value);
 							}}
 							placeholder={t("searchQueriesPlaceholder")}
-							className="pl-10 bg-card border"
+							className="pl-10 bg-card border uppercase"
 						/>
 					</div>
 					<div className="flex gap-2">
@@ -385,12 +452,12 @@ export default function QueriesPage() {
 						<TableHeader>
 							<TableRow>
 								<TableHead>{t("tableQuery")}</TableHead>
-								<TableHead>{t("tableType")}</TableHead>
 								<TableHead>{t("tableSource")}</TableHead>
 								<TableHead>{t("tableUser")}</TableHead>
 								<TableHead>{t("tableDate")}</TableHead>
 								<TableHead>{t("tableStatus")}</TableHead>
-								<TableHead className="w-10" />
+								<TableHead>{t("tableRiskIndicators")}</TableHead>
+								<TableHead className="w-10" aria-label={t("exportPdf")} />
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -412,19 +479,14 @@ export default function QueriesPage() {
 										className="cursor-pointer hover:bg-muted/50"
 										onClick={() => router.push(`/queries/${query.id}`)}
 									>
-										<TableCell className="font-medium">{query.query}</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2">
 												{query.entityType === "organization" ? (
-													<Building2 className="h-4 w-4 text-muted-foreground" />
+													<Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
 												) : (
-													<User className="h-4 w-4 text-muted-foreground" />
+													<User className="h-4 w-4 text-muted-foreground shrink-0" />
 												)}
-												<span className="capitalize">
-													{query.entityType === "organization"
-														? t("filterCompany")
-														: t("filterIndividual")}
-												</span>
+												<span className="font-medium">{query.query}</span>
 											</div>
 										</TableCell>
 										<TableCell>
@@ -433,23 +495,63 @@ export default function QueriesPage() {
 											</span>
 										</TableCell>
 										<TableCell>
-											<TooltipProvider delayDuration={200}>
-												<Tooltip>
-													<TooltipTrigger asChild>
+											{(() => {
+												const display =
+													query.userDisplay ??
+													(query.userId && members[query.userId]
+														? {
+																name: members[query.userId].name,
+																image: members[query.userId].image ?? null,
+															}
+														: null);
+												if (display) {
+													return (
+														<TooltipProvider delayDuration={200}>
+															<Tooltip>
+																<TooltipTrigger asChild>
+																	<div className="flex items-center gap-2 min-w-0 max-w-[180px]">
+																		<Avatar className="h-7 w-7 shrink-0">
+																			{display.image ? (
+																				<AvatarImage
+																					src={display.image}
+																					alt={display.name}
+																				/>
+																			) : null}
+																			<AvatarFallback className="text-xs">
+																				{getInitials(display.name)}
+																			</AvatarFallback>
+																		</Avatar>
+																		<span className="text-sm text-muted-foreground truncate">
+																			{display.name}
+																		</span>
+																	</div>
+																</TooltipTrigger>
+																<TooltipContent>{display.name}</TooltipContent>
+															</Tooltip>
+														</TooltipProvider>
+													);
+												}
+												if (query.userId) {
+													// Legacy import-worker (or similar) — show friendly label
+													if (query.userId.startsWith("import-")) {
+														return (
+															<span className="text-sm text-muted-foreground">
+																{t("userImportLabel")}
+															</span>
+														);
+													}
+													return (
 														<span className="text-sm text-muted-foreground truncate max-w-[120px] inline-block">
-															{query.userId
-																? (members[query.userId] ??
-																	query.userId.slice(0, 8) + "…")
-																: "—"}
+															{query.userId.slice(0, 8)}…
 														</span>
-													</TooltipTrigger>
-													{query.userId && members[query.userId] && (
-														<TooltipContent>
-															{members[query.userId]}
-														</TooltipContent>
-													)}
-												</Tooltip>
-											</TooltipProvider>
+													);
+												}
+												return (
+													<span className="text-sm text-muted-foreground">
+														—
+													</span>
+												);
+											})()}
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
@@ -458,6 +560,47 @@ export default function QueriesPage() {
 											</div>
 										</TableCell>
 										<TableCell>{getStatusBadge(query.status)}</TableCell>
+										<TableCell>
+											{(() => {
+												const indicators = getRiskIndicators(query);
+												if (indicators.length === 0) {
+													return (
+														<span
+															className="text-sm text-muted-foreground"
+															aria-label={t("riskIndicatorNone")}
+														>
+															—
+														</span>
+													);
+												}
+												return (
+													<div
+														className="flex flex-wrap gap-1"
+														role="list"
+														aria-label={t("tableRiskIndicators")}
+													>
+														{indicators.map((key) => (
+															<TooltipProvider key={key} delayDuration={200}>
+																<Tooltip>
+																	<TooltipTrigger asChild>
+																		<Badge
+																			variant="destructive"
+																			className="text-xs font-normal"
+																			role="listitem"
+																		>
+																			{riskIndicatorBadgeText[key]}
+																		</Badge>
+																	</TooltipTrigger>
+																	<TooltipContent>
+																		{riskIndicatorLabels[key]}
+																	</TooltipContent>
+																</Tooltip>
+															</TooltipProvider>
+														))}
+													</div>
+												);
+											})()}
+										</TableCell>
 										<TableCell>
 											<Button
 												variant="ghost"
@@ -485,7 +628,7 @@ export default function QueriesPage() {
 				</div>
 
 				{/* Pagination */}
-				<div className="mt-6 flex items-center justify-between">
+				<div className="mt-6 mb-6 flex items-center justify-between">
 					<div className="text-sm text-muted-foreground">
 						{t("showingQueries")
 							.replace("{from}", String(paramOffset + 1))

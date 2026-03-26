@@ -125,6 +125,36 @@ describe("watchlist-search", () => {
 			);
 		});
 
+		it("should include countries in request body when provided", async () => {
+			const mockResponse: WatchlistSearchApiResponse = {
+				success: true,
+				result: {
+					queryId: "test-query-id",
+					ofac: { matches: [], count: 0 },
+					unsc: { matches: [], count: 0 },
+					sat69b: { matches: [], count: 0 },
+				},
+			};
+
+			vi.mocked(httpModule.fetchJson).mockResolvedValue({
+				json: mockResponse,
+				status: 200,
+			});
+
+			await searchWatchlist({
+				q: "Test",
+				countries: ["MX", "US", "CO"],
+			});
+
+			const call = vi.mocked(httpModule.fetchJson).mock.calls[0];
+			expect(call).toBeDefined();
+			expect(call[1]).toBeDefined();
+			const body = JSON.parse(
+				(call[1] as { body: string }).body,
+			) as WatchlistSearchRequest;
+			expect(body.countries).toEqual(["MX", "US", "CO"]);
+		});
+
 		it("should return matches separated by dataset", async () => {
 			const mockOfacMatch: OfacMatch = {
 				target: {

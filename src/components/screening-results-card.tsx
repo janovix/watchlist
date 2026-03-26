@@ -27,7 +27,10 @@ import {
 	extractHostname,
 } from "@/components/external-link-dialog";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
-import type { ConnectionStatus } from "@/hooks/useSearchQuery";
+import type {
+	ConnectionStatus,
+	ProgressMessages,
+} from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
 import type { WatchlistFeatures } from "@/lib/api/watchlist-config";
 
@@ -70,6 +73,9 @@ function getBilingualText(
 
 type ItemStatus = "loading" | "complete_clear" | "complete_match" | "failed";
 
+/** Risk level for PEP and Adverse Media: low = yellow, medium = orange, high = red */
+type RiskLevel = "none" | "low" | "medium" | "high";
+
 function resolveItemStatus(
 	status: QueryStatus | null | undefined,
 	count: number | null | undefined,
@@ -101,6 +107,65 @@ function getStatusIcon(itemStatus: ItemStatus) {
 	}
 }
 
+/** Max coincidence score (0–1) across matches; used for OFAC/UNSC/SAT 69-B semaphore icon */
+function getMaxScoreFromMatches(
+	matches: Array<{ score?: number }> | undefined,
+): number {
+	if (!Array.isArray(matches) || matches.length === 0) return 0;
+	const scores = matches
+		.map((m) => (typeof m.score === "number" ? m.score : 0))
+		.filter((s) => s > 0);
+	return scores.length === 0 ? 0 : Math.max(...scores);
+}
+
+/** Map max score to risk level for section icon: low = yellow, medium = orange, high = red */
+function watchlistScoreToRiskLevel(score: number): RiskLevel {
+	if (score > 0.75) return "high";
+	if (score > 0.5) return "medium";
+	return "low";
+}
+
+/** Icon for OFAC/UNSC/SAT 69-B: semaphore by max coincidence when there are matches, else status icon */
+function getWatchlistSectionIcon(
+	itemStatus: ItemStatus,
+	matches: Array<{ score?: number }> | undefined,
+) {
+	if (
+		itemStatus !== "complete_match" ||
+		!Array.isArray(matches) ||
+		matches.length === 0
+	) {
+		return getStatusIcon(itemStatus);
+	}
+	const maxScore = getMaxScoreFromMatches(matches);
+	return getRiskLevelIcon(watchlistScoreToRiskLevel(maxScore));
+}
+
+/** Badge for OFAC/UNSC/SAT 69-B: "Coincidencias" with semaphore color when matches exist, else standard status badge */
+function WatchlistSectionBadge({
+	itemStatus,
+	matches,
+}: {
+	itemStatus: ItemStatus;
+	matches: Array<{ score?: number }> | undefined;
+}) {
+	const { t } = useLanguage();
+	if (
+		itemStatus === "complete_match" &&
+		Array.isArray(matches) &&
+		matches.length > 0
+	) {
+		const maxScore = getMaxScoreFromMatches(matches);
+		const riskLevel = watchlistScoreToRiskLevel(maxScore);
+		return (
+			<Badge className={cn("text-xs", getRiskLevelBadgeColor(riskLevel))}>
+				{t("statusMatches")}
+			</Badge>
+		);
+	}
+	return <StatusBadgeLabel itemStatus={itemStatus} />;
+}
+
 function getStatusBadgeColor(itemStatus: ItemStatus): string {
 	switch (itemStatus) {
 		case "loading":
@@ -112,6 +177,41 @@ function getStatusBadgeColor(itemStatus: ItemStatus): string {
 		case "failed":
 			return "bg-yellow-500/10 text-yellow-400";
 	}
+}
+
+/** Map risk level to icon and badge styling: low = yellow, medium = orange, high = red */
+function getRiskLevelIcon(risk: RiskLevel) {
+	switch (risk) {
+		case "none":
+			return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+		case "low":
+			return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+		case "medium":
+			return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+		case "high":
+			return <AlertTriangle className="h-5 w-5 text-red-500" />;
+	}
+}
+
+function getRiskLevelBadgeColor(risk: RiskLevel): string {
+	switch (risk) {
+		case "none":
+			return "bg-green-500/10 text-green-400";
+		case "low":
+			return "bg-yellow-500/10 text-yellow-400";
+		case "medium":
+			return "bg-orange-500/10 text-orange-400";
+		case "high":
+			return "bg-red-500/10 text-red-400";
+	}
+}
+
+/** Map PEP probability (0–1) to risk level for coloring */
+function pepProbabilityToRiskLevel(probability: number): RiskLevel {
+	if (probability <= 0) return "none";
+	if (probability <= 1 / 3) return "low";
+	if (probability <= 2 / 3) return "medium";
+	return "high";
 }
 
 function StatusBadgeLabel({ itemStatus }: { itemStatus: ItemStatus }) {
@@ -126,6 +226,39 @@ function StatusBadgeLabel({ itemStatus }: { itemStatus: ItemStatus }) {
 	return (
 		<Badge className={`text-xs ${getStatusBadgeColor(itemStatus)}`}>
 			{badgeText[itemStatus]}
+		</Badge>
+	);
+}
+
+/** Badge for risk-based sections (PEP, Adverse Media): Limpio vs Coincidencias with risk color */
+function RiskSectionBadge({
+	riskLevel,
+	isLoading,
+	isFailed,
+}: {
+	riskLevel: RiskLevel;
+	isLoading: boolean;
+	isFailed: boolean;
+}) {
+	const { t } = useLanguage();
+	if (isLoading) {
+		return (
+			<Badge className="text-xs bg-muted/20 text-muted-foreground">
+				{t("statusSearching")}
+			</Badge>
+		);
+	}
+	if (isFailed) {
+		return (
+			<Badge className="text-xs bg-yellow-500/10 text-yellow-400">
+				{t("statusError")}
+			</Badge>
+		);
+	}
+	const label = riskLevel === "none" ? t("statusClean") : t("statusMatches");
+	return (
+		<Badge className={cn("text-xs", getRiskLevelBadgeColor(riskLevel))}>
+			{label}
 		</Badge>
 	);
 }
@@ -173,6 +306,7 @@ function SubsectionBadge({
 interface ScreeningResultsCardProps {
 	data: SearchQuery;
 	connectionStatus: ConnectionStatus;
+	progressMessages?: ProgressMessages;
 	features?: WatchlistFeatures;
 }
 
@@ -183,6 +317,7 @@ interface ScreeningResultsCardProps {
 export function ScreeningResultsCard({
 	data,
 	connectionStatus,
+	progressMessages,
 	features,
 }: ScreeningResultsCardProps) {
 	const { language, t } = useLanguage();
@@ -252,6 +387,19 @@ export function ScreeningResultsCard({
 		data.adverseMediaStatus,
 		!!adverseMediaHasRisk,
 	);
+	const adverseMediaRiskLevel: RiskLevel =
+		adverseMediaRaw && !("error" in adverseMediaRaw)
+			? (adverseMediaRaw as AdverseMediaResult).risk_level
+			: "none";
+
+	// PEP combined risk for section header: official match = high, else AI probability
+	const pepCombinedRiskLevel: RiskLevel = pepOfficialHasMatches
+		? "high"
+		: pepAiRaw &&
+			  !("error" in pepAiRaw) &&
+			  typeof (pepAiRaw as GrokPepResult).probability === "number"
+			? pepProbabilityToRiskLevel((pepAiRaw as GrokPepResult).probability)
+			: "none";
 
 	return (
 		<div className="space-y-2 pb-4">
@@ -276,10 +424,26 @@ export function ScreeningResultsCard({
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(ofacStatus)}
+							{getWatchlistSectionIcon(
+								ofacStatus,
+								(
+									data.ofacResult as
+										| { matches: Array<{ score: number }> }
+										| undefined
+								)?.matches,
+							)}
 							<span className="font-semibold">{t("ofacSanctionsList")}</span>
 							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={ofacStatus} />
+								<WatchlistSectionBadge
+									itemStatus={ofacStatus}
+									matches={
+										(
+											data.ofacResult as
+												| { matches: Array<{ score?: number }> }
+												| undefined
+										)?.matches
+									}
+								/>
 							</div>
 						</div>
 					</AccordionTrigger>
@@ -315,10 +479,26 @@ export function ScreeningResultsCard({
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(unStatus)}
+							{getWatchlistSectionIcon(
+								unStatus,
+								(
+									data.unResult as
+										| { matches: Array<{ score: number }> }
+										| undefined
+								)?.matches,
+							)}
 							<span className="font-semibold">{t("unSanctionsList")}</span>
 							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={unStatus} />
+								<WatchlistSectionBadge
+									itemStatus={unStatus}
+									matches={
+										(
+											data.unResult as
+												| { matches: Array<{ score?: number }> }
+												| undefined
+										)?.matches
+									}
+								/>
 							</div>
 						</div>
 					</AccordionTrigger>
@@ -354,10 +534,26 @@ export function ScreeningResultsCard({
 				>
 					<AccordionTrigger className="hover:no-underline">
 						<div className="flex items-center gap-3 w-full">
-							{getStatusIcon(sat69bStatus)}
+							{getWatchlistSectionIcon(
+								sat69bStatus,
+								(
+									data.sat69bResult as
+										| { matches: Array<{ score: number }> }
+										| undefined
+								)?.matches,
+							)}
 							<span className="font-semibold">{t("sat69bTitle")}</span>
 							<div className="ml-auto">
-								<StatusBadgeLabel itemStatus={sat69bStatus} />
+								<WatchlistSectionBadge
+									itemStatus={sat69bStatus}
+									matches={
+										(
+											data.sat69bResult as
+												| { matches: Array<{ score?: number }> }
+												| undefined
+										)?.matches
+									}
+								/>
 							</div>
 						</div>
 					</AccordionTrigger>
@@ -394,10 +590,18 @@ export function ScreeningResultsCard({
 					>
 						<AccordionTrigger className="hover:no-underline">
 							<div className="flex items-center gap-3 w-full">
-								{getStatusIcon(pepCombinedStatus)}
+								{pepCombinedStatus === "loading"
+									? getStatusIcon("loading")
+									: pepCombinedStatus === "failed"
+										? getStatusIcon("failed")
+										: getRiskLevelIcon(pepCombinedRiskLevel)}
 								<span className="font-semibold">{t("pepTitle")}</span>
 								<div className="ml-auto">
-									<StatusBadgeLabel itemStatus={pepCombinedStatus} />
+									<RiskSectionBadge
+										riskLevel={pepCombinedRiskLevel}
+										isLoading={pepCombinedStatus === "loading"}
+										isFailed={pepCombinedStatus === "failed"}
+									/>
 								</div>
 							</div>
 						</AccordionTrigger>
@@ -479,7 +683,7 @@ export function ScreeningResultsCard({
 										</div>
 										{pepAiItemStatus === "loading" ? (
 											<p className="text-muted-foreground text-sm pl-2">
-												{t("analyzingAi")}
+												{progressMessages?.pepGrok ?? t("analyzingAi")}
 											</p>
 										) : pepAiItemStatus === "failed" ? (
 											<Alert variant="destructive" className="py-2">
@@ -503,11 +707,11 @@ export function ScreeningResultsCard({
 																{t("probability")}
 															</span>
 															<Badge
-																variant={
-																	(pepAiRaw as GrokPepResult).probability > 0.5
-																		? "destructive"
-																		: "default"
-																}
+																className={getRiskLevelBadgeColor(
+																	pepProbabilityToRiskLevel(
+																		(pepAiRaw as GrokPepResult).probability,
+																	),
+																)}
 															>
 																{Math.round(
 																	(pepAiRaw as GrokPepResult).probability * 100,
@@ -583,17 +787,25 @@ export function ScreeningResultsCard({
 					>
 						<AccordionTrigger className="hover:no-underline">
 							<div className="flex items-center gap-3 w-full">
-								{getStatusIcon(adverseMediaStatus)}
+								{adverseMediaStatus === "loading"
+									? getStatusIcon("loading")
+									: adverseMediaStatus === "failed"
+										? getStatusIcon("failed")
+										: getRiskLevelIcon(adverseMediaRiskLevel)}
 								<span className="font-semibold">{t("adverseMediaTitle")}</span>
 								<div className="ml-auto">
-									<StatusBadgeLabel itemStatus={adverseMediaStatus} />
+									<RiskSectionBadge
+										riskLevel={adverseMediaRiskLevel}
+										isLoading={adverseMediaStatus === "loading"}
+										isFailed={adverseMediaStatus === "failed"}
+									/>
 								</div>
 							</div>
 						</AccordionTrigger>
 						<AccordionContent>
 							{adverseMediaStatus === "loading" ? (
 								<p className="text-muted-foreground text-sm">
-									{t("analyzingAdverseMedia")}
+									{progressMessages?.adverseMedia ?? t("analyzingAdverseMedia")}
 								</p>
 							) : adverseMediaStatus === "failed" ? (
 								<Alert variant="destructive" className="py-2">
@@ -613,12 +825,9 @@ export function ScreeningResultsCard({
 										<div className="flex items-center gap-2">
 											<span className="font-medium">{t("riskLevel")}</span>
 											<Badge
-												variant={
-													(adverseMediaRaw as AdverseMediaResult).risk_level ===
-													"high"
-														? "destructive"
-														: "default"
-												}
+												className={getRiskLevelBadgeColor(
+													(adverseMediaRaw as AdverseMediaResult).risk_level,
+												)}
 											>
 												{(adverseMediaRaw as AdverseMediaResult).risk_level}
 											</Badge>

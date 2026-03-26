@@ -1,303 +1,144 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { cookies } from "next/headers";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { getServerSession } from "./getServerSession";
-import type { Session } from "./types";
 
-// Mock next/headers
-vi.mock("next/headers", () => ({
-	cookies: vi.fn(),
+vi.mock("./serverAuthClient", () => ({
+	serverAuthClient: {
+		getSession: vi.fn(),
+	},
 }));
 
+// Import after mock so we get the mocked version
+import { serverAuthClient } from "./serverAuthClient";
+
 describe("getServerSession", () => {
-	const mockSession: Session = {
-		user: {
-			id: "user-1",
-			name: "Test User",
-			email: "test@example.com",
-			image: null,
-			emailVerified: true,
-			createdAt: new Date("2024-01-01"),
-			updatedAt: new Date("2024-01-02"),
-		},
-		session: {
-			id: "session-1",
-			userId: "user-1",
-			token: "token-123",
-			expiresAt: new Date("2024-12-31"),
-			createdAt: new Date("2024-01-01"),
-			updatedAt: new Date("2024-01-02"),
-		},
+	const mockUser = {
+		id: "user-1",
+		name: "Test User",
+		email: "test@example.com",
+		image: null as string | null,
+		emailVerified: true,
+		createdAt: "2024-01-01T00:00:00.000Z",
+		updatedAt: "2024-01-02T00:00:00.000Z",
+	};
+
+	const mockSessionData = {
+		id: "session-1",
+		userId: "user-1",
+		token: "token-123",
+		expiresAt: "2024-12-31T00:00:00.000Z",
+		createdAt: "2024-01-01T00:00:00.000Z",
+		updatedAt: "2024-01-02T00:00:00.000Z",
 	};
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL = "https://auth.example.com";
-		process.env.NEXT_PUBLIC_AUTH_APP_URL = "https://app.example.com";
 	});
 
-	afterEach(() => {
-		delete process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
-		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
-	});
-
-	it("should return null if no session token cookie is present", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("other-cookie=value"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
+	it("should return null when serverAuthClient returns no data", async () => {
+		vi.mocked(serverAuthClient.getSession).mockResolvedValue({
+			data: null,
+			error: null,
+		} as any);
 
 		const result = await getServerSession();
 
 		expect(result).toBeNull();
 	});
 
-	it("should return null if NEXT_PUBLIC_AUTH_SERVICE_URL is not set", async () => {
-		delete process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
+	it("should return session with normalized Date fields from ISO strings", async () => {
+		vi.mocked(serverAuthClient.getSession).mockResolvedValue({
+			data: { user: mockUser, session: mockSessionData },
+			error: null,
+		} as any);
 
 		const result = await getServerSession();
 
-		expect(result).toBeNull();
-	});
-
-	it("should fetch and return session successfully", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				user: {
-					...mockSession.user,
-					createdAt: mockSession.user.createdAt.toISOString(),
-					updatedAt: mockSession.user.updatedAt.toISOString(),
-				},
-				session: {
-					...mockSession.session,
-					expiresAt: mockSession.session.expiresAt.toISOString(),
-					createdAt: mockSession.session.createdAt.toISOString(),
-					updatedAt: mockSession.session.updatedAt.toISOString(),
-				},
-			}),
-		});
-
-		const result = await getServerSession();
-
-		expect(result).toBeDefined();
+		expect(result).not.toBeNull();
 		expect(result?.user.id).toBe("user-1");
+		expect(result?.user.email).toBe("test@example.com");
+		expect(result?.user.createdAt).toBeInstanceOf(Date);
+		expect(result?.user.updatedAt).toBeInstanceOf(Date);
 		expect(result?.session.id).toBe("session-1");
-		expect(global.fetch).toHaveBeenCalledWith(
-			"https://auth.example.com/api/auth/get-session",
-			expect.objectContaining({
-				headers: expect.objectContaining({
-					Cookie: "better-auth.session_token=abc123",
-					Origin: "https://app.example.com",
-				}),
-				cache: "no-store",
-			}),
-		);
+		expect(result?.session.token).toBe("token-123");
+		expect(result?.session.expiresAt).toBeInstanceOf(Date);
+		expect(result?.session.createdAt).toBeInstanceOf(Date);
+		expect(result?.session.updatedAt).toBeInstanceOf(Date);
 	});
 
-	it("should return null if fetch response is not ok", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: false,
-		});
-
-		const result = await getServerSession();
-
-		expect(result).toBeNull();
-	});
-
-	it("should return null if response data is missing user or session", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				user: mockSession.user,
-				// Missing session
-			}),
-		});
-
-		const result = await getServerSession();
-
-		expect(result).toBeNull();
-	});
-
-	it("should handle fetch errors gracefully", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
-
-		const consoleErrorSpy = vi
-			.spyOn(console, "error")
-			.mockImplementation(() => {});
-
-		const result = await getServerSession();
-
-		expect(result).toBeNull();
-		expect(consoleErrorSpy).toHaveBeenCalled();
-
-		consoleErrorSpy.mockRestore();
-	});
-
-	it("should normalize image field from undefined to null", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
+	it("should handle Date objects in response (not just ISO strings)", async () => {
+		vi.mocked(serverAuthClient.getSession).mockResolvedValue({
+			data: {
 				user: {
-					...mockSession.user,
-					image: undefined, // Should be normalized to null
-					createdAt: mockSession.user.createdAt.toISOString(),
-					updatedAt: mockSession.user.updatedAt.toISOString(),
+					...mockUser,
+					createdAt: new Date("2024-01-01"),
+					updatedAt: new Date("2024-01-02"),
 				},
 				session: {
-					...mockSession.session,
-					expiresAt: mockSession.session.expiresAt.toISOString(),
-					createdAt: mockSession.session.createdAt.toISOString(),
-					updatedAt: mockSession.session.updatedAt.toISOString(),
+					...mockSessionData,
+					expiresAt: new Date("2024-12-31"),
+					createdAt: new Date("2024-01-01"),
+					updatedAt: new Date("2024-01-02"),
 				},
-			}),
-		});
+			},
+			error: null,
+		} as any);
+
+		const result = await getServerSession();
+
+		expect(result?.user.createdAt).toBeInstanceOf(Date);
+		expect(result?.user.updatedAt).toBeInstanceOf(Date);
+		expect(result?.session.expiresAt).toBeInstanceOf(Date);
+		expect(result?.session.createdAt).toBeInstanceOf(Date);
+		expect(result?.session.updatedAt).toBeInstanceOf(Date);
+	});
+
+	it("should preserve null image field", async () => {
+		vi.mocked(serverAuthClient.getSession).mockResolvedValue({
+			data: {
+				user: { ...mockUser, image: null },
+				session: mockSessionData,
+			},
+			error: null,
+		} as any);
 
 		const result = await getServerSession();
 
 		expect(result?.user.image).toBeNull();
 	});
 
-	it("should return null when NEXT_PUBLIC_AUTH_APP_URL is not set", async () => {
-		delete process.env.NEXT_PUBLIC_AUTH_APP_URL;
-
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn();
-
-		const result = await getServerSession();
-
-		expect(result).toBeNull();
-		expect(global.fetch).not.toHaveBeenCalled();
-	});
-
-	it("should handle Date objects in response (not just ISO strings)", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				user: {
-					...mockSession.user,
-					createdAt: mockSession.user.createdAt, // Already a Date
-					updatedAt: mockSession.user.updatedAt, // Already a Date
-				},
+	it("should handle null ipAddress and userAgent", async () => {
+		vi.mocked(serverAuthClient.getSession).mockResolvedValue({
+			data: {
+				user: mockUser,
 				session: {
-					...mockSession.session,
-					expiresAt: mockSession.session.expiresAt, // Already a Date
-					createdAt: mockSession.session.createdAt, // Already a Date
-					updatedAt: mockSession.session.updatedAt, // Already a Date
-				},
-			}),
-		});
-
-		const result = await getServerSession();
-
-		expect(result).toBeDefined();
-		expect(result?.user.createdAt).toBeInstanceOf(Date);
-	});
-
-	it("should handle ipAddress and userAgent being null", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				user: {
-					...mockSession.user,
-					createdAt: mockSession.user.createdAt.toISOString(),
-					updatedAt: mockSession.user.updatedAt.toISOString(),
-				},
-				session: {
-					...mockSession.session,
+					...mockSessionData,
 					ipAddress: null,
 					userAgent: null,
-					expiresAt: mockSession.session.expiresAt.toISOString(),
-					createdAt: mockSession.session.createdAt.toISOString(),
-					updatedAt: mockSession.session.updatedAt.toISOString(),
 				},
-			}),
-		});
+			},
+			error: null,
+		} as any);
 
 		const result = await getServerSession();
 
-		// getServerSession doesn't normalize null to undefined, it preserves null
 		expect(result?.session.ipAddress).toBeNull();
 		expect(result?.session.userAgent).toBeNull();
 	});
 
-	it("should return null if response has user but no session", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
+	it("should return null and log error when getSession throws", async () => {
+		const mockError = new Error("Network error");
+		vi.mocked(serverAuthClient.getSession).mockRejectedValue(mockError);
 
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				user: mockSession.user,
-				// Missing session
-			}),
-		});
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 		const result = await getServerSession();
 
 		expect(result).toBeNull();
-	});
+		expect(consoleSpy).toHaveBeenCalledWith(
+			"[getServerSession] Failed to fetch session:",
+			mockError,
+		);
 
-	it("should return null if response has session but no user", async () => {
-		const mockCookieStore = {
-			toString: vi.fn().mockReturnValue("better-auth.session_token=abc123"),
-		};
-		vi.mocked(cookies).mockResolvedValue(mockCookieStore as any);
-
-		global.fetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				session: mockSession.session,
-				// Missing user
-			}),
-		});
-
-		const result = await getServerSession();
-
-		expect(result).toBeNull();
+		consoleSpy.mockRestore();
 	});
 });

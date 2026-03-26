@@ -10,6 +10,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { requireEnv } from "@/lib/env";
 import { getQuery, type SearchQuery } from "@/lib/api/queries";
+import { ApiError } from "@/lib/api/http";
+import { tokenCache } from "@/lib/auth/tokenCache";
 
 export type ConnectionStatus =
 	| "disconnected"
@@ -23,12 +25,20 @@ export interface UseSearchQueryOptions {
 	enabled?: boolean;
 }
 
+/** Last progress message per stream (from SSE progress events) */
+export interface ProgressMessages {
+	pepGrok: string | null;
+	adverseMedia: string | null;
+	pepOfficial: string | null;
+}
+
 export interface UseSearchQueryResult {
 	data: SearchQuery | null;
 	isLoading: boolean;
 	error: string | null;
 	connectionStatus: ConnectionStatus;
 	isComplete: boolean;
+	progressMessages: ProgressMessages;
 	refetch: () => Promise<void>;
 }
 
@@ -56,6 +66,11 @@ export function useSearchQuery({
 	const [connectionStatus, setConnectionStatus] =
 		useState<ConnectionStatus>("disconnected");
 	const [isComplete, setIsComplete] = useState(false);
+	const [progressMessages, setProgressMessages] = useState<ProgressMessages>({
+		pepGrok: null,
+		adverseMedia: null,
+		pepOfficial: null,
+	});
 
 	const eventSourceRef = useRef<EventSource | null>(null);
 	const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
@@ -79,14 +94,34 @@ export function useSearchQuery({
 	/** Fetch the current query state from REST API */
 	const fetchData = useCallback(async () => {
 		if (!queryId) return;
-		try {
-			const response = await getQuery(queryId, { jwt });
-			setData(response.result);
+
+		const applyResult = (result: SearchQuery) => {
+			setData(result);
 			setError(null);
-			if (checkIfComplete(response.result)) {
+			if (checkIfComplete(result)) {
 				setIsComplete(true);
 			}
+		};
+
+		try {
+			const response = await getQuery(queryId, { jwt });
+			applyResult(response.result);
 		} catch (err) {
+			// On 401 silently force-refresh the token and retry once.
+			// This acts as a safety net when the JWT expires while the hook
+			// is still polling (e.g. the tab was in the background).
+			if (err instanceof ApiError && err.status === 401) {
+				try {
+					const freshToken = await tokenCache.getToken(true);
+					const response = await getQuery(queryId, {
+						jwt: freshToken ?? undefined,
+					});
+					applyResult(response.result);
+					return;
+				} catch {
+					// Retry also failed — fall through to normal error handling.
+				}
+			}
 			console.error("[useSearchQuery] fetch error:", err);
 			setError(err instanceof Error ? err.message : "Failed to load query");
 		}
@@ -145,9 +180,26 @@ export function useSearchQuery({
 				});
 			});
 
+			// PEP AI (Grok) progress
+			es.addEventListener("pep_grok_progress", (event) => {
+				try {
+					const payload = JSON.parse((event as MessageEvent).data) as {
+						message?: string;
+						phase?: string;
+					};
+					const text = payload.message ?? payload.phase ?? null;
+					setProgressMessages((prev) =>
+						text ? { ...prev, pepGrok: text } : prev,
+					);
+				} catch {
+					// ignore parse errors
+				}
+			});
+
 			// PEP AI (Grok) results
 			es.addEventListener("pep_grok_results", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, pepGrok: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -161,6 +213,7 @@ export function useSearchQuery({
 			// PEP AI error
 			es.addEventListener("pep_grok_error", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, pepGrok: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -171,9 +224,26 @@ export function useSearchQuery({
 				});
 			});
 
+			// Adverse media progress
+			es.addEventListener("adverse_media_progress", (event) => {
+				try {
+					const payload = JSON.parse((event as MessageEvent).data) as {
+						message?: string;
+						phase?: string;
+					};
+					const text = payload.message ?? payload.phase ?? null;
+					setProgressMessages((prev) =>
+						text ? { ...prev, adverseMedia: text } : prev,
+					);
+				} catch {
+					// ignore parse errors
+				}
+			});
+
 			// Adverse media results
 			es.addEventListener("adverse_media_results", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, adverseMedia: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -187,6 +257,7 @@ export function useSearchQuery({
 			// Adverse media error
 			es.addEventListener("adverse_media_error", (event) => {
 				const payload = JSON.parse((event as MessageEvent).data);
+				setProgressMessages((prev) => ({ ...prev, adverseMedia: null }));
 				setData((prev) => {
 					if (!prev) return prev;
 					return {
@@ -221,6 +292,11 @@ export function useSearchQuery({
 		if (!queryId || !enabled) {
 			setConnectionStatus("disconnected");
 			setData(null);
+			setProgressMessages({
+				pepGrok: null,
+				adverseMedia: null,
+				pepOfficial: null,
+			});
 			setIsLoading(false);
 			return;
 		}
@@ -271,6 +347,7 @@ export function useSearchQuery({
 		error,
 		connectionStatus,
 		isComplete,
+		progressMessages,
 		refetch: fetchData,
 	};
 }

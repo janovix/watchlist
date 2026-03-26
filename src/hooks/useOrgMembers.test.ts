@@ -47,7 +47,13 @@ describe("useOrgMembers", () => {
 		mockOrganizationListMembers.mockResolvedValue({
 			data: [
 				{ user: { id: "user-1", name: "Alice Smith" } },
-				{ user: { id: "user-2", name: "Bob Jones" } },
+				{
+					user: {
+						id: "user-2",
+						name: "Bob Jones",
+						image: "https://example.com/bob.jpg",
+					},
+				},
 			],
 		});
 
@@ -59,8 +65,8 @@ describe("useOrgMembers", () => {
 		});
 
 		expect(result.current.members).toEqual({
-			"user-1": "Alice Smith",
-			"user-2": "Bob Jones",
+			"user-1": { name: "Alice Smith", image: null },
+			"user-2": { name: "Bob Jones", image: "https://example.com/bob.jpg" },
 		});
 	});
 
@@ -125,7 +131,9 @@ describe("useOrgMembers", () => {
 			expect(result.current.isLoading).toBe(false);
 		});
 
-		expect(result.current.members).toEqual({ "user-1": "Valid User" });
+		expect(result.current.members).toEqual({
+			"user-1": { name: "Valid User", image: null },
+		});
 	});
 
 	it("should handle errors gracefully and set isLoading false", async () => {
@@ -162,7 +170,9 @@ describe("useOrgMembers", () => {
 		// Second render should use cache
 		const { result: r2 } = renderHook(() => useOrgMembers());
 		expect(r2.current.isLoading).toBe(false);
-		expect(r2.current.members).toEqual({ "user-1": "Cached User" });
+		expect(r2.current.members).toEqual({
+			"user-1": { name: "Cached User", image: null },
+		});
 		expect(mockOrganizationList).toHaveBeenCalledOnce();
 	});
 });

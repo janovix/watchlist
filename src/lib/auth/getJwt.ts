@@ -1,39 +1,27 @@
-import { cookies } from "next/headers";
-import { getAuthCoreBaseUrl, getAuthAppUrl } from "./config";
+import { serverAuthClient } from "./serverAuthClient";
 
 /**
- * Get JWT token from auth-svc for server-side API calls
- * Uses cookies from the request to authenticate with auth-svc
- * @returns JWT token or null if not authenticated
+ * Get a JWT token from auth-svc for server-side API calls.
+ *
+ * Uses the server-side Better Auth client (jwtClient plugin) which
+ * automatically forwards cookies and the Origin header via its onRequest
+ * hook — no hand-rolled fetch or manual cookie wiring needed.
+ *
+ * @returns JWT token string, or null if not authenticated.
  */
 export async function getJwt(): Promise<string | null> {
-	const cookieStore = await cookies();
-	const cookieHeader = cookieStore.toString();
-	if (
-		!cookieHeader.includes("better-auth.session_token") &&
-		!cookieHeader.includes("__Secure-better-auth.session_token")
-	) {
-		return null;
-	}
 	try {
-		const response = await fetch(`${getAuthCoreBaseUrl()}/api/auth/token`, {
-			headers: {
-				Cookie: cookieHeader,
-				Origin: getAuthAppUrl(),
-				Accept: "application/json",
-			},
-			cache: "no-store",
-		});
-		if (!response.ok) {
+		const result = await serverAuthClient.token();
+		if (result.error || !result.data?.token) {
 			console.error(
-				`Failed to get JWT: ${response.status} ${response.statusText}`,
+				"[getJwt] Failed to get JWT:",
+				result.error ?? "No token in response",
 			);
 			return null;
 		}
-		const data = (await response.json()) as { token?: string };
-		return data.token ?? null;
+		return result.data.token;
 	} catch (error) {
-		console.error("Error fetching JWT:", error);
+		console.error("[getJwt] Error fetching JWT:", error);
 		return null;
 	}
 }

@@ -9,7 +9,8 @@ export type QueryStatus =
 	| "running"
 	| "completed"
 	| "partial"
-	| "failed";
+	| "failed"
+	| "skipped";
 
 /**
  * Search query from GET /queries/:queryId
@@ -58,6 +59,8 @@ export interface QueryListItem {
 	userId: string | null;
 	query: string;
 	source: string;
+	/** Resolved user display (name + avatar) when userId is an org member */
+	userDisplay?: { name: string; image: string | null } | null;
 	entityType: string | null;
 	birthDate: string | null;
 	countries: string[] | null;
@@ -72,6 +75,8 @@ export interface QueryListItem {
 	pepOfficialCount: number | null;
 	pepAiStatus: QueryStatus | null;
 	adverseMediaStatus: QueryStatus | null;
+	/** Set when adverse media result has risk_level !== "none" (optional for backward compatibility) */
+	adverseMediaHasRisk?: boolean | null;
 	createdAt: string;
 	updatedAt: string;
 }

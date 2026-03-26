@@ -41,6 +41,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		completed: "outline",
 		partial: "secondary",
 		failed: "destructive",
+		skipped: "secondary",
 	};
 	const { t } = useLanguage();
 	const labels: Record<QueryStatus, string> = {
@@ -49,6 +50,7 @@ function StatusBadge({ status }: { status: QueryStatus }) {
 		completed: t("statusCompleted"),
 		partial: t("statusPartial"),
 		failed: t("statusFailed"),
+		skipped: t("statusSkipped"),
 	};
 	return (
 		<Badge variant={variants[status] ?? "default"} className="capitalize">
@@ -113,11 +115,12 @@ export default function QueryDetailPage() {
 
 	const queryId = params?.queryId as string;
 
-	const { data, isLoading, error, connectionStatus } = useSearchQuery({
-		queryId,
-		jwt: jwt ?? undefined,
-		enabled: mounted && !jwtLoading && !!queryId,
-	});
+	const { data, isLoading, error, connectionStatus, progressMessages } =
+		useSearchQuery({
+			queryId,
+			jwt: jwt ?? undefined,
+			enabled: mounted && !jwtLoading && !!queryId,
+		});
 
 	useEffect(() => {
 		setMounted(true);
@@ -233,7 +236,19 @@ export default function QueryDetailPage() {
 									)}
 									{data.birthDate && (
 										<>
-											<span>{data.birthDate}</span>
+											<span>
+												{data.birthDate.includes("T")
+													? data.birthDate.slice(0, 10)
+													: data.birthDate}
+											</span>
+											<span>•</span>
+										</>
+									)}
+									{data.countries && data.countries.length > 0 && (
+										<>
+											<span>
+												{t("countries")}: {data.countries.join(", ")}
+											</span>
 											<span>•</span>
 										</>
 									)}
@@ -257,6 +272,7 @@ export default function QueryDetailPage() {
 						<ScreeningResultsCard
 							data={data}
 							connectionStatus={connectionStatus}
+							progressMessages={progressMessages}
 							features={features}
 						/>
 					</>

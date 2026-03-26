@@ -180,6 +180,7 @@ export const translations = {
 		dateOfCreationLabel: "Fecha de creación (YYYY-MM-DD)",
 		countriesLabel: "Países",
 		countriesPlaceholder: "MX, US, CO... (códigos ISO separados por coma)",
+		countriesPlaceholderSelect: "Seleccionar países...",
 
 		// Watchlist search results
 		matchesFound: "{count} coincidencias encontradas",
@@ -242,9 +243,21 @@ export const translations = {
 		tableUser: "Usuario",
 		tableDate: "Fecha",
 		tableStatus: "Estado",
+		tableRiskIndicators: "Indicadores",
+		riskIndicatorOfac: "OFAC: coincidencias encontradas",
+		riskIndicatorUnsc: "UNSC: coincidencias encontradas",
+		riskIndicatorSat69b: "SAT 69-B/EFOS: coincidencias encontradas",
+		riskIndicatorPep: "PEP: coincidencias encontradas",
+		riskIndicatorAdverseMedia: "Medios adversos: riesgo detectado",
+		riskIndicatorNone: "Sin indicadores",
 		sourceManual: "Búsqueda",
 		sourceAmlScreening: "Screening AML",
+		sourceWatchlistQuery: "Consulta en listas",
+		sourceAml: "AML",
+		sourceCsvImport: "Importación CSV",
+		sourceApi: "API",
 		sourceUnknown: "Desconocido",
+		userImportLabel: "Importación",
 		noQueriesFound: "No se encontraron consultas que coincidan con tus filtros",
 		noQueriesYet:
 			"Aún no hay consultas. Comienza buscando un individuo o empresa.",
@@ -267,6 +280,7 @@ export const translations = {
 		statusCompleted: "Completado",
 		statusFailed: "Fallido",
 		statusPartial: "Parcial",
+		statusSkipped: "Omitido",
 
 		// Screening results
 		statusSearching: "Buscando...",
@@ -542,6 +556,7 @@ export const translations = {
 		dateOfCreationLabel: "Date of creation (YYYY-MM-DD)",
 		countriesLabel: "Countries",
 		countriesPlaceholder: "MX, US, CO... (ISO codes comma-separated)",
+		countriesPlaceholderSelect: "Select countries...",
 
 		// Watchlist search results
 		matchesFound: "{count} matches found",
@@ -603,9 +618,21 @@ export const translations = {
 		tableUser: "User",
 		tableDate: "Date",
 		tableStatus: "Status",
+		tableRiskIndicators: "Risk indicators",
+		riskIndicatorOfac: "OFAC: matches found",
+		riskIndicatorUnsc: "UNSC: matches found",
+		riskIndicatorSat69b: "SAT 69-B/EFOS: matches found",
+		riskIndicatorPep: "PEP: matches found",
+		riskIndicatorAdverseMedia: "Adverse media: risk detected",
+		riskIndicatorNone: "No indicators",
 		sourceManual: "Search",
 		sourceAmlScreening: "AML Screening",
+		sourceWatchlistQuery: "Watchlist query",
+		sourceAml: "AML",
+		sourceCsvImport: "CSV import",
+		sourceApi: "API",
 		sourceUnknown: "Unknown",
+		userImportLabel: "Import",
 		noQueriesFound: "No queries found matching your filters",
 		noQueriesYet:
 			"No queries yet. Start by searching for an individual or company.",
@@ -628,6 +655,7 @@ export const translations = {
 		statusCompleted: "Completed",
 		statusFailed: "Failed",
 		statusPartial: "Partial",
+		statusSkipped: "Skipped",
 
 		// Screening results
 		statusSearching: "Searching...",
