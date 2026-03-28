@@ -77,6 +77,8 @@ export interface QueryListItem {
 	adverseMediaStatus: QueryStatus | null;
 	/** Set when adverse media result has risk_level !== "none" (optional for backward compatibility) */
 	adverseMediaHasRisk?: boolean | null;
+	/** Adverse media risk level when has risk: low (yellow), medium (orange), high (red) */
+	adverseMediaRiskLevel?: "low" | "medium" | "high" | null;
 	createdAt: string;
 	updatedAt: string;
 }

@@ -1,3 +1,10 @@
+# [1.1.0-rc.32](https://github.com/janovix/watchlist/compare/v1.1.0-rc.31...v1.1.0-rc.32) (2026-03-26)
+
+
+### Features
+
+* add risk level handling and badge color logic to QueriesPage ([82cce05](https://github.com/janovix/watchlist/commit/82cce05eaafde964af40f18f6707f8fb1a9eaac4))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
