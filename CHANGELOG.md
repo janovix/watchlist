@@ -1,3 +1,10 @@
+# [1.1.0-rc.33](https://github.com/janovix/watchlist/compare/v1.1.0-rc.32...v1.1.0-rc.33) (2026-03-28)
+
+
+### Bug Fixes
+
+* remove z-index from header component for improved layout consistency ([dcb3839](https://github.com/janovix/watchlist/commit/dcb3839fb795b67f84abefa7d8508fd68764a93a))
+
 # [1.1.0-rc.32](https://github.com/janovix/watchlist/compare/v1.1.0-rc.31...v1.1.0-rc.32) (2026-03-26)
 
 
