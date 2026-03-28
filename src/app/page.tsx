@@ -18,8 +18,6 @@ import {
 } from "@/lib/api/watchlist-search";
 import { listQueries } from "@/lib/api/queries";
 import { useJwt } from "@/hooks/useJwt";
-import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
-import { NoWatchlistAccess } from "@/components/subscription";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -44,7 +42,6 @@ export default function HomePage() {
 	const [showRecent, setShowRecent] = useState(true);
 	const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
 	const { jwt, isLoading: jwtLoading } = useJwt();
-	const subscription = useSubscriptionSafe();
 
 	// Fetch recent searches on mount
 	useEffect(() => {
@@ -74,15 +71,6 @@ export default function HomePage() {
 		};
 		fetchRecent();
 	}, [jwt]);
-
-	// Check watchlist product access
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
 
 	const handleSearch = async (searchQuery?: string) => {
 		const queryToSearch = searchQuery || query;

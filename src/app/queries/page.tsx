@@ -31,8 +31,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useJwt } from "@/hooks/useJwt";
 import { useLanguage } from "@/components/language-provider";
-import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
-import { NoWatchlistAccess } from "@/components/subscription";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useOrgMembers } from "@/hooks/useOrgMembers";
 import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
@@ -101,7 +99,6 @@ export default function QueriesPage() {
 	const [localSearch, setLocalSearch] = useState("");
 	const [exportingId, setExportingId] = useState<string | null>(null);
 	const { jwt, isLoading: jwtLoading } = useJwt();
-	const subscription = useSubscriptionSafe();
 	const { org } = useOrganization();
 	const { members } = useOrgMembers();
 
@@ -206,15 +203,6 @@ export default function QueriesPage() {
 
 		fetchQueries();
 	}, [jwt, jwtLoading, paramOffset]);
-
-	// Check watchlist product access - early return after all hooks
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
 
 	// Local client-side filtering
 	const filteredQueries = queries.filter((q) => {

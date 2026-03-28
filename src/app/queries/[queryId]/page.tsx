@@ -20,8 +20,6 @@ import { useJwt } from "@/hooks/useJwt";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { ScreeningResultsCard } from "@/components/screening-results-card";
 import { useLanguage } from "@/components/language-provider";
-import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
-import { NoWatchlistAccess } from "@/components/subscription";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useWatchlistConfig } from "@/hooks/useWatchlistConfig";
 import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
@@ -109,7 +107,6 @@ export default function QueryDetailPage() {
 	const [mounted, setMounted] = useState(false);
 	const [exporting, setExporting] = useState(false);
 	const { jwt, isLoading: jwtLoading } = useJwt();
-	const subscription = useSubscriptionSafe();
 	const { org } = useOrganization();
 	const { features } = useWatchlistConfig();
 
@@ -142,14 +139,6 @@ export default function QueryDetailPage() {
 			setExporting(false);
 		}
 	}, [data, org, language, t]);
-
-	// Access control
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
 
 	if (!mounted) {
 		return (
