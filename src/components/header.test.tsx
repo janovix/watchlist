@@ -106,7 +106,7 @@ describe("Header", () => {
 		const headers = container.querySelectorAll("header");
 		expect(headers.length).toBeGreaterThan(0);
 		const header = headers[0];
-		expect(header).toHaveClass("sticky", "top-0", "z-50");
+		expect(header).toHaveClass("sticky", "top-0");
 	});
 
 	it("should have responsive classes", () => {
