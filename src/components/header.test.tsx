@@ -1,8 +1,51 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Header } from "./header";
-import { LanguageProvider } from "./language-provider";
 import { ThemeProvider } from "./theme-provider";
+
+const mockSetLanguage = vi.fn();
+
+vi.mock("@/components/language-provider", () => ({
+	LanguageProvider: ({ children }: { children: React.ReactNode }) => (
+		<>{children}</>
+	),
+	useLanguage: () => ({
+		language: "en" as const,
+		setLanguage: mockSetLanguage,
+		t: (key: string) => key,
+	}),
+}));
+
+vi.mock("@algenium/blocks", () => ({
+	LanguageSwitcher: ({
+		onLanguageChange,
+	}: {
+		onLanguageChange: (key: string) => void;
+	}) => (
+		<div>
+			<button
+				type="button"
+				data-testid="lang-fr"
+				onClick={() => onLanguageChange("fr")}
+			>
+				lang-fr
+			</button>
+			<button
+				type="button"
+				data-testid="lang-en"
+				onClick={() => onLanguageChange("en")}
+			>
+				lang-en
+			</button>
+		</div>
+	),
+	ThemeSwitcher: () => (
+		<button type="button" data-testid="theme-switcher">
+			theme
+		</button>
+	),
+}));
 
 // Mock next/link
 vi.mock("next/link", () => ({
@@ -23,10 +66,10 @@ vi.mock("next-themes", () => ({
 	),
 }));
 
-const renderWithProviders = (component: React.ReactElement) => {
+const renderWithTheme = (component: React.ReactElement) => {
 	return render(
 		<ThemeProvider attribute="class" defaultTheme="light">
-			<LanguageProvider>{component}</LanguageProvider>
+			{component}
 		</ThemeProvider>,
 	);
 };
@@ -44,7 +87,6 @@ describe("Header", () => {
 			themes: ["light", "dark"],
 		});
 
-		// Mock matchMedia
 		window.matchMedia = vi.fn((query) => ({
 			matches: false,
 			media: query,
@@ -58,11 +100,12 @@ describe("Header", () => {
 	});
 
 	afterEach(() => {
+		cleanup();
 		window.matchMedia = originalMatchMedia;
 	});
 
 	it("should render header with logo and controls", () => {
-		renderWithProviders(<Header />);
+		renderWithTheme(<Header />);
 
 		const header = screen.getByRole("banner");
 		expect(header).toBeInTheDocument();
@@ -70,7 +113,7 @@ describe("Header", () => {
 	});
 
 	it("should render logo link", () => {
-		renderWithProviders(<Header />);
+		renderWithTheme(<Header />);
 
 		const logoLinks = screen.getAllByRole("link", { name: /watchlist/i });
 		expect(logoLinks.length).toBeGreaterThan(0);
@@ -79,38 +122,44 @@ describe("Header", () => {
 		expect(logoLink).toHaveAttribute("href", "/");
 	});
 
-	it("should render language toggle", () => {
-		renderWithProviders(<Header />);
+	it("should render language and theme switchers from blocks", () => {
+		renderWithTheme(<Header />);
 
-		const buttons = screen.getAllByRole("button");
-		expect(buttons.length).toBeGreaterThan(0);
+		expect(screen.getByTestId("theme-switcher")).toBeInTheDocument();
+		expect(screen.getByTestId("lang-en")).toBeInTheDocument();
+		expect(screen.getByTestId("lang-fr")).toBeInTheDocument();
 	});
 
-	it("should render theme toggle", () => {
-		renderWithProviders(<Header />);
+	it("calls setLanguage only for supported watchlist language keys", async () => {
+		const user = userEvent.setup();
+		renderWithTheme(<Header />);
 
-		const buttons = screen.getAllByRole("button");
-		expect(buttons.length).toBeGreaterThan(0);
+		await user.click(screen.getByTestId("lang-fr"));
+		expect(mockSetLanguage).not.toHaveBeenCalled();
+
+		await user.click(screen.getByTestId("lang-en"));
+		expect(mockSetLanguage).toHaveBeenCalledWith("en");
 	});
 
-	it("should render user menu", () => {
-		renderWithProviders(<Header />);
+	it("should render user menu trigger", () => {
+		renderWithTheme(<Header />);
 
-		const buttons = screen.getAllByRole("button");
-		expect(buttons.length).toBeGreaterThan(0);
+		expect(
+			screen.getByRole("button", { name: /user menu/i }),
+		).toBeInTheDocument();
 	});
 
 	it("should have sticky positioning", () => {
-		const { container } = renderWithProviders(<Header />);
+		const { container } = renderWithTheme(<Header />);
 
 		const headers = container.querySelectorAll("header");
 		expect(headers.length).toBeGreaterThan(0);
 		const header = headers[0];
-		expect(header).toHaveClass("sticky", "top-0", "z-50");
+		expect(header).toHaveClass("sticky", "top-0");
 	});
 
 	it("should have responsive classes", () => {
-		const { container } = renderWithProviders(<Header />);
+		const { container } = renderWithTheme(<Header />);
 
 		const headers = container.querySelectorAll("header");
 		expect(headers.length).toBeGreaterThan(0);

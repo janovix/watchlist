@@ -17,6 +17,7 @@ describe("middleware", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockFetch.mockReset();
 		process.env = { ...originalEnv };
 		process.env.NEXT_PUBLIC_AUTH_SERVICE_URL =
 			"https://auth-svc.example.workers.dev";
@@ -56,32 +57,18 @@ describe("middleware", () => {
 
 	it("should allow request when session is valid and user has name", async () => {
 		mockGetSessionCookie.mockReturnValue("session-token-123");
-		// First call: session validation, Second call: organization list
-		mockFetch
-			.mockResolvedValueOnce({
-				ok: true,
-				headers: {
-					getSetCookie: () => [],
-				},
-				json: () =>
-					Promise.resolve({
-						session: { id: "123" },
-						user: { id: "u1", name: "John Doe" },
-					}),
-			})
-			.mockResolvedValueOnce({
-				ok: true,
-				headers: {
-					getSetCookie: () => [],
-				},
-				json: () =>
-					Promise.resolve({
-						success: true,
-						data: [
-							{ id: "org1", slug: "acme", name: "Acme Inc", role: "owner" },
-						],
-					}),
-			});
+		// Single fetch: get-session (org membership is not checked in middleware)
+		mockFetch.mockResolvedValue({
+			ok: true,
+			headers: {
+				getSetCookie: () => [],
+			},
+			json: () =>
+				Promise.resolve({
+					session: { id: "123" },
+					user: { id: "u1", name: "John Doe" },
+				}),
+		});
 
 		const request = new NextRequest("https://example.com/dashboard");
 		const response = await middleware(request);

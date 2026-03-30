@@ -43,4 +43,20 @@ describe("config", () => {
 			);
 		});
 	});
+
+	describe("getAuthCoreServerUrl", () => {
+		it("should return env value when set", async () => {
+			process.env.NEXT_PUBLIC_AUTH_SERVICE_URL = "https://server-auth.example";
+			const { getAuthCoreServerUrl } = await import("./config");
+			expect(getAuthCoreServerUrl()).toBe("https://server-auth.example");
+		});
+
+		it("should throw when env not set", async () => {
+			delete process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+			const { getAuthCoreServerUrl } = await import("./config");
+			expect(() => getAuthCoreServerUrl()).toThrow(
+				"Missing required environment variable: NEXT_PUBLIC_AUTH_SERVICE_URL",
+			);
+		});
+	});
 });

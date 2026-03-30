@@ -4,7 +4,6 @@ import {
 	CheckCircle2,
 	AlertTriangle,
 	Loader2,
-	Activity,
 	ExternalLink,
 	Link2,
 } from "lucide-react";
@@ -27,10 +26,7 @@ import {
 	extractHostname,
 } from "@/components/external-link-dialog";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
-import type {
-	ConnectionStatus,
-	ProgressMessages,
-} from "@/hooks/useSearchQuery";
+import type { ProgressMessages } from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
 import type { WatchlistFeatures } from "@/lib/api/watchlist-config";
 
@@ -305,7 +301,6 @@ function SubsectionBadge({
 
 interface ScreeningResultsCardProps {
 	data: SearchQuery;
-	connectionStatus: ConnectionStatus;
 	progressMessages?: ProgressMessages;
 	features?: WatchlistFeatures;
 }
@@ -316,7 +311,6 @@ interface ScreeningResultsCardProps {
 
 export function ScreeningResultsCard({
 	data,
-	connectionStatus,
 	progressMessages,
 	features,
 }: ScreeningResultsCardProps) {
@@ -392,30 +386,18 @@ export function ScreeningResultsCard({
 			? (adverseMediaRaw as AdverseMediaResult).risk_level
 			: "none";
 
-	// PEP combined risk for section header: official match = high, else AI probability
-	const pepCombinedRiskLevel: RiskLevel = pepOfficialHasMatches
-		? "high"
-		: pepAiRaw &&
-			  !("error" in pepAiRaw) &&
-			  typeof (pepAiRaw as GrokPepResult).probability === "number"
-			? pepProbabilityToRiskLevel((pepAiRaw as GrokPepResult).probability)
-			: "none";
+	// PEP combined risk for section header: official match = high only when PEP search is enabled; else AI probability
+	const pepCombinedRiskLevel: RiskLevel =
+		showPepSearch && pepOfficialHasMatches
+			? "high"
+			: pepAiRaw &&
+				  !("error" in pepAiRaw) &&
+				  typeof (pepAiRaw as GrokPepResult).probability === "number"
+				? pepProbabilityToRiskLevel((pepAiRaw as GrokPepResult).probability)
+				: "none";
 
 	return (
 		<div className="space-y-2 pb-4">
-			{/* Live connection badge */}
-			{connectionStatus === "connected" && (
-				<div className="flex justify-end">
-					<Badge
-						variant="outline"
-						className="gap-1 bg-blue-50 dark:bg-blue-950"
-					>
-						<Activity className="h-3 w-3 text-blue-500 animate-pulse" />
-						<span className="text-blue-500 text-xs">{t("liveConnection")}</span>
-					</Badge>
-				</div>
-			)}
-
 			<Accordion type="multiple" className="space-y-2">
 				{/* OFAC */}
 				<AccordionItem
@@ -607,82 +589,11 @@ export function ScreeningResultsCard({
 						</AccordionTrigger>
 						<AccordionContent>
 							<div className="space-y-4">
-								{/* PEP Official subsection */}
-								{showPepSearch && (
-									<div className="space-y-2">
-										<div className="flex items-center justify-between">
-											<p className="text-sm font-medium text-muted-foreground">
-												{t("pepOfficialSubtitle")}
-											</p>
-											<SubsectionBadge status={data.pepOfficialStatus} />
-										</div>
-										{pepOfficialItemStatus === "loading" ? (
-											<p className="text-muted-foreground text-sm pl-2">
-												{t("searchingPepOfficial")}
-											</p>
-										) : pepOfficialItemStatus === "failed" ? (
-											<Alert variant="destructive" className="py-2">
-												<AlertDescription className="text-xs">
-													{(pepOfficialRaw as ErrorResult)?.error ??
-														t("pepOfficialError")}
-												</AlertDescription>
-											</Alert>
-										) : !pepOfficialHasMatches ? (
-											<p className="text-green-600 text-sm pl-2">
-												{t("pepOfficialNoMatch")}
-											</p>
-										) : (
-											<div className="space-y-2 pl-2">
-												{(pepOfficialRaw as PepRawResult[]).map((result) => (
-													<div
-														key={result.id}
-														className="border rounded-lg p-3 bg-card text-sm"
-													>
-														<p className="font-semibold">{result.nombre}</p>
-														{result.informacionPrincipal?.institucion && (
-															<p className="text-muted-foreground mt-1">
-																<span className="font-medium">
-																	{t("institution")}{" "}
-																</span>
-																{result.informacionPrincipal.institucion}
-															</p>
-														)}
-														{result.informacionPrincipal?.cargo && (
-															<p className="text-muted-foreground">
-																<span className="font-medium">
-																	{t("position")}{" "}
-																</span>
-																{result.informacionPrincipal.cargo}
-															</p>
-														)}
-														{result.informacionPrincipal?.area && (
-															<p className="text-muted-foreground">
-																<span className="font-medium">
-																	{t("area")}{" "}
-																</span>
-																{result.informacionPrincipal.area}
-															</p>
-														)}
-													</div>
-												))}
-											</div>
-										)}
-									</div>
-								)}
-
-								{showPepSearch && showPepGrok && <div className="border-t" />}
-
 								{/* PEP AI subsection */}
 								{showPepGrok && (
 									<div className="space-y-2">
-										<div className="flex items-center justify-between">
-											<p className="text-sm font-medium text-muted-foreground">
-												{t("pepAiSubtitle")}
-											</p>
-											<SubsectionBadge status={data.pepAiStatus} />
-										</div>
 										{pepAiItemStatus === "loading" ? (
-											<p className="text-muted-foreground text-sm pl-2">
+											<p className="text-muted-foreground text-sm">
 												{progressMessages?.pepGrok ?? t("analyzingAi")}
 											</p>
 										) : pepAiItemStatus === "failed" ? (
@@ -692,7 +603,7 @@ export function ScreeningResultsCard({
 												</AlertDescription>
 											</Alert>
 										) : (
-											<div className="space-y-2 pl-2 text-sm">
+											<div className="space-y-2 text-sm">
 												{!pepAiHasMatches && (
 													<p className="text-green-600 text-sm">
 														{t("pepAiNoMatch")}

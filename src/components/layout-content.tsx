@@ -2,12 +2,22 @@
 
 import { ReactNode } from "react";
 import { Header } from "@/components/header";
+import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
+import { NoWatchlistAccess } from "@/components/subscription";
 
 export function LayoutContent({ children }: { children: ReactNode }) {
+	const subscription = useSubscriptionSafe();
+
 	return (
 		<div className="flex min-h-screen flex-col">
 			<Header />
-			{children}
+			{subscription?.isLoading ? (
+				<NoWatchlistAccess isLoading />
+			) : subscription && !hasWatchlistAccess(subscription.subscription) ? (
+				<NoWatchlistAccess />
+			) : (
+				children
+			)}
 		</div>
 	);
 }

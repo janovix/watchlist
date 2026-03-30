@@ -20,8 +20,6 @@ import { useJwt } from "@/hooks/useJwt";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { ScreeningResultsCard } from "@/components/screening-results-card";
 import { useLanguage } from "@/components/language-provider";
-import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
-import { NoWatchlistAccess } from "@/components/subscription";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useWatchlistConfig } from "@/hooks/useWatchlistConfig";
 import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
@@ -109,18 +107,16 @@ export default function QueryDetailPage() {
 	const [mounted, setMounted] = useState(false);
 	const [exporting, setExporting] = useState(false);
 	const { jwt, isLoading: jwtLoading } = useJwt();
-	const subscription = useSubscriptionSafe();
 	const { org } = useOrganization();
 	const { features } = useWatchlistConfig();
 
 	const queryId = params?.queryId as string;
 
-	const { data, isLoading, error, connectionStatus, progressMessages } =
-		useSearchQuery({
-			queryId,
-			jwt: jwt ?? undefined,
-			enabled: mounted && !jwtLoading && !!queryId,
-		});
+	const { data, isLoading, error, progressMessages } = useSearchQuery({
+		queryId,
+		jwt: jwt ?? undefined,
+		enabled: mounted && !jwtLoading && !!queryId,
+	});
 
 	useEffect(() => {
 		setMounted(true);
@@ -135,21 +131,14 @@ export default function QueryDetailPage() {
 				{ name: org?.name ?? "Organization", logo: org?.logo },
 				language as "es" | "en",
 				t,
+				features,
 			);
 		} catch (err) {
 			console.error("PDF generation failed:", err);
 		} finally {
 			setExporting(false);
 		}
-	}, [data, org, language, t]);
-
-	// Access control
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
+	}, [data, org, language, t, features]);
 
 	if (!mounted) {
 		return (
@@ -271,7 +260,6 @@ export default function QueryDetailPage() {
 						{/* Results */}
 						<ScreeningResultsCard
 							data={data}
-							connectionStatus={connectionStatus}
 							progressMessages={progressMessages}
 							features={features}
 						/>

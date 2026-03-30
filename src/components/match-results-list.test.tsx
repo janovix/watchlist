@@ -7,6 +7,7 @@ import type {
 	UnscMatch,
 	Sat69bMatch,
 } from "@/lib/api/watchlist-search";
+import { translations } from "@/lib/translations";
 
 const renderWithProvider = (component: React.ReactElement) => {
 	return render(<LanguageProvider>{component}</LanguageProvider>);
@@ -15,6 +16,20 @@ const renderWithProvider = (component: React.ReactElement) => {
 describe("MatchResultsList", () => {
 	afterEach(() => {
 		cleanup();
+	});
+
+	it("should render empty state when there are no matches", () => {
+		renderWithProvider(<MatchResultsList matches={[]} />);
+		const title = screen.getByRole("heading", { level: 2 });
+		expect([
+			translations.es.noMatchesFound,
+			translations.en.noMatchesFound,
+		]).toContain(title.textContent);
+		const description = title.nextElementSibling;
+		expect([
+			translations.es.noMatchesDescription,
+			translations.en.noMatchesDescription,
+		]).toContain(description?.textContent ?? "");
 	});
 
 	it("should show low score match", () => {

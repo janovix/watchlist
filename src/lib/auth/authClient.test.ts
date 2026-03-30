@@ -21,7 +21,12 @@ vi.mock("./config", () => ({
 }));
 
 import { createAuthClient } from "better-auth/client";
-import { authClient, getClientJwt } from "./authClient";
+import {
+	authClient,
+	getClientJwt,
+	AUTH_RATE_LIMIT_EVENT,
+	type RateLimitEventDetail,
+} from "./authClient";
 import { getAuthCoreBaseUrl } from "./config";
 
 // Get the mocked token function from authClient
@@ -55,6 +60,105 @@ describe("authClient", () => {
 		expect(client.fetchOptions.onError).toBeTypeOf("function");
 		// Note: getAuthCoreBaseUrl is called at module load time, so it may not be tracked
 		// by the mock. We verify the result instead.
+	});
+
+	describe("fetchOptions.onError (429 rate limit)", () => {
+		const getOnError = () => {
+			const client = authClient as unknown as {
+				fetchOptions: { onError: (ctx: unknown) => Promise<void> };
+			};
+			return client.fetchOptions.onError;
+		};
+
+		const makeResponse = (opts: {
+			status: number;
+			retryAfterHeader?: string | null;
+			url?: string;
+		}) => ({
+			status: opts.status,
+			headers: {
+				get: (name: string) =>
+					name === "X-Retry-After" ? (opts.retryAfterHeader ?? null) : null,
+			},
+			url: opts.url ?? "https://auth.example.com/api/foo",
+		});
+
+		it("dispatches AUTH_RATE_LIMIT_EVENT when 429 with valid X-Retry-After", async () => {
+			const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+			const onError = getOnError();
+			await onError({
+				response: makeResponse({ status: 429, retryAfterHeader: "12" }),
+			});
+			expect(dispatchSpy).toHaveBeenCalled();
+			const evt = dispatchSpy.mock
+				.calls[0][0] as unknown as CustomEvent<RateLimitEventDetail>;
+			expect(evt.type).toBe(AUTH_RATE_LIMIT_EVENT);
+			expect(evt.detail).toEqual({
+				retryAfter: 12,
+				url: "https://auth.example.com/api/foo",
+			});
+			dispatchSpy.mockRestore();
+		});
+
+		it("does nothing when 429 but X-Retry-After header missing", async () => {
+			const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+			const onError = getOnError();
+			await onError({
+				response: makeResponse({ status: 429, retryAfterHeader: null }),
+			});
+			expect(dispatchSpy).not.toHaveBeenCalled();
+			dispatchSpy.mockRestore();
+		});
+
+		it("does nothing when 429 but X-Retry-After is NaN", async () => {
+			const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+			const onError = getOnError();
+			await onError({
+				response: makeResponse({ status: 429, retryAfterHeader: "nope" }),
+			});
+			expect(dispatchSpy).not.toHaveBeenCalled();
+			dispatchSpy.mockRestore();
+		});
+
+		it("does nothing when 429 but X-Retry-After is zero or negative", async () => {
+			const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+			const onError = getOnError();
+			await onError({
+				response: makeResponse({ status: 429, retryAfterHeader: "0" }),
+			});
+			expect(dispatchSpy).not.toHaveBeenCalled();
+			await onError({
+				response: makeResponse({ status: 429, retryAfterHeader: "-1" }),
+			});
+			expect(dispatchSpy).not.toHaveBeenCalled();
+			dispatchSpy.mockRestore();
+		});
+
+		it("does nothing for non-429 responses", async () => {
+			const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+			const onError = getOnError();
+			await onError({
+				response: makeResponse({ status: 500, retryAfterHeader: "10" }),
+			});
+			expect(dispatchSpy).not.toHaveBeenCalled();
+			dispatchSpy.mockRestore();
+		});
+
+		it("does not throw when window is undefined (SSR)", async () => {
+			const original = globalThis.window;
+			try {
+				// @ts-expect-error — simulate non-browser environment
+				delete globalThis.window;
+				const onError = getOnError();
+				await expect(
+					onError({
+						response: makeResponse({ status: 429, retryAfterHeader: "5" }),
+					}),
+				).resolves.toBeUndefined();
+			} finally {
+				globalThis.window = original;
+			}
+		});
 	});
 
 	describe("getClientJwt", () => {

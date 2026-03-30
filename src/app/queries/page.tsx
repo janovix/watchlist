@@ -31,10 +31,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useJwt } from "@/hooks/useJwt";
 import { useLanguage } from "@/components/language-provider";
-import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
-import { NoWatchlistAccess } from "@/components/subscription";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useOrgMembers } from "@/hooks/useOrgMembers";
+import { useWatchlistConfig } from "@/hooks/useWatchlistConfig";
 import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
 import {
 	Tooltip,
@@ -43,6 +42,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 const LIMIT = 20;
 /** Delay (ms) before pushing search term to URL to avoid race with rapid typing */
@@ -101,9 +101,9 @@ export default function QueriesPage() {
 	const [localSearch, setLocalSearch] = useState("");
 	const [exportingId, setExportingId] = useState<string | null>(null);
 	const { jwt, isLoading: jwtLoading } = useJwt();
-	const subscription = useSubscriptionSafe();
 	const { org } = useOrganization();
 	const { members } = useOrgMembers();
+	const { features } = useWatchlistConfig();
 
 	const handleExportPdf = useCallback(
 		async (queryId: string, e: React.MouseEvent) => {
@@ -117,6 +117,7 @@ export default function QueriesPage() {
 					{ name: org?.name ?? "Organization", logo: org?.logo },
 					language as "es" | "en",
 					t,
+					features,
 				);
 			} catch (err) {
 				console.error("PDF generation failed:", err);
@@ -124,7 +125,7 @@ export default function QueriesPage() {
 				setExportingId(null);
 			}
 		},
-		[jwt, org, language, t],
+		[jwt, org, language, t, features],
 	);
 
 	// Parse and sanitize search params
@@ -207,15 +208,6 @@ export default function QueriesPage() {
 		fetchQueries();
 	}, [jwt, jwtLoading, paramOffset]);
 
-	// Check watchlist product access - early return after all hooks
-	if (subscription?.isLoading) {
-		return <NoWatchlistAccess isLoading />;
-	}
-
-	if (subscription && !hasWatchlistAccess(subscription.subscription)) {
-		return <NoWatchlistAccess />;
-	}
-
 	// Local client-side filtering
 	const filteredQueries = queries.filter((q) => {
 		const matchesSearch = q.query
@@ -283,6 +275,7 @@ export default function QueriesPage() {
 	};
 
 	type RiskIndicator = "ofac" | "unsc" | "sat69b" | "pep" | "adverseMedia";
+	type RiskLevel = "low" | "medium" | "high";
 	const getRiskIndicators = (q: QueryListItem): RiskIndicator[] => {
 		const out: RiskIndicator[] = [];
 		if ((q.ofacCount ?? 0) > 0) out.push("ofac");
@@ -291,6 +284,27 @@ export default function QueriesPage() {
 		if ((q.pepOfficialCount ?? 0) > 0) out.push("pep");
 		if (q.adverseMediaHasRisk === true) out.push("adverseMedia");
 		return out;
+	};
+	/** Badge color by risk level: low = yellow, medium = orange, high = red */
+	const getRiskLevelBadgeColor = (level: RiskLevel): string => {
+		switch (level) {
+			case "low":
+				return "bg-yellow-500/10 text-yellow-400";
+			case "medium":
+				return "bg-orange-500/10 text-orange-400";
+			case "high":
+				return "bg-red-500/10 text-red-400";
+		}
+	};
+	/** Risk level per indicator: adverse media from API, others are high (sanctions/PEP match) */
+	const getIndicatorRiskLevel = (
+		key: RiskIndicator,
+		q: QueryListItem,
+	): RiskLevel => {
+		if (key === "adverseMedia" && q.adverseMediaRiskLevel) {
+			return q.adverseMediaRiskLevel;
+		}
+		return "high";
 	};
 	const riskIndicatorLabels: Record<RiskIndicator, string> = {
 		ofac: t("riskIndicatorOfac"),
@@ -579,24 +593,30 @@ export default function QueriesPage() {
 														role="list"
 														aria-label={t("tableRiskIndicators")}
 													>
-														{indicators.map((key) => (
-															<TooltipProvider key={key} delayDuration={200}>
-																<Tooltip>
-																	<TooltipTrigger asChild>
-																		<Badge
-																			variant="destructive"
-																			className="text-xs font-normal"
-																			role="listitem"
-																		>
-																			{riskIndicatorBadgeText[key]}
-																		</Badge>
-																	</TooltipTrigger>
-																	<TooltipContent>
-																		{riskIndicatorLabels[key]}
-																	</TooltipContent>
-																</Tooltip>
-															</TooltipProvider>
-														))}
+														{indicators.map((key) => {
+															const level = getIndicatorRiskLevel(key, query);
+															return (
+																<TooltipProvider key={key} delayDuration={200}>
+																	<Tooltip>
+																		<TooltipTrigger asChild>
+																			<Badge
+																				variant="outline"
+																				className={cn(
+																					"text-xs font-normal",
+																					getRiskLevelBadgeColor(level),
+																				)}
+																				role="listitem"
+																			>
+																				{riskIndicatorBadgeText[key]}
+																			</Badge>
+																		</TooltipTrigger>
+																		<TooltipContent>
+																			{riskIndicatorLabels[key]}
+																		</TooltipContent>
+																	</Tooltip>
+																</TooltipProvider>
+															);
+														})}
 													</div>
 												);
 											})()}

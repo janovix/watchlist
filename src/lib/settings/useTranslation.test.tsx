@@ -101,5 +101,25 @@ describe("useTranslation", () => {
 
 			expect(screen.getByTestId("hasTranslations")).toHaveTextContent("yes");
 		});
+
+		it("should return the key when translation is missing", () => {
+			function FallbackKeyConsumer() {
+				const { t } = useTranslation();
+				const looseT = t as (key: string) => string;
+				return (
+					<span data-testid="fallback">{looseT("nonexistent.key.xyz")}</span>
+				);
+			}
+
+			render(
+				<SettingsProvider serverSettings={DEFAULT_SETTINGS}>
+					<FallbackKeyConsumer />
+				</SettingsProvider>,
+			);
+
+			expect(screen.getByTestId("fallback")).toHaveTextContent(
+				"nonexistent.key.xyz",
+			);
+		});
 	});
 });

@@ -69,11 +69,20 @@ describe("NoWatchlistAccess", () => {
 		expect(screen.queryByTestId("loader2-icon")).not.toBeInTheDocument();
 	});
 
-	it("should render external links with correct attributes", () => {
+	it("should point plan and settings links at NEXT_PUBLIC_AUTH_APP_URL", () => {
 		render(<NoWatchlistAccess />);
 
-		// Due to Next/link mock, we just verify links are rendered
 		const links = screen.getAllByRole("link");
-		expect(links.length).toBeGreaterThan(0);
+		const billing = links.find(
+			(a) =>
+				a.getAttribute("href") ===
+				"https://auth.example.workers.dev/settings/billing",
+		);
+		const settings = links.find(
+			(a) =>
+				a.getAttribute("href") === "https://auth.example.workers.dev/settings",
+		);
+		expect(billing).toBeDefined();
+		expect(settings).toBeDefined();
 	});
 });

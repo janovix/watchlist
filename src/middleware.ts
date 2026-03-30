@@ -80,7 +80,7 @@ function redirectToLogin(request: NextRequest): NextResponse {
 }
 
 /**
- * Redirect to onboarding if user hasn't completed profile setup or has no organization.
+ * Redirect to onboarding if user hasn't completed profile setup (no display name).
  */
 function redirectToOnboarding(request: NextRequest): NextResponse {
 	const authAppUrl = getAuthAppUrl();
@@ -96,64 +96,6 @@ function redirectToOnboarding(request: NextRequest): NextResponse {
 function needsProfileOnboarding(user: { name?: string | null }): boolean {
 	const userName = user?.name?.trim();
 	return !userName;
-}
-
-interface Organization {
-	id: string;
-	slug: string;
-	name: string;
-	role?: string;
-}
-
-interface OrgsResponse {
-	organizations?: Organization[];
-	activeOrganizationId?: string | null;
-}
-
-/**
- * Fetch user's organizations from auth service, each enriched with the
- * current user's membership role in a single query (no N+1 list-members).
- */
-async function fetchUserOrganizations(
-	cookieHeader: string,
-): Promise<OrgsResponse | null> {
-	try {
-		const response = await fetch(
-			`${getAuthServiceUrl()}/api/organization/list-with-role`,
-			{
-				headers: {
-					Cookie: cookieHeader,
-					Origin: getAuthAppUrl(),
-				},
-				cache: "no-store",
-			},
-		);
-
-		if (!response.ok) {
-			return null;
-		}
-
-		const data = (await response.json()) as {
-			success: boolean;
-			data: Organization[];
-		} | null;
-
-		return {
-			organizations: data?.data ?? [],
-			activeOrganizationId: null,
-		};
-	} catch {
-		return null;
-	}
-}
-
-/**
- * Check if user has any organization membership.
- */
-function hasOrganizationMembership(
-	organizations: Organization[] | null,
-): boolean {
-	return organizations !== null && organizations.length > 0;
 }
 
 export async function middleware(request: NextRequest) {
@@ -254,23 +196,8 @@ export async function middleware(request: NextRequest) {
 			return addAuthCookies(onboardingResponse, authServiceSetCookies);
 		}
 
-		// Fetch user organizations to check if they have any membership
-		const orgsData = await fetchUserOrganizations(cookieHeader);
-		const userOrganizations = orgsData?.organizations ?? null;
-
-		console.log(
-			"[Watchlist Middleware] User organizations:",
-			userOrganizations?.length ?? 0,
-		);
-
-		// Check if user has any organization membership
-		if (!hasOrganizationMembership(userOrganizations)) {
-			console.log(
-				"[Watchlist Middleware] User has no organization, redirecting to onboarding",
-			);
-			const onboardingResponse = redirectToOnboarding(request);
-			return addAuthCookies(onboardingResponse, authServiceSetCookies);
-		}
+		// Organization membership and product entitlement are not enforced here —
+		// LayoutContent shows NoWatchlistAccess when subscription does not include Watchlist.
 
 		console.log("[Watchlist Middleware] Session valid, allowing request");
 	} catch (error) {

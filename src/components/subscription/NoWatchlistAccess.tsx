@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { ShieldX, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { getAuthAppUrl } from "@/lib/auth/config";
 
 interface NoWatchlistAccessProps {
 	/** Whether the subscription is still loading */
@@ -28,11 +29,9 @@ export function NoWatchlistAccess({
 }: NoWatchlistAccessProps) {
 	const { t } = useTranslation();
 
-	// Build auth billing URL based on current location
-	const authBillingUrl =
-		typeof window !== "undefined"
-			? `${window.location.origin.replace("watchlist.", "auth.")}/settings/billing`
-			: "/settings/billing";
+	const authAppBase = getAuthAppUrl();
+	const authBillingUrl = `${authAppBase}/settings/billing`;
+	const authSettingsUrl = `${authAppBase}/settings`;
 
 	if (isLoading) {
 		return (
@@ -81,7 +80,7 @@ export function NoWatchlistAccess({
 							className="text-muted-foreground"
 						>
 							<Link
-								href={authBillingUrl.replace("/billing", "")}
+								href={authSettingsUrl}
 								target="_blank"
 								rel="noopener noreferrer"
 							>

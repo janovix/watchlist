@@ -1,5 +1,5 @@
 import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto, Fira_Code, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,11 +17,11 @@ const _roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const _firaCode = Fira_Code({ subsets: ["latin"] });
 const _playfair = Playfair_Display({ subsets: ["latin"] });
 
+// Icons, manifest, viewport: keep in sync with aml/src/app/layout.tsx
 export const metadata: Metadata = {
 	title: "Janovix Watchlist",
 	description:
 		"Sistema de verificación PEP para compliance y debida diligencia",
-	generator: "v0.app",
 	manifest: "/site.webmanifest",
 	icons: {
 		icon: [
@@ -29,8 +29,24 @@ export const metadata: Metadata = {
 			{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
 			{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
 		],
-		apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+		apple: [
+			{
+				url: "/apple-touch-icon.png",
+				sizes: "180x180",
+				type: "image/png",
+			},
+		],
 	},
+};
+
+export const viewport: Viewport = {
+	themeColor: "#0f766e",
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 5,
+	userScalable: true,
+	viewportFit: "cover",
+	interactiveWidget: "resizes-content",
 };
 
 export default async function RootLayout({
