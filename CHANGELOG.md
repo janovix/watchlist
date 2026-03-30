@@ -1,3 +1,10 @@
+# [1.1.0-rc.34](https://github.com/janovix/watchlist/compare/v1.1.0-rc.33...v1.1.0-rc.34) (2026-03-30)
+
+
+### Bug Fixes
+
+* update theme color in web manifest and enhance layout with z-index adjustments in header component ([8dd6e63](https://github.com/janovix/watchlist/commit/8dd6e6393751566b2e589de648647ee9f38ac774))
+
 # [1.1.0-rc.33](https://github.com/janovix/watchlist/compare/v1.1.0-rc.32...v1.1.0-rc.33) (2026-03-28)
 
 
