@@ -338,6 +338,87 @@ describe("OrgPicker", () => {
 		});
 	});
 
+	it("calls setActive and reloads when switching to another organization", async () => {
+		const user = userEvent.setup();
+		const reloadMock = vi.fn();
+		Object.defineProperty(window, "location", {
+			value: { reload: reloadMock, href: "" },
+			writable: true,
+		});
+		mockSetActive.mockResolvedValue(undefined);
+		mockOrganizationList.mockResolvedValue({
+			data: [
+				{
+					id: "org-1",
+					name: "Acme Corp",
+					slug: "acme",
+					logo: null,
+					role: "owner",
+				},
+				{
+					id: "org-2",
+					name: "Beta Inc",
+					slug: "beta",
+					logo: null,
+					role: "owner",
+				},
+			],
+		});
+		mockGetSession.mockResolvedValue({
+			data: { session: { activeOrganizationId: "org-1" } },
+		});
+
+		render(<OrgPicker />);
+
+		await waitFor(() => {
+			expect(screen.getByText("AC")).toBeInTheDocument();
+		});
+
+		await user.click(
+			screen.getByRole("button", { name: "switchOrganization" }),
+		);
+
+		await waitFor(
+			() => {
+				expect(screen.getByText("Beta Inc")).toBeInTheDocument();
+			},
+			{ timeout: 3000 },
+		);
+
+		await user.click(screen.getByText("Beta Inc"));
+
+		await waitFor(() => {
+			expect(mockSetActive).toHaveBeenCalledWith({
+				organizationId: "org-2",
+			});
+			expect(reloadMock).toHaveBeenCalled();
+		});
+	});
+
+	it("should hide picker when getSession fails after org list loads", async () => {
+		mockOrganizationList.mockResolvedValue({
+			data: [
+				{
+					id: "org-1",
+					name: "Acme",
+					slug: "acme",
+					logo: null,
+					role: "owner",
+				},
+			],
+		});
+		mockGetSession.mockRejectedValue(new Error("session failed"));
+		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+		const { container } = render(<OrgPicker />);
+
+		await waitFor(() => {
+			expect(container.firstChild).toBeNull();
+		});
+
+		warnSpy.mockRestore();
+	});
+
 	it("should render settings link with correct URL for each org", async () => {
 		const user = userEvent.setup();
 		mockOrganizationList.mockResolvedValue({

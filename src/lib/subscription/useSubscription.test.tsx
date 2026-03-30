@@ -234,6 +234,50 @@ describe("SubscriptionProvider and hooks", () => {
 			});
 		});
 
+		it("should surface error when refresh fails", async () => {
+			const mockStatus: SubscriptionStatus = {
+				hasSubscription: true,
+				status: "active",
+				plan: "pro",
+				limits: null,
+				isTrialing: false,
+				trialDaysRemaining: null,
+				currentPeriodStart: null,
+				currentPeriodEnd: null,
+				cancelAtPeriodEnd: false,
+				isLicenseBased: false,
+				licenseExpiresAt: null,
+				organizationsOwned: 1,
+				organizationsLimit: 3,
+			};
+
+			vi.mocked(getSubscriptionStatus)
+				.mockResolvedValueOnce(mockStatus)
+				.mockRejectedValueOnce(new Error("refresh failed"));
+			vi.mocked(isFreeTier).mockReturnValue(false);
+			vi.mocked(hasPaidSubscription).mockReturnValue(true);
+			vi.mocked(isEnterprise).mockReturnValue(false);
+
+			render(
+				<SubscriptionProvider>
+					<TestComponent />
+				</SubscriptionProvider>,
+			);
+
+			await waitFor(() => {
+				expect(screen.getByTestId("loading")).toHaveTextContent("false");
+			});
+
+			const refreshButton = screen.getByText("Refresh");
+			await act(async () => {
+				refreshButton.click();
+			});
+
+			await waitFor(() => {
+				expect(screen.getByTestId("error")).toHaveTextContent("refresh failed");
+			});
+		});
+
 		it("should handle free tier subscription", async () => {
 			const mockStatus: SubscriptionStatus = {
 				hasSubscription: false,

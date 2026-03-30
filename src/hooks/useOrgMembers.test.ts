@@ -152,6 +152,26 @@ describe("useOrgMembers", () => {
 		warnSpy.mockRestore();
 	});
 
+	it("should handle listMembers failure after organization list succeeds", async () => {
+		mockOrganizationList.mockResolvedValue({ data: [{ id: "org-1" }] });
+		mockOrganizationListMembers.mockRejectedValue(new Error("members down"));
+		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+		const { useOrgMembers } = await import("./useOrgMembers");
+		const { result } = renderHook(() => useOrgMembers());
+
+		await waitFor(() => {
+			expect(result.current.isLoading).toBe(false);
+		});
+
+		expect(result.current.members).toEqual({});
+		expect(warnSpy).toHaveBeenCalledWith(
+			"[useOrgMembers] Failed to fetch members:",
+			expect.any(Error),
+		);
+		warnSpy.mockRestore();
+	});
+
 	it("should use cached members and not call API again on second render", async () => {
 		mockOrganizationList.mockResolvedValue({ data: [{ id: "org-1" }] });
 		mockOrganizationListMembers.mockResolvedValue({

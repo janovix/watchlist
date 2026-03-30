@@ -1,7 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, afterEach } from "vitest";
 import { ApiError, fetchJson } from "./http";
 
 describe("api/http fetchJson", () => {
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
 	it("returns parsed JSON for ok responses", async () => {
 		vi.stubGlobal(
 			"fetch",
@@ -142,5 +145,39 @@ describe("api/http fetchJson", () => {
 		} else {
 			expect(headers).not.toHaveProperty("Authorization");
 		}
+	});
+
+	it("propagates when fetch rejects", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockRejectedValue(new Error("network failure")),
+		);
+
+		await expect(fetchJson("https://example.com")).rejects.toThrow(
+			"network failure",
+		);
+	});
+
+	it("merges custom headers with JWT Authorization", async () => {
+		const mockJwt = "jwt-token";
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				return new Response(JSON.stringify({ ok: true }), {
+					status: 200,
+					headers: { "content-type": "application/json" },
+				});
+			}),
+		);
+
+		await fetchJson("https://example.com", {
+			jwt: mockJwt,
+			headers: { "X-Request-Id": "abc-123" },
+		});
+
+		const options = vi.mocked(global.fetch).mock.calls[0][1] as RequestInit;
+		const headers = options.headers as Record<string, string>;
+		expect(headers["X-Request-Id"]).toBe("abc-123");
+		expect(headers.Authorization).toBe(`Bearer ${mockJwt}`);
 	});
 });

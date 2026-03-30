@@ -29,7 +29,7 @@ export function NoWatchlistAccess({
 }: NoWatchlistAccessProps) {
 	const { t } = useTranslation();
 
-	const authAppBase = getAuthAppUrl().replace(/\/$/, "");
+	const authAppBase = getAuthAppUrl();
 	const authBillingUrl = `${authAppBase}/settings/billing`;
 	const authSettingsUrl = `${authAppBase}/settings`;
 

@@ -423,6 +423,25 @@ describe("subscriptionClient", () => {
 			};
 			expect(hasWatchlistAccess(subscription)).toBe(false);
 		});
+
+		it("should return false when subscription is past_due", () => {
+			const subscription: SubscriptionStatus = {
+				hasSubscription: true,
+				status: "past_due",
+				plan: "pro",
+				limits: null,
+				isTrialing: false,
+				trialDaysRemaining: null,
+				currentPeriodStart: null,
+				currentPeriodEnd: null,
+				cancelAtPeriodEnd: false,
+				isLicenseBased: false,
+				licenseExpiresAt: null,
+				organizationsOwned: 1,
+				organizationsLimit: 3,
+			};
+			expect(hasWatchlistAccess(subscription)).toBe(false);
+		});
 	});
 
 	describe("hasAMLAccess", () => {

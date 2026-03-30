@@ -4,7 +4,6 @@ import {
 	CheckCircle2,
 	AlertTriangle,
 	Loader2,
-	Activity,
 	ExternalLink,
 	Link2,
 } from "lucide-react";
@@ -27,10 +26,7 @@ import {
 	extractHostname,
 } from "@/components/external-link-dialog";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
-import type {
-	ConnectionStatus,
-	ProgressMessages,
-} from "@/hooks/useSearchQuery";
+import type { ProgressMessages } from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
 import type { WatchlistFeatures } from "@/lib/api/watchlist-config";
 
@@ -305,7 +301,6 @@ function SubsectionBadge({
 
 interface ScreeningResultsCardProps {
 	data: SearchQuery;
-	connectionStatus: ConnectionStatus;
 	progressMessages?: ProgressMessages;
 	features?: WatchlistFeatures;
 }
@@ -316,7 +311,6 @@ interface ScreeningResultsCardProps {
 
 export function ScreeningResultsCard({
 	data,
-	connectionStatus,
 	progressMessages,
 	features,
 }: ScreeningResultsCardProps) {
@@ -392,14 +386,15 @@ export function ScreeningResultsCard({
 			? (adverseMediaRaw as AdverseMediaResult).risk_level
 			: "none";
 
-	// PEP combined risk for section header: official match = high, else AI probability
-	const pepCombinedRiskLevel: RiskLevel = pepOfficialHasMatches
-		? "high"
-		: pepAiRaw &&
-			  !("error" in pepAiRaw) &&
-			  typeof (pepAiRaw as GrokPepResult).probability === "number"
-			? pepProbabilityToRiskLevel((pepAiRaw as GrokPepResult).probability)
-			: "none";
+	// PEP combined risk for section header: official match = high only when PEP search is enabled; else AI probability
+	const pepCombinedRiskLevel: RiskLevel =
+		showPepSearch && pepOfficialHasMatches
+			? "high"
+			: pepAiRaw &&
+				  !("error" in pepAiRaw) &&
+				  typeof (pepAiRaw as GrokPepResult).probability === "number"
+				? pepProbabilityToRiskLevel((pepAiRaw as GrokPepResult).probability)
+				: "none";
 
 	return (
 		<div className="space-y-2 pb-4">

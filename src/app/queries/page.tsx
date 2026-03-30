@@ -33,6 +33,7 @@ import { useJwt } from "@/hooks/useJwt";
 import { useLanguage } from "@/components/language-provider";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useOrgMembers } from "@/hooks/useOrgMembers";
+import { useWatchlistConfig } from "@/hooks/useWatchlistConfig";
 import { generateScreeningPdf } from "@/lib/pdf/generate-screening-pdf";
 import {
 	Tooltip,
@@ -102,6 +103,7 @@ export default function QueriesPage() {
 	const { jwt, isLoading: jwtLoading } = useJwt();
 	const { org } = useOrganization();
 	const { members } = useOrgMembers();
+	const { features } = useWatchlistConfig();
 
 	const handleExportPdf = useCallback(
 		async (queryId: string, e: React.MouseEvent) => {
@@ -115,6 +117,7 @@ export default function QueriesPage() {
 					{ name: org?.name ?? "Organization", logo: org?.logo },
 					language as "es" | "en",
 					t,
+					features,
 				);
 			} catch (err) {
 				console.error("PDF generation failed:", err);
@@ -122,7 +125,7 @@ export default function QueriesPage() {
 				setExportingId(null);
 			}
 		},
-		[jwt, org, language, t],
+		[jwt, org, language, t, features],
 	);
 
 	// Parse and sanitize search params
@@ -597,6 +600,7 @@ export default function QueriesPage() {
 																	<Tooltip>
 																		<TooltipTrigger asChild>
 																			<Badge
+																				variant="outline"
 																				className={cn(
 																					"text-xs font-normal",
 																					getRiskLevelBadgeColor(level),

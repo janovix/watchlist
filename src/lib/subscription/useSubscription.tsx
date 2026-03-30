@@ -33,9 +33,9 @@ export interface SubscriptionContextValue {
 	isEnterprise: boolean;
 }
 
-const SubscriptionContext = createContext<SubscriptionContextValue | null>(
-	null,
-);
+/** Exported for Storybook/tests that need to mock subscription state. */
+export const SubscriptionContext =
+	createContext<SubscriptionContextValue | null>(null);
 
 interface SubscriptionProviderProps {
 	children: ReactNode;

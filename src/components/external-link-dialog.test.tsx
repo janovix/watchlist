@@ -82,6 +82,10 @@ describe("extractHostname", () => {
 		);
 	});
 
+	it("should extract hostname from an IPv4 literal URL", () => {
+		expect(extractHostname("http://192.168.1.10/path")).toBe("192.168.1.10");
+	});
+
 	it("should return the original value for invalid inputs", () => {
 		// An empty string or completely invalid value falls back to the value itself
 		expect(extractHostname("not a url at all!!!")).toBeDefined();

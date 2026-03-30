@@ -6,6 +6,13 @@ import type {
 	Sat69bMatch,
 } from "@/lib/api/watchlist-search";
 import type { Language, translations } from "@/lib/translations";
+import type { WatchlistFeatures } from "@/lib/api/watchlist-config";
+
+const DEFAULT_PDF_FEATURES: WatchlistFeatures = {
+	pepSearch: true,
+	pepGrok: true,
+	adverseMedia: true,
+};
 
 type TranslationFn = (key: keyof (typeof translations)["es"]) => string;
 
@@ -282,6 +289,7 @@ export async function generateScreeningPdf(
 	org: OrgInfo,
 	language: Language,
 	t: TranslationFn,
+	features: WatchlistFeatures = DEFAULT_PDF_FEATURES,
 ): Promise<void> {
 	const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 	let y = MARGIN;
@@ -466,8 +474,8 @@ export async function generateScreeningPdf(
 		y = drawMatchTable(doc, y, sat69bMatches, t);
 	}
 
-	// --- PEP Official (omit section when skipped) ---
-	if (data.pepOfficialStatus !== "skipped") {
+	// --- PEP Official (feature flag + omit when skipped) ---
+	if (features.pepSearch && data.pepOfficialStatus !== "skipped") {
 		const pepOfficialRaw = data.pepOfficialResult as PepRawResult[] | null;
 		const pepOfficialHas =
 			Array.isArray(pepOfficialRaw) && pepOfficialRaw.length > 0;
@@ -511,81 +519,89 @@ export async function generateScreeningPdf(
 	}
 
 	// --- PEP AI (Grok) ---
-	const pepAiRaw = data.pepAiResult as GrokPepResult | null;
-	const pepAiHas = pepAiRaw && pepAiRaw.probability > 0;
-	const pepAiStatusColor =
-		data.pepAiStatus === "completed" && pepAiHas
-			? COLORS.red
-			: data.pepAiStatus === "completed"
-				? COLORS.green
-				: data.pepAiStatus === "failed"
-					? COLORS.yellow
-					: COLORS.gray;
-	const pepAiStatusText =
-		data.pepAiStatus === "completed" && pepAiHas
-			? `${t("pdfProbability")}: ${Math.round(pepAiRaw!.probability * 100)}%`
-			: getStatusLabel(data.pepAiStatus, t);
+	if (features.pepGrok) {
+		const pepAiRaw = data.pepAiResult as GrokPepResult | null;
+		const pepAiHas = pepAiRaw && pepAiRaw.probability > 0;
+		const pepAiStatusColor =
+			data.pepAiStatus === "completed" && pepAiHas
+				? COLORS.red
+				: data.pepAiStatus === "completed"
+					? COLORS.green
+					: data.pepAiStatus === "failed"
+						? COLORS.yellow
+						: COLORS.gray;
+		const pepAiStatusText =
+			data.pepAiStatus === "completed" && pepAiHas
+				? `${t("pdfProbability")}: ${Math.round(pepAiRaw!.probability * 100)}%`
+				: getStatusLabel(data.pepAiStatus, t);
 
-	y = drawSectionHeader(
-		doc,
-		y,
-		t("pepAiSubtitle"),
-		pepAiStatusText,
-		pepAiStatusColor,
-	);
+		y = drawSectionHeader(
+			doc,
+			y,
+			t("pepAiSubtitle"),
+			pepAiStatusText,
+			pepAiStatusColor,
+		);
 
-	if (pepAiHas && pepAiRaw!.summary) {
-		y = ensureSpace(doc, y, 15);
-		doc.setFont("helvetica", "normal");
-		doc.setFontSize(7.5);
-		doc.setTextColor(...COLORS.primary);
-		const summaryText = getBilingualText(pepAiRaw!.summary, language);
-		const lines = doc.splitTextToSize(summaryText, CONTENT_WIDTH - 8);
-		doc.text(lines, MARGIN + 4, y + 4);
-		y += lines.length * 3.5 + 4;
-	}
+		if (pepAiHas && pepAiRaw!.summary) {
+			y = ensureSpace(doc, y, 15);
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(7.5);
+			doc.setTextColor(...COLORS.primary);
+			const summaryText = getBilingualText(pepAiRaw!.summary, language);
+			const lines = doc.splitTextToSize(summaryText, CONTENT_WIDTH - 8);
+			doc.text(lines, MARGIN + 4, y + 4);
+			y += lines.length * 3.5 + 4;
+		}
 
-	if (pepAiHas && pepAiRaw!.sources && pepAiRaw!.sources.length > 0) {
-		y = drawSources(doc, y, pepAiRaw!.sources, t);
+		if (pepAiHas && pepAiRaw!.sources && pepAiRaw!.sources.length > 0) {
+			y = drawSources(doc, y, pepAiRaw!.sources, t);
+		}
 	}
 
 	// --- Adverse Media ---
-	const adverseRaw = data.adverseMediaResult as AdverseMediaResult | null;
-	const adverseHasRisk = adverseRaw && adverseRaw.risk_level !== "none";
-	const adverseStatusColor =
-		data.adverseMediaStatus === "completed" && adverseHasRisk
-			? COLORS.red
-			: data.adverseMediaStatus === "completed"
-				? COLORS.green
-				: data.adverseMediaStatus === "failed"
-					? COLORS.yellow
-					: COLORS.gray;
-	const adverseStatusText =
-		data.adverseMediaStatus === "completed" && adverseHasRisk
-			? `${t("pdfRiskLevel")}: ${adverseRaw!.risk_level.toUpperCase()}`
-			: getStatusLabel(data.adverseMediaStatus, t);
+	if (features.adverseMedia) {
+		const adverseRaw = data.adverseMediaResult as AdverseMediaResult | null;
+		const adverseHasRisk = adverseRaw && adverseRaw.risk_level !== "none";
+		const adverseStatusColor =
+			data.adverseMediaStatus === "completed" && adverseHasRisk
+				? COLORS.red
+				: data.adverseMediaStatus === "completed"
+					? COLORS.green
+					: data.adverseMediaStatus === "failed"
+						? COLORS.yellow
+						: COLORS.gray;
+		const adverseStatusText =
+			data.adverseMediaStatus === "completed" && adverseHasRisk
+				? `${t("pdfRiskLevel")}: ${adverseRaw!.risk_level.toUpperCase()}`
+				: getStatusLabel(data.adverseMediaStatus, t);
 
-	y = drawSectionHeader(
-		doc,
-		y,
-		language === "es" ? "Medios Adversos" : "Adverse Media",
-		adverseStatusText,
-		adverseStatusColor,
-	);
+		y = drawSectionHeader(
+			doc,
+			y,
+			language === "es" ? "Medios Adversos" : "Adverse Media",
+			adverseStatusText,
+			adverseStatusColor,
+		);
 
-	if (adverseHasRisk && adverseRaw!.findings) {
-		y = ensureSpace(doc, y, 15);
-		doc.setFont("helvetica", "normal");
-		doc.setFontSize(7.5);
-		doc.setTextColor(...COLORS.primary);
-		const findingsText = getBilingualText(adverseRaw!.findings, language);
-		const lines = doc.splitTextToSize(findingsText, CONTENT_WIDTH - 8);
-		doc.text(lines, MARGIN + 4, y + 4);
-		y += lines.length * 3.5 + 4;
-	}
+		if (adverseHasRisk && adverseRaw!.findings) {
+			y = ensureSpace(doc, y, 15);
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(7.5);
+			doc.setTextColor(...COLORS.primary);
+			const findingsText = getBilingualText(adverseRaw!.findings, language);
+			const lines = doc.splitTextToSize(findingsText, CONTENT_WIDTH - 8);
+			doc.text(lines, MARGIN + 4, y + 4);
+			y += lines.length * 3.5 + 4;
+		}
 
-	if (adverseHasRisk && adverseRaw!.sources && adverseRaw!.sources.length > 0) {
-		y = drawSources(doc, y, adverseRaw!.sources, t);
+		if (
+			adverseHasRisk &&
+			adverseRaw!.sources &&
+			adverseRaw!.sources.length > 0
+		) {
+			y = drawSources(doc, y, adverseRaw!.sources, t);
+		}
 	}
 
 	// --- Footer ---

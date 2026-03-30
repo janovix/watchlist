@@ -27,30 +27,34 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock auth session store
-vi.mock("@/lib/auth/useAuthSession", () => ({
-	useAuthSession: () => ({
-		data: {
-			user: {
-				id: "user-1",
-				name: "María García",
-				email: "maria.garcia@empresa.com",
-				image: null,
-				emailVerified: true,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-			session: {
-				id: "session-1",
-				userId: "user-1",
-				token: "token-123",
-				expiresAt: new Date(),
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
+const defaultSession = {
+	data: {
+		user: {
+			id: "user-1",
+			name: "María García",
+			email: "maria.garcia@empresa.com",
+			image: null as string | null,
+			emailVerified: true,
+			createdAt: new Date(),
+			updatedAt: new Date(),
 		},
-		error: null,
-		isPending: false,
-	}),
+		session: {
+			id: "session-1",
+			userId: "user-1",
+			token: "token-123",
+			expiresAt: new Date(),
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		},
+	},
+	error: null,
+	isPending: false,
+};
+
+const mockUseAuthSession = vi.fn(() => defaultSession);
+
+vi.mock("@/lib/auth/useAuthSession", () => ({
+	useAuthSession: () => mockUseAuthSession(),
 }));
 
 // Mock actions
@@ -66,6 +70,8 @@ describe("UserMenu", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockPush.mockClear();
+		defaultSession.data.user.image = null;
+		mockUseAuthSession.mockReturnValue({ ...defaultSession });
 	});
 
 	afterEach(() => {
@@ -83,6 +89,25 @@ describe("UserMenu", () => {
 
 		const button = container.querySelector('button[aria-label="User menu"]');
 		expect(button).toHaveTextContent("MG"); // María García initials
+	});
+
+	it("should display avatar image when user has image URL", () => {
+		mockUseAuthSession.mockReturnValue({
+			data: {
+				user: {
+					...defaultSession.data.user,
+					image: "https://cdn.example/avatar.png",
+				},
+				session: defaultSession.data.session,
+			},
+			error: null,
+			isPending: false,
+		});
+
+		renderWithProvider(<UserMenu />);
+
+		const img = screen.getByRole("img", { name: /María García/i });
+		expect(img).toHaveAttribute("src", "https://cdn.example/avatar.png");
 	});
 
 	it("should open menu when clicked", async () => {

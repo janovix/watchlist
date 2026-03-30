@@ -11,7 +11,7 @@ const meta: Meta<typeof Header> = {
 		docs: {
 			description: {
 				component:
-					"The application header containing the icon logo, search input, language toggle, theme toggle, and user menu. Sticky header that stays at the top while scrolling. Includes backdrop blur effect and border styling.",
+					"The application header containing the icon logo, language toggle, theme toggle, user menu, and organization picker. Sticky header that stays at the top while scrolling.",
 			},
 		},
 	},
@@ -37,7 +37,7 @@ export const Default: Story = {
 		docs: {
 			description: {
 				story:
-					"Default header with icon logo, search input, and navigation controls. Theme-aware and adapts to system preferences.",
+					"Default header with icon logo, language and theme toggles, organization picker, and user menu. Theme-aware and adapts to system preferences.",
 			},
 		},
 	},

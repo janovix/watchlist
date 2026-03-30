@@ -15,7 +15,9 @@ export {
 } from "./subscriptionClient";
 
 export {
+	SubscriptionContext,
 	SubscriptionProvider,
 	useSubscription,
 	useSubscriptionSafe,
+	type SubscriptionContextValue,
 } from "./useSubscription";

@@ -112,12 +112,11 @@ export default function QueryDetailPage() {
 
 	const queryId = params?.queryId as string;
 
-	const { data, isLoading, error, connectionStatus, progressMessages } =
-		useSearchQuery({
-			queryId,
-			jwt: jwt ?? undefined,
-			enabled: mounted && !jwtLoading && !!queryId,
-		});
+	const { data, isLoading, error, progressMessages } = useSearchQuery({
+		queryId,
+		jwt: jwt ?? undefined,
+		enabled: mounted && !jwtLoading && !!queryId,
+	});
 
 	useEffect(() => {
 		setMounted(true);
@@ -132,13 +131,14 @@ export default function QueryDetailPage() {
 				{ name: org?.name ?? "Organization", logo: org?.logo },
 				language as "es" | "en",
 				t,
+				features,
 			);
 		} catch (err) {
 			console.error("PDF generation failed:", err);
 		} finally {
 			setExporting(false);
 		}
-	}, [data, org, language, t]);
+	}, [data, org, language, t, features]);
 
 	if (!mounted) {
 		return (
@@ -260,7 +260,6 @@ export default function QueryDetailPage() {
 						{/* Results */}
 						<ScreeningResultsCard
 							data={data}
-							connectionStatus={connectionStatus}
 							progressMessages={progressMessages}
 							features={features}
 						/>
