@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "driver.js/dist/driver.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -299,4 +300,56 @@
 
 .animate-progress-fill {
 	animation: progress-fill 20s linear forwards;
+}
+
+/* driver.js onboarding popover — match app theme (light / dark) */
+.watchlist-tour-popover.driver-popover {
+	--driver-bg: var(--popover);
+	--driver-text: var(--popover-foreground);
+	background-color: var(--driver-bg) !important;
+	color: var(--driver-text) !important;
+	box-shadow: var(--shadow-md);
+}
+
+.watchlist-tour-popover .driver-popover-title,
+.watchlist-tour-popover .driver-popover-description {
+	color: var(--driver-text) !important;
+}
+
+.watchlist-tour-popover .driver-popover-progress-text {
+	color: var(--muted-foreground) !important;
+}
+
+.watchlist-tour-popover .driver-popover-footer button {
+	background-color: var(--secondary) !important;
+	color: var(--secondary-foreground) !important;
+	border-color: var(--border) !important;
+	text-shadow: none !important;
+}
+
+.watchlist-tour-popover .driver-popover-footer button:hover,
+.watchlist-tour-popover .driver-popover-footer button:focus {
+	background-color: var(--muted) !important;
+}
+
+.watchlist-tour-popover .driver-popover-close-btn {
+	color: var(--muted-foreground) !important;
+}
+
+.watchlist-tour-popover .driver-popover-close-btn:hover,
+.watchlist-tour-popover .driver-popover-close-btn:focus {
+	color: var(--foreground) !important;
+}
+
+.watchlist-tour-popover .driver-popover-arrow-side-left {
+	border-right-color: var(--driver-bg) !important;
+}
+.watchlist-tour-popover .driver-popover-arrow-side-right {
+	border-left-color: var(--driver-bg) !important;
+}
+.watchlist-tour-popover .driver-popover-arrow-side-top {
+	border-bottom-color: var(--driver-bg) !important;
+}
+.watchlist-tour-popover .driver-popover-arrow-side-bottom {
+	border-top-color: var(--driver-bg) !important;
 }

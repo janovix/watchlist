@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { Info } from "lucide-react";
 import { LanguageSwitcher, ThemeSwitcher } from "@algenium/blocks";
 import { Logo } from "@/components/logo";
 import { useLanguage } from "@/components/language-provider";
+import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { OrgPicker } from "@/components/org-picker";
 import { UserMenu } from "@/components/user-menu";
+import { LAYOUT_OUTER } from "@/lib/layout";
+import { cn } from "@/lib/utils";
 
 const WATCHLIST_LANGUAGES = [
 	{ key: "en", label: "EN", nativeName: "English" },
@@ -24,6 +28,16 @@ function HeaderNavPickers() {
 	return (
 		<TooltipProvider delayDuration={0}>
 			<div className="flex items-center gap-1.5 sm:gap-2">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-9 w-9 shrink-0"
+					asChild
+				>
+					<Link href="/info" aria-label={t("aboutWatchlist")}>
+						<Info className="h-4 w-4" aria-hidden />
+					</Link>
+				</Button>
 				<LanguageSwitcher
 					languages={[...WATCHLIST_LANGUAGES]}
 					currentLanguage={language}
@@ -58,7 +72,7 @@ function HeaderNavPickers() {
 export function Header() {
 	return (
 		<header className="border-b border-border bg-background sticky top-0">
-			<div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 sm:py-3">
+			<div className={cn(LAYOUT_OUTER, "py-2 sm:py-3")}>
 				<div className="flex items-center justify-between gap-2 sm:gap-4">
 					{/* Left side: Logo only */}
 					<Link

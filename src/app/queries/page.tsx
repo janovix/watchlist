@@ -14,9 +14,10 @@ import {
 	Loader2,
 	Plus,
 } from "lucide-react";
-import { Logo } from "@/components/logo";
 import { listQueries, getQuery, type QueryListItem } from "@/lib/api/queries";
-import { getPrivacyUrl, getTermsUrl } from "@/lib/config-urls";
+import { Footer } from "@/components/footer";
+import { LAYOUT_OUTER } from "@/lib/layout";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +43,6 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 
 const LIMIT = 20;
 /** Delay (ms) before pushing search term to URL to avoid race with rapid typing */
@@ -89,6 +89,73 @@ function sanitizeSearchParams(
 		filter: sanitizedFilter,
 		offset: sanitizedOffset,
 	};
+}
+
+/** Full-page skeleton for query history (route `loading.tsx` + client fetch). */
+export function QueriesPageSkeleton() {
+	return (
+		<main className="flex flex-1 flex-col py-6 sm:py-8">
+			<div className={cn(LAYOUT_OUTER, "flex flex-1 w-full flex-col")}>
+				<div className="mb-8">
+					<div className="mb-4 flex items-center gap-3">
+						<Skeleton className="h-8 md:h-10 w-64 md:w-96" />
+					</div>
+					<Skeleton className="h-4 w-72" />
+				</div>
+
+				<div className="mb-6 flex flex-col md:flex-row gap-4">
+					<Skeleton className="h-10 flex-1 rounded-md" />
+					<div className="flex gap-2">
+						<Skeleton className="h-10 w-20 rounded-md" />
+						<Skeleton className="h-10 w-32 rounded-md" />
+						<Skeleton className="h-10 w-32 rounded-md" />
+					</div>
+				</div>
+
+				<div className="rounded-lg border bg-card overflow-hidden">
+					<div className="border-b px-4 py-3">
+						<div className="flex gap-4 flex-wrap">
+							<Skeleton className="h-4 w-32 flex-1 min-w-[8rem]" />
+							<Skeleton className="h-4 w-20" />
+							<Skeleton className="h-4 w-20" />
+							<Skeleton className="h-4 w-20" />
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-4 w-16" />
+							<Skeleton className="h-4 w-28" />
+							<Skeleton className="h-4 w-8" />
+						</div>
+					</div>
+					{[...Array(20)].map((_, i) => (
+						<div
+							key={i}
+							className="border-b last:border-b-0 px-4 py-4 flex items-center gap-4 flex-wrap"
+						>
+							<Skeleton className="h-4 w-48 flex-1 min-w-[10rem]" />
+							<Skeleton className="h-4 w-24" />
+							<div className="flex items-center gap-2">
+								<Skeleton className="h-7 w-7 rounded-full" />
+								<Skeleton className="h-4 w-24" />
+							</div>
+							<Skeleton className="h-4 w-28" />
+							<Skeleton className="h-6 w-20 rounded-full" />
+							<Skeleton className="h-6 w-24 rounded-full" />
+							<Skeleton className="h-8 w-8 rounded-md" />
+						</div>
+					))}
+				</div>
+
+				<div className="mt-6 mb-6 flex items-center justify-between">
+					<Skeleton className="h-4 w-48" />
+					<div className="flex gap-2">
+						<Skeleton className="h-9 w-24 rounded-md" />
+						<Skeleton className="h-9 w-24 rounded-md" />
+					</div>
+				</div>
+
+				<Footer />
+			</div>
+		</main>
+	);
 }
 
 export default function QueriesPage() {
@@ -281,7 +348,9 @@ export default function QueriesPage() {
 		if ((q.ofacCount ?? 0) > 0) out.push("ofac");
 		if ((q.unCount ?? 0) > 0) out.push("unsc");
 		if ((q.sat69bCount ?? 0) > 0) out.push("sat69b");
-		if ((q.pepOfficialCount ?? 0) > 0) out.push("pep");
+		if ((q.pepOfficialCount ?? 0) > 0 || q.pepAiIndicatesMatch === true) {
+			out.push("pep");
+		}
 		if (q.adverseMediaHasRisk === true) out.push("adverseMedia");
 		return out;
 	};
@@ -325,84 +394,12 @@ export default function QueriesPage() {
 	const hasPrevPage = paramOffset > 0;
 
 	if (isLoading) {
-		return (
-			<main className="flex-1 flex flex-col px-4 sm:px-6 py-6 sm:py-8">
-				<div className="max-w-6xl mx-auto flex-1 w-full">
-					{/* Header skeleton */}
-					<div className="mb-8">
-						<div className="flex items-center gap-3 mb-4">
-							<Skeleton className="h-8 md:h-10 w-64 md:w-96" />
-						</div>
-						<Skeleton className="h-4 w-72" />
-					</div>
-
-					{/* Filters skeleton */}
-					<div className="mb-6 flex flex-col md:flex-row gap-4">
-						<Skeleton className="h-10 flex-1 rounded-md" />
-						<div className="flex gap-2">
-							<Skeleton className="h-10 w-20 rounded-md" />
-							<Skeleton className="h-10 w-32 rounded-md" />
-							<Skeleton className="h-10 w-32 rounded-md" />
-						</div>
-					</div>
-
-					{/* Table skeleton */}
-					<div className="rounded-lg border bg-card overflow-hidden">
-						<div className="border-b px-4 py-3">
-							<div className="flex gap-4">
-								<Skeleton className="h-4 w-48 flex-1" />
-								<Skeleton className="h-4 w-24" />
-								<Skeleton className="h-4 w-24" />
-								<Skeleton className="h-4 w-24" />
-							</div>
-						</div>
-						{[...Array(20)].map((_, i) => (
-							<div
-								key={i}
-								className="border-b last:border-b-0 px-4 py-4 flex items-center gap-4"
-							>
-								<Skeleton className="h-4 w-48 flex-1" />
-								<div className="flex items-center gap-2">
-									<Skeleton className="h-4 w-4 rounded" />
-									<Skeleton className="h-4 w-20" />
-								</div>
-								<div className="flex items-center gap-2">
-									<Skeleton className="h-4 w-4 rounded" />
-									<Skeleton className="h-4 w-24" />
-								</div>
-								<Skeleton className="h-6 w-24 rounded-full" />
-							</div>
-						))}
-					</div>
-
-					{/* Pagination skeleton */}
-					<div className="mt-6 mb-6 flex items-center justify-between">
-						<Skeleton className="h-4 w-48" />
-						<div className="flex gap-2">
-							<Skeleton className="h-9 w-24 rounded-md" />
-							<Skeleton className="h-9 w-24 rounded-md" />
-						</div>
-					</div>
-
-					{/* Footer skeleton */}
-					<footer className="mt-auto pt-6 border-t border-border/50">
-						<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
-							<Skeleton className="h-3 w-20" />
-							<div className="flex items-center gap-4">
-								<Skeleton className="h-4 w-32" />
-								<Skeleton className="h-4 w-24" />
-								<Skeleton className="h-4 w-24" />
-							</div>
-						</div>
-					</footer>
-				</div>
-			</main>
-		);
+		return <QueriesPageSkeleton />;
 	}
 
 	return (
-		<main className="flex-1 flex flex-col px-4 sm:px-6 py-6 sm:py-8">
-			<div className="max-w-6xl mx-auto flex-1 flex flex-col w-full">
+		<main className="flex flex-1 flex-col py-6 sm:py-8">
+			<div className={cn(LAYOUT_OUTER, "flex flex-1 w-full flex-col")}>
 				{/* Header */}
 				<div className="mb-8">
 					<div className="flex items-start justify-between gap-4 mb-4">
@@ -686,33 +683,7 @@ export default function QueriesPage() {
 					</div>
 				</div>
 
-				{/* Footer */}
-				<footer className="mt-auto pt-6 border-t border-border/50">
-					<div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
-						<div className="flex items-center gap-2 opacity-80">
-							<Logo variant="logo" width={80} height={14} />
-						</div>
-						<div className="flex items-center gap-4">
-							<span>&copy; {new Date().getFullYear()} Janovix</span>
-							<a
-								href={getPrivacyUrl()}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="hover:text-foreground transition-colors"
-							>
-								{t("privacy")}
-							</a>
-							<a
-								href={getTermsUrl()}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="hover:text-foreground transition-colors"
-							>
-								{t("terms")}
-							</a>
-						</div>
-					</div>
-				</footer>
+				<Footer />
 			</div>
 		</main>
 	);

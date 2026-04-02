@@ -21,6 +21,27 @@ export const translations = {
 		searchIndividualPlaceholder: "BUSCAR INDIVIDUO...",
 		searchCompanyPlaceholder: "BUSCAR EMPRESA...",
 
+		// Home / search welcome
+		homeTitle: "Watchlist",
+		homeSubtitle:
+			"Verifique personas y empresas frente a listas de sanciones, PEP y medios adversos en un solo flujo.",
+		tourStep1Title: "Tipo de sujeto",
+		tourStep1Desc:
+			"Use el interruptor para elegir Individuo o Empresa según el tipo de sujeto.",
+		tourStep2Title: "Campo de búsqueda",
+		tourStep2Desc:
+			"Escriba el nombre legal completo en mayúsculas (mínimo 4 caracteres).",
+		tourStep3Title: "Ajustes avanzados",
+		tourStep3Desc:
+			"Abra el ícono de ajustes para añadir fecha de nacimiento o constitución, identificadores (RFC, CURP, etc.) o países y reducir homónimos.",
+		tourStep4Title: "Ejecutar búsqueda",
+		tourStep4Desc:
+			"Pulse el botón con flecha o la tecla Enter para iniciar la consulta.",
+		tourNext: "Siguiente",
+		tourPrev: "Anterior",
+		tourDone: "Listo",
+		tourProgress: "{{current}} de {{total}}",
+
 		// Recent Searches / Queries
 		recentSearches: "Consultas recientes",
 		noRecentSearches: "No hay consultas recientes",
@@ -326,6 +347,13 @@ export const translations = {
 		adverseMediaError: "Error al analizar medios adversos",
 		noAdverseMedia: "Sin indicios de medios adversos.",
 		riskLevel: "Nivel de riesgo:",
+		riskLevelNone: "Ninguno",
+		riskLevelLow: "Bajo",
+		riskLevelMedium: "Medio",
+		riskLevelHigh: "Alto",
+
+		// Legal fine print (footer)
+		legalDisclaimerFinePrint: `Los resultados de esta herramienta tienen fines informativos y de apoyo a la debida diligencia únicamente. No constituyen asesoría legal, fiscal ni de cumplimiento normativo. La información se proporciona "tal cual", sin garantía de exactitud, integridad o vigencia. Las fuentes oficiales (SAT, UIF, OFAC, Consejo de Seguridad de la ONU, entre otras) son las únicas autoridades para fines definitivos. Una coincidencia o señal no implica culpabilidad, ilícito ni responsabilidad legal. El estatus PEP, listas de sanciones y hallazgos en medios adversos son indicadores de riesgo que requieren análisis profesional. La verificación por nombre puede producir falsos positivos por homonimia. Debe verificar la identidad con datos adicionales (fecha de nacimiento, fecha de constitución, país de origen u otros). La información se obtiene de fuentes públicas disponibles (publicaciones oficiales, bases regulatorias abiertas y medios de acceso público), en un proceso análogo a lo que cualquier persona puede realizar manualmente. Usted es el único responsable de las decisiones de cumplimiento y las acciones que adopte. Se requiere criterio profesional y verificación independiente antes de cualquier medida adversa. Los resultados son una instantánea en un momento determinado; los estatus en listas oficiales (p. ej. SAT 69-B) pueden cambiar—confirme siempre en la fuente original. Este servicio se rige por las leyes aplicables de los Estados Unidos Mexicanos.`,
 
 		// Type switch
 		individual: "Individual",
@@ -398,6 +426,26 @@ export const translations = {
 		searchButton: "Verify PEP",
 		searchIndividualPlaceholder: "SEARCH INDIVIDUAL...",
 		searchCompanyPlaceholder: "SEARCH COMPANY...",
+
+		// Home / search welcome
+		homeTitle: "Watchlist",
+		homeSubtitle:
+			"Screen individuals and companies against sanctions, PEP, and adverse media lists in one workflow.",
+		tourStep1Title: "Subject type",
+		tourStep1Desc:
+			"Toggle between Individual and Company to match the subject you are screening.",
+		tourStep2Title: "Search field",
+		tourStep2Desc:
+			"Type the full legal name in uppercase (minimum 4 characters).",
+		tourStep3Title: "Advanced settings",
+		tourStep3Desc:
+			"Open the settings control to add birth or incorporation date, identifiers (RFC, CURP, etc.), or countries to cut down homonym false positives.",
+		tourStep4Title: "Run the search",
+		tourStep4Desc: "Press the arrow button or hit Enter to start the query.",
+		tourNext: "Next",
+		tourPrev: "Previous",
+		tourDone: "Done",
+		tourProgress: "{{current}} of {{total}}",
 
 		// Recent Searches / Queries
 		recentSearches: "Recent queries",
@@ -701,6 +749,13 @@ export const translations = {
 		adverseMediaError: "Error analyzing adverse media",
 		noAdverseMedia: "No adverse media indicators found.",
 		riskLevel: "Risk level:",
+		riskLevelNone: "None",
+		riskLevelLow: "Low",
+		riskLevelMedium: "Medium",
+		riskLevelHigh: "High",
+
+		// Legal fine print (footer)
+		legalDisclaimerFinePrint: `The results from this tool are for informational and due diligence support purposes only. They do not constitute legal, tax, or compliance advice. Information is provided "as is" without warranty of accuracy, completeness, or timeliness. Official sources (SAT, UIF, OFAC, UN Security Council, and others) are the sole authorities for definitive determinations. A match or flag does not imply wrongdoing, illegality, or legal liability. PEP status, sanctions listings, and adverse media findings are risk indicators that require professional analysis. Name-based screening may produce false positives due to homonyms. You should verify identity using additional data (date of birth, incorporation date, country of origin, or other identifiers). Information is obtained from publicly available sources (official publications, open regulatory databases, and publicly accessible media), in a process analogous to what any person could perform manually. You are solely responsible for compliance decisions and actions taken. Professional judgment and independent verification are required before any adverse action. Results are a point-in-time snapshot; official list statuses (e.g. SAT 69-B) may change—always confirm against the original source. This service is governed by the applicable laws of the United Mexican States.`,
 
 		// Type switch
 		individual: "Individual",

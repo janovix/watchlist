@@ -11,7 +11,6 @@ vi.mock("next/link", () => ({
 vi.mock("lucide-react", () => ({
 	ShieldX: () => <div data-testid="shield-x-icon" />,
 	ArrowRight: () => <div data-testid="arrow-right-icon" />,
-	Loader2: () => <div data-testid="loader2-icon" />,
 }));
 
 // Mock useTranslation hook
@@ -41,11 +40,15 @@ describe("NoWatchlistAccess", () => {
 		cleanup();
 	});
 
-	it("should render spinner when isLoading is true", () => {
-		render(<NoWatchlistAccess isLoading={true} />);
+	it("should render layout skeleton when isLoading is true", () => {
+		const { container } = render(<NoWatchlistAccess isLoading={true} />);
 
-		expect(screen.getByTestId("loader2-icon")).toBeInTheDocument();
-		expect(screen.getByText("Loading")).toBeInTheDocument();
+		expect(
+			screen.getByTestId("no-watchlist-loading-skeleton"),
+		).toBeInTheDocument();
+		expect(
+			container.querySelectorAll('[data-slot="skeleton"]').length,
+		).toBeGreaterThanOrEqual(8);
 	});
 
 	it("should render card with content when isLoading is false", () => {
@@ -66,7 +69,9 @@ describe("NoWatchlistAccess", () => {
 		// Use getAllByText to get the first one in case there are multiple
 		const titles = screen.getAllByText("No Watchlist Access");
 		expect(titles.length).toBeGreaterThan(0);
-		expect(screen.queryByTestId("loader2-icon")).not.toBeInTheDocument();
+		expect(
+			screen.queryByTestId("no-watchlist-loading-skeleton"),
+		).not.toBeInTheDocument();
 	});
 
 	it("should point plan and settings links at NEXT_PUBLIC_AUTH_APP_URL", () => {

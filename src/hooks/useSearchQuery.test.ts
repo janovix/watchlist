@@ -51,6 +51,8 @@ function minimalSearchQuery(overrides: Partial<SearchQuery> = {}): SearchQuery {
 		id: "query-123",
 		organizationId: "org-1",
 		userId: "user-1",
+		source: "watchlist_query",
+		userDisplay: null,
 		query: "Test Person",
 		entityType: "person",
 		birthDate: null,

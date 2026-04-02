@@ -115,7 +115,9 @@ describe("LayoutContent", () => {
 		);
 
 		expect(screen.queryByTestId("child-content")).not.toBeInTheDocument();
-		expect(screen.getByText("loading")).toBeInTheDocument();
+		expect(
+			screen.getByTestId("no-watchlist-loading-skeleton"),
+		).toBeInTheDocument();
 	});
 
 	it("shows NoWatchlistAccess when user lacks watchlist access", () => {
