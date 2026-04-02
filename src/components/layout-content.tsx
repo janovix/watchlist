@@ -11,13 +11,15 @@ export function LayoutContent({ children }: { children: ReactNode }) {
 	return (
 		<div className="flex min-h-screen flex-col">
 			<Header />
-			{subscription?.isLoading ? (
-				<NoWatchlistAccess isLoading />
-			) : subscription && !hasWatchlistAccess(subscription.subscription) ? (
-				<NoWatchlistAccess />
-			) : (
-				children
-			)}
+			<div className="isolate flex min-h-0 flex-1 flex-col">
+				{subscription?.isLoading ? (
+					<NoWatchlistAccess isLoading />
+				) : subscription && !hasWatchlistAccess(subscription.subscription) ? (
+					<NoWatchlistAccess />
+				) : (
+					children
+				)}
+			</div>
 		</div>
 	);
 }

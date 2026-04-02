@@ -302,6 +302,16 @@
 	animation: progress-fill 20s linear forwards;
 }
 
+/*
+ * Radix Popper copies the inner content's computed z-index onto this wrapper.
+ * @algenium/blocks uses Tailwind classes like z-[200] in JS strings; this app's
+ * Tailwind build does not scan node_modules, so those utilities are often missing
+ * and the wrapper stacks at auto — then dropdowns paint under the sticky header (z-10).
+ */
+[data-radix-popper-content-wrapper] {
+	z-index: 110 !important;
+}
+
 /* driver.js onboarding popover — match app theme (light / dark) */
 .watchlist-tour-popover.driver-popover {
 	--driver-bg: var(--popover);

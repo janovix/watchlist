@@ -71,7 +71,7 @@ function HeaderNavPickers() {
 
 export function Header() {
 	return (
-		<header className="border-b border-border bg-background sticky top-0">
+		<header className="border-b border-border bg-background sticky top-0 z-10">
 			<div className={cn(LAYOUT_OUTER, "py-2 sm:py-3")}>
 				<div className="flex items-center justify-between gap-2 sm:gap-4">
 					{/* Left side: Logo only */}
