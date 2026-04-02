@@ -1,3 +1,10 @@
+# [1.1.0-rc.35](https://github.com/janovix/watchlist/compare/v1.1.0-rc.34...v1.1.0-rc.35) (2026-04-02)
+
+
+### Features
+
+* integrate driver.js for onboarding popover and enhance loading states across various pages ([bac0bd4](https://github.com/janovix/watchlist/commit/bac0bd44bbd734fc82dae0d9ddd0e5150aed623b))
+
 # [1.1.0-rc.34](https://github.com/janovix/watchlist/compare/v1.1.0-rc.33...v1.1.0-rc.34) (2026-03-30)
 
 
