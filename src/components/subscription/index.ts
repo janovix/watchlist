@@ -3,3 +3,4 @@
  */
 export { SubscriptionBanner } from "./SubscriptionBanner";
 export { NoWatchlistAccess } from "./NoWatchlistAccess";
+export { ApproachingUsageLimitBanner } from "./ApproachingUsageLimitBanner";

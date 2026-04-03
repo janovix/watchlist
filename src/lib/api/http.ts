@@ -2,11 +2,16 @@ export class ApiError extends Error {
 	name = "ApiError" as const;
 	status: number;
 	body: unknown;
+	code?: string;
 
-	constructor(message: string, opts: { status: number; body: unknown }) {
+	constructor(
+		message: string,
+		opts: { status: number; body: unknown; code?: string },
+	) {
 		super(message);
 		this.status = opts.status;
 		this.body = opts.body;
+		this.code = opts.code;
 	}
 }
 
@@ -40,9 +45,17 @@ export async function fetchJson<T>(
 	const body = isJson ? await res.json().catch(() => null) : await res.text();
 
 	if (!res.ok) {
+		const errorCode =
+			typeof body === "object" &&
+			body !== null &&
+			"code" in body &&
+			typeof (body as Record<string, unknown>).code === "string"
+				? ((body as Record<string, unknown>).code as string)
+				: undefined;
 		throw new ApiError(`Request failed: ${res.status} ${res.statusText}`, {
 			status: res.status,
 			body,
+			code: errorCode,
 		});
 	}
 

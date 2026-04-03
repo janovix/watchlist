@@ -3,7 +3,10 @@
 import { ReactNode } from "react";
 import { Header } from "@/components/header";
 import { useSubscriptionSafe, hasWatchlistAccess } from "@/lib/subscription";
-import { NoWatchlistAccess } from "@/components/subscription";
+import {
+	NoWatchlistAccess,
+	ApproachingUsageLimitBanner,
+} from "@/components/subscription";
 
 export function LayoutContent({ children }: { children: ReactNode }) {
 	const subscription = useSubscriptionSafe();
@@ -17,7 +20,12 @@ export function LayoutContent({ children }: { children: ReactNode }) {
 				) : subscription && !hasWatchlistAccess(subscription.subscription) ? (
 					<NoWatchlistAccess />
 				) : (
-					children
+					<>
+						<div className="px-4 pt-4">
+							<ApproachingUsageLimitBanner />
+						</div>
+						{children}
+					</>
 				)}
 			</div>
 		</div>
