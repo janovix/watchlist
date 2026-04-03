@@ -1,3 +1,10 @@
+# [1.1.0-rc.37](https://github.com/janovix/watchlist/compare/v1.1.0-rc.36...v1.1.0-rc.37) (2026-04-03)
+
+
+### Features
+
+* add adverse media risk level label and legal disclaimer to screening PDF generation ([8764905](https://github.com/janovix/watchlist/commit/8764905c9a839c8fad000cfbb0553cfd62c04446))
+
 # [1.1.0-rc.36](https://github.com/janovix/watchlist/compare/v1.1.0-rc.35...v1.1.0-rc.36) (2026-04-02)
 
 
