@@ -216,6 +216,24 @@ function getStatusLabel(
 	return map[status] ?? status;
 }
 
+function getAdverseMediaRiskLevelLabel(
+	level: AdverseMediaResult["risk_level"],
+	t: TranslationFn,
+): string {
+	switch (level) {
+		case "none":
+			return t("riskLevelNone");
+		case "low":
+			return t("riskLevelLow");
+		case "medium":
+			return t("riskLevelMedium");
+		case "high":
+			return t("riskLevelHigh");
+		default:
+			return level;
+	}
+}
+
 function getMatchName(
 	target: OfacMatch["target"] | UnscMatch["target"] | Sat69bMatch["target"],
 ): string {
@@ -569,10 +587,6 @@ export async function generateScreeningPdf(
 	];
 	const metaRight = [
 		[t("pdfDate"), new Date(data.createdAt).toLocaleDateString()],
-		[
-			t("pdfStatus"),
-			data.status.charAt(0).toUpperCase() + data.status.slice(1),
-		],
 	];
 
 	const metaRows = Math.max(metaLeft.length, metaRight.length);
@@ -614,20 +628,41 @@ export async function generateScreeningPdf(
 		y = rowStartY + rowHeightMm + 1;
 	}
 
+	// --- ID + Status (same row, aligned with left/right columns) ---
 	y = ensureSpace(doc, y, 8);
+	const idStatusY = y;
+
 	doc.setFont("helvetica", "bold");
 	doc.setFontSize(META_LABEL_PT);
 	doc.setTextColor(...COLORS.gray);
-	doc.text(`${t("pdfQueryId")}:`, MARGIN, y);
+	doc.text(`${t("pdfQueryId")}:`, MARGIN, idStatusY);
 	doc.setFont("helvetica", "normal");
 	doc.setFontSize(META_LABEL_PT);
 	doc.setTextColor(...COLORS.primary);
-	const idLines = doc.splitTextToSize(
-		data.id,
-		MARGIN + CONTENT_WIDTH - leftValueX,
+	const idLines = doc.splitTextToSize(data.id, leftValueMaxW);
+	doc.text(idLines, leftValueX, idStatusY);
+
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(META_LABEL_PT);
+	doc.setTextColor(...COLORS.gray);
+	doc.text(`${t("pdfStatus")}:`, rightColLabelX, idStatusY);
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(META_LABEL_PT);
+	doc.setTextColor(...COLORS.primary);
+	const statusVal = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+	const rightValMaxW = MARGIN + CONTENT_WIDTH - rightValueX;
+	const statusLines = doc.splitTextToSize(
+		statusVal,
+		Math.max(20, rightValMaxW),
 	);
-	doc.text(idLines, leftValueX, y);
-	y += idLines.length * 4.2 + 6;
+	doc.text(statusLines, rightValueX, idStatusY);
+
+	const idStatusRowH = Math.max(
+		idLines.length * 4.2,
+		statusLines.length * 4.2,
+		5,
+	);
+	y = idStatusY + idStatusRowH + 6;
 
 	// --- OFAC ---
 	const ofacMatches: OfacMatch[] =
@@ -803,7 +838,7 @@ export async function generateScreeningPdf(
 						: COLORS.gray;
 		const adverseStatusText =
 			data.adverseMediaStatus === "completed" && adverseHasRisk
-				? `${t("pdfRiskLevel")}: ${adverseRaw!.risk_level.toUpperCase()}`
+				? `${t("pdfRiskLevel")}: ${getAdverseMediaRiskLevelLabel(adverseRaw!.risk_level, t)}`
 				: getStatusLabel(data.adverseMediaStatus, t);
 
 		y = drawSectionHeader(
@@ -829,6 +864,28 @@ export async function generateScreeningPdf(
 			y = drawSources(doc, y, adverseRaw.sources, t, faviconMap);
 		}
 	}
+
+	// --- Legal disclaimer fineprint (same copy as app footer) ---
+	const disclaimerText = t("legalDisclaimerFinePrint");
+	doc.setFont("helvetica", "italic");
+	doc.setFontSize(5.5);
+	doc.setTextColor(...COLORS.gray);
+	const disclaimerLines = doc.splitTextToSize(disclaimerText, CONTENT_WIDTH);
+	const lineStepMm = 2.5;
+
+	y = ensureSpace(doc, y, 8);
+	doc.setDrawColor(...COLORS.border);
+	doc.setLineWidth(0.2);
+	doc.line(MARGIN, y, MARGIN + CONTENT_WIDTH, y);
+	y += 4;
+
+	for (const line of disclaimerLines) {
+		y = ensureSpace(doc, y, lineStepMm + 1);
+		doc.text(line, MARGIN, y);
+		y += lineStepMm;
+	}
+
+	y += 4;
 
 	// --- Footer ---
 	const pageHeight = doc.internal.pageSize.getHeight();
