@@ -1,3 +1,10 @@
+# [1.1.0-rc.36](https://github.com/janovix/watchlist/compare/v1.1.0-rc.35...v1.1.0-rc.36) (2026-04-02)
+
+
+### Bug Fixes
+
+* adjust z-index for header component and enhance layout structure in layout content ([69aad30](https://github.com/janovix/watchlist/commit/69aad30147ffa645ee41aa5e4c852615b9ae6d0f))
+
 # [1.1.0-rc.35](https://github.com/janovix/watchlist/compare/v1.1.0-rc.34...v1.1.0-rc.35) (2026-04-02)
 
 
