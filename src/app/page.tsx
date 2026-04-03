@@ -29,7 +29,12 @@ export function HomePageSkeleton() {
 	return (
 		<div className={cn("flex flex-1 flex-col", LAYOUT_HORIZONTAL_PAD)}>
 			<div className="flex min-h-0 flex-1 flex-col items-center justify-center">
-				<div className={cn("flex w-full flex-col gap-6", LAYOUT_NARROW)}>
+				<div
+					className={cn(
+						"flex w-full flex-col gap-6 max-sm:pt-8",
+						LAYOUT_NARROW,
+					)}
+				>
 					<div className="flex flex-col items-center gap-3 text-center">
 						<Skeleton className="h-9 w-48 max-w-full rounded-md" />
 						<div className="flex w-full max-w-md flex-col gap-2">
@@ -44,7 +49,7 @@ export function HomePageSkeleton() {
 						<Skeleton className="h-9 w-9 shrink-0 rounded-full" />
 					</div>
 					<div className="overflow-hidden rounded-xl border border-border min-w-0">
-						<div className="flex items-center justify-between gap-2 border-b border-border bg-card px-6 py-4">
+						<div className="flex items-center justify-between gap-2 border-b border-border bg-card px-4 py-4 sm:px-6">
 							<Skeleton className="h-4 w-36" />
 							<Skeleton className="h-8 w-28 rounded-md" />
 						</div>
@@ -52,13 +57,13 @@ export function HomePageSkeleton() {
 							{[...Array(RECENT_SKELETON_ROWS)].map((_, i) => (
 								<div
 									key={i}
-									className="flex items-center justify-between border-b border-border/50 px-6 py-3.5 last:border-0"
+									className="flex flex-col gap-2 border-b border-border/50 px-4 py-3.5 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:px-6"
 								>
 									<div className="flex items-center gap-3">
 										<Skeleton className="h-3.5 w-3.5 rounded-sm" />
-										<Skeleton className="h-4 w-48" />
+										<Skeleton className="h-4 w-48 max-w-full" />
 									</div>
-									<Skeleton className="h-3.5 w-32" />
+									<Skeleton className="h-3.5 w-32 max-sm:self-start" />
 								</div>
 							))}
 						</div>
@@ -181,7 +186,12 @@ export default function HomePage() {
 	return (
 		<main className={cn("flex flex-1 flex-col", LAYOUT_HORIZONTAL_PAD)}>
 			<div className="flex min-h-0 flex-1 flex-col items-center justify-center">
-				<div className={cn("flex w-full flex-col gap-6", LAYOUT_NARROW)}>
+				<div
+					className={cn(
+						"flex w-full flex-col gap-6 max-sm:pt-8",
+						LAYOUT_NARROW,
+					)}
+				>
 					<div className="flex flex-col items-center gap-3 text-center">
 						<h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
 							{t("homeTitle")}

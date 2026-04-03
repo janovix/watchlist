@@ -174,7 +174,11 @@ function getPdfSourceHostnames(
 	features: WatchlistFeatures,
 ): string[] {
 	const set = new Set<string>();
-	if (features.pepGrok && data.pepAiStatus !== "skipped") {
+	if (
+		data.entityType !== "organization" &&
+		features.pepGrok &&
+		data.pepAiStatus !== "skipped"
+	) {
 		const pepAiRaw = data.pepAiResult as GrokPepResult | null;
 		if (pepAiRaw?.sources?.length) {
 			for (const src of pepAiRaw.sources) {
@@ -739,8 +743,12 @@ export async function generateScreeningPdf(
 		y = drawMatchTable(doc, y, sat69bMatches, t);
 	}
 
-	// --- PEP Official (feature flag + omit when skipped) ---
-	if (features.pepSearch && data.pepOfficialStatus !== "skipped") {
+	// --- PEP Official (persons only; feature flag + omit when skipped) ---
+	if (
+		data.entityType !== "organization" &&
+		features.pepSearch &&
+		data.pepOfficialStatus !== "skipped"
+	) {
 		const pepOfficialRaw = data.pepOfficialResult as PepRawResult[] | null;
 		const pepOfficialHas =
 			Array.isArray(pepOfficialRaw) && pepOfficialRaw.length > 0;
@@ -783,8 +791,12 @@ export async function generateScreeningPdf(
 		}
 	}
 
-	// --- PEP AI (Grok) — omit entire section when skipped (same as PEP Official) ---
-	if (features.pepGrok && data.pepAiStatus !== "skipped") {
+	// --- PEP AI (Grok) — persons only; omit when skipped (same as PEP Official) ---
+	if (
+		data.entityType !== "organization" &&
+		features.pepGrok &&
+		data.pepAiStatus !== "skipped"
+	) {
 		const pepAiRaw = data.pepAiResult as GrokPepResult | null;
 		const pepAiHas = pepAiRaw && pepAiRaw.probability > 0;
 		const pepAiStatusColor =

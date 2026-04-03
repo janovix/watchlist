@@ -112,7 +112,7 @@ export function QueriesPageSkeleton() {
 					</div>
 				</div>
 
-				<div className="rounded-lg border bg-card overflow-hidden">
+				<div className="hidden md:block rounded-lg border bg-card overflow-hidden">
 					<div className="border-b px-4 py-3">
 						<div className="flex gap-4 flex-wrap">
 							<Skeleton className="h-4 w-32 flex-1 min-w-[8rem]" />
@@ -140,6 +140,23 @@ export function QueriesPageSkeleton() {
 							<Skeleton className="h-6 w-20 rounded-full" />
 							<Skeleton className="h-6 w-24 rounded-full" />
 							<Skeleton className="h-8 w-8 rounded-md" />
+						</div>
+					))}
+				</div>
+				<div className="md:hidden space-y-3">
+					{[...Array(5)].map((_, i) => (
+						<div
+							key={i}
+							className="rounded-lg border border-border bg-card p-4 space-y-3"
+						>
+							<Skeleton className="h-5 w-full max-w-[90%]" />
+							<div className="space-y-2">
+								<Skeleton className="h-3 w-16" />
+								<Skeleton className="h-4 w-3/4" />
+								<Skeleton className="h-3 w-12" />
+								<Skeleton className="h-4 w-1/2" />
+							</div>
+							<Skeleton className="h-9 w-32 ml-auto rounded-md" />
 						</div>
 					))}
 				</div>
@@ -348,7 +365,10 @@ export default function QueriesPage() {
 		if ((q.ofacCount ?? 0) > 0) out.push("ofac");
 		if ((q.unCount ?? 0) > 0) out.push("unsc");
 		if ((q.sat69bCount ?? 0) > 0) out.push("sat69b");
-		if ((q.pepOfficialCount ?? 0) > 0 || q.pepAiIndicatesMatch === true) {
+		if (
+			q.entityType !== "organization" &&
+			((q.pepOfficialCount ?? 0) > 0 || q.pepAiIndicatesMatch === true)
+		) {
 			out.push("pep");
 		}
 		if (q.adverseMediaHasRisk === true) out.push("adverseMedia");
@@ -388,6 +408,101 @@ export default function QueriesPage() {
 		sat69b: "SAT 69-B",
 		pep: "PEP",
 		adverseMedia: t("adverseMediaTitle"),
+	};
+
+	const renderRiskIndicators = (query: QueryListItem) => {
+		const indicators = getRiskIndicators(query);
+		if (indicators.length === 0) {
+			return (
+				<span
+					className="text-sm text-muted-foreground"
+					aria-label={t("riskIndicatorNone")}
+				>
+					—
+				</span>
+			);
+		}
+		return (
+			<div
+				className="flex flex-wrap gap-1"
+				role="list"
+				aria-label={t("tableRiskIndicators")}
+			>
+				{indicators.map((key) => {
+					const level = getIndicatorRiskLevel(key, query);
+					return (
+						<TooltipProvider key={key} delayDuration={200}>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Badge
+										variant="outline"
+										className={cn(
+											"text-xs font-normal",
+											getRiskLevelBadgeColor(level),
+										)}
+										role="listitem"
+									>
+										{riskIndicatorBadgeText[key]}
+									</Badge>
+								</TooltipTrigger>
+								<TooltipContent>{riskIndicatorLabels[key]}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					);
+				})}
+			</div>
+		);
+	};
+
+	/** Full-width user line for mobile query cards (table row keeps compact truncate). */
+	const renderMobileUserCell = (query: QueryListItem) => {
+		const display =
+			query.userDisplay ??
+			(query.userId && members[query.userId]
+				? {
+						name: members[query.userId].name,
+						image: members[query.userId].image ?? null,
+					}
+				: null);
+		if (display) {
+			return (
+				<TooltipProvider delayDuration={200}>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<div className="flex min-w-0 items-center gap-2">
+								<Avatar className="h-7 w-7 shrink-0">
+									{display.image ? (
+										<AvatarImage src={display.image} alt={display.name} />
+									) : null}
+									<AvatarFallback className="text-xs">
+										{getInitials(display.name)}
+									</AvatarFallback>
+								</Avatar>
+								<span className="text-sm break-words text-muted-foreground">
+									{display.name}
+								</span>
+							</div>
+						</TooltipTrigger>
+						<TooltipContent>{display.name}</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			);
+		}
+		if (query.userId) {
+			if (query.userId.startsWith("import-")) {
+				return (
+					<span className="text-sm text-muted-foreground">
+						{t("userImportLabel")}
+					</span>
+				);
+			}
+			return (
+				<span className="text-sm break-all text-muted-foreground">
+					{query.userId.slice(0, 8)}…
+				</span>
+			);
+		}
+		return <span className="text-sm text-muted-foreground">—</span>;
 	};
 
 	const hasNextPage = paramOffset + LIMIT < totalCount;
@@ -457,8 +572,8 @@ export default function QueriesPage() {
 					</div>
 				</div>
 
-				{/* Table */}
-				<div className="rounded-lg border bg-card overflow-hidden">
+				{/* Table — md+ */}
+				<div className="hidden md:block rounded-lg border bg-card overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -571,53 +686,7 @@ export default function QueriesPage() {
 											</div>
 										</TableCell>
 										<TableCell>{getStatusBadge(query.status)}</TableCell>
-										<TableCell>
-											{(() => {
-												const indicators = getRiskIndicators(query);
-												if (indicators.length === 0) {
-													return (
-														<span
-															className="text-sm text-muted-foreground"
-															aria-label={t("riskIndicatorNone")}
-														>
-															—
-														</span>
-													);
-												}
-												return (
-													<div
-														className="flex flex-wrap gap-1"
-														role="list"
-														aria-label={t("tableRiskIndicators")}
-													>
-														{indicators.map((key) => {
-															const level = getIndicatorRiskLevel(key, query);
-															return (
-																<TooltipProvider key={key} delayDuration={200}>
-																	<Tooltip>
-																		<TooltipTrigger asChild>
-																			<Badge
-																				variant="outline"
-																				className={cn(
-																					"text-xs font-normal",
-																					getRiskLevelBadgeColor(level),
-																				)}
-																				role="listitem"
-																			>
-																				{riskIndicatorBadgeText[key]}
-																			</Badge>
-																		</TooltipTrigger>
-																		<TooltipContent>
-																			{riskIndicatorLabels[key]}
-																		</TooltipContent>
-																	</Tooltip>
-																</TooltipProvider>
-															);
-														})}
-													</div>
-												);
-											})()}
-										</TableCell>
+										<TableCell>{renderRiskIndicators(query)}</TableCell>
 										<TableCell>
 											<Button
 												variant="ghost"
@@ -642,6 +711,98 @@ export default function QueriesPage() {
 							)}
 						</TableBody>
 					</Table>
+				</div>
+
+				{/* Mobile: stacked cards (no horizontal scroll) */}
+				<div className="md:hidden space-y-3">
+					{filteredQueries.length === 0 ? (
+						<div className="rounded-lg border border-border bg-card px-4 py-12 text-center text-sm text-muted-foreground">
+							{paramSearch || paramFilter !== "all"
+								? t("noQueriesFound")
+								: t("noQueriesYet")}
+						</div>
+					) : (
+						filteredQueries.map((query) => (
+							<div
+								key={query.id}
+								className="rounded-lg border border-border bg-card p-4 shadow-sm"
+							>
+								<button
+									type="button"
+									className="flex w-full min-w-0 items-start gap-2 text-left"
+									onClick={() => router.push(`/queries/${query.id}`)}
+								>
+									{query.entityType === "organization" ? (
+										<Building2 className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+									) : (
+										<User className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+									)}
+									<span className="min-w-0 flex-1 font-medium uppercase wrap-break-word">
+										{query.query}
+									</span>
+								</button>
+
+								<dl className="mt-3 space-y-2.5 text-sm">
+									<div>
+										<dt className="text-xs font-medium text-muted-foreground">
+											{t("tableSource")}
+										</dt>
+										<dd className="mt-0.5 wrap-break-word text-foreground">
+											{getSourceLabel(query.source ?? "manual")}
+										</dd>
+									</div>
+									<div>
+										<dt className="text-xs font-medium text-muted-foreground">
+											{t("tableUser")}
+										</dt>
+										<dd className="mt-0.5">{renderMobileUserCell(query)}</dd>
+									</div>
+									<div>
+										<dt className="text-xs font-medium text-muted-foreground">
+											{t("tableDate")}
+										</dt>
+										<dd className="mt-0.5 flex flex-wrap items-center gap-2 text-muted-foreground">
+											<Clock className="h-3.5 w-3.5 shrink-0" />
+											<span className="wrap-break-word">
+												{formatFullDate(query.createdAt)}
+											</span>
+										</dd>
+									</div>
+									<div>
+										<dt className="text-xs font-medium text-muted-foreground">
+											{t("tableStatus")}
+										</dt>
+										<dd className="mt-0.5">{getStatusBadge(query.status)}</dd>
+									</div>
+									<div>
+										<dt className="text-xs font-medium text-muted-foreground">
+											{t("tableRiskIndicators")}
+										</dt>
+										<dd className="mt-0.5">{renderRiskIndicators(query)}</dd>
+									</div>
+								</dl>
+
+								<div className="mt-3 flex justify-end border-t border-border pt-3">
+									<Button
+										variant="outline"
+										size="sm"
+										className="gap-2"
+										disabled={
+											query.status !== "completed" || exportingId === query.id
+										}
+										onClick={(e) => handleExportPdf(query.id, e)}
+									>
+										{exportingId === query.id ? (
+											<Loader2 className="h-4 w-4 animate-spin" />
+										) : (
+											<Download className="h-4 w-4" />
+										)}
+										{t("exportPdf")}
+									</Button>
+								</div>
+							</div>
+						))
+					)}
 				</div>
 
 				{/* Pagination */}

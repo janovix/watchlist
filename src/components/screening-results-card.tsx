@@ -335,7 +335,9 @@ export function ScreeningResultsCard({
 	const showPepSearch = features?.pepSearch ?? true;
 	const showPepGrok = features?.pepGrok ?? true;
 	const showAdverseMedia = features?.adverseMedia ?? true;
-	const showPepSection = showPepSearch || showPepGrok;
+	/** PEP applies to natural persons only, not legal entities */
+	const showPepSection =
+		(showPepSearch || showPepGrok) && data.entityType !== "organization";
 
 	// Synchronous result statuses
 	const ofacStatus = resolveItemStatus(data.ofacStatus, data.ofacCount);
