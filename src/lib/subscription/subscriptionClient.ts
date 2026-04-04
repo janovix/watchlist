@@ -98,13 +98,18 @@ export interface UsageDetailsPayload {
 }
 
 /**
- * Get subscription status for current user
+ * Get subscription status for the active organization context.
+ * Uses resolveFromOrg so invited members see the org owner's plan (billing entity),
+ * matching AML. Personal org-creation limits still come from the requesting user.
  */
 export async function getSubscriptionStatus(): Promise<SubscriptionStatus | null> {
 	try {
-		const response = await fetch(`${getBaseUrl()}/api/subscription/status`, {
-			credentials: "include",
-		});
+		const response = await fetch(
+			`${getBaseUrl()}/api/subscription/status?resolveFromOrg=true`,
+			{
+				credentials: "include",
+			},
+		);
 
 		if (!response.ok) {
 			console.warn("Failed to fetch subscription status:", response.status);
