@@ -1,3 +1,10 @@
+# [1.1.0-rc.38](https://github.com/janovix/watchlist/compare/v1.1.0-rc.37...v1.1.0-rc.38) (2026-04-03)
+
+
+### Features
+
+* add ApproachingUsageLimitBanner component and integrate it into layout content ([fdbe872](https://github.com/janovix/watchlist/commit/fdbe87214ceb5a3a4402b19a6663c84c812a1b9e))
+
 # [1.1.0-rc.37](https://github.com/janovix/watchlist/compare/v1.1.0-rc.36...v1.1.0-rc.37) (2026-04-03)
 
 
