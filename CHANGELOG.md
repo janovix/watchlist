@@ -1,3 +1,10 @@
+# [1.1.0-rc.41](https://github.com/janovix/watchlist/compare/v1.1.0-rc.40...v1.1.0-rc.41) (2026-04-04)
+
+
+### Features
+
+* add EntitlementAttributionFooter component and integrate it into layout content; update footer layout and styles for improved responsiveness ([30fdd5c](https://github.com/janovix/watchlist/commit/30fdd5c55e1f51ec00932f6d98d4072b39452ee7))
+
 # [1.1.0-rc.40](https://github.com/janovix/watchlist/compare/v1.1.0-rc.39...v1.1.0-rc.40) (2026-04-04)
 
 
