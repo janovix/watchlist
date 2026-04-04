@@ -192,7 +192,7 @@ export default function HomePage() {
 			<div className="flex min-h-0 flex-1 flex-col items-center justify-center">
 				<div
 					className={cn(
-						"flex w-full flex-col gap-6 max-sm:pt-8",
+						"flex w-full flex-col gap-6 max-sm:pt-8 mb-6",
 						LAYOUT_NARROW,
 					)}
 				>

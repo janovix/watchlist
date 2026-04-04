@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
 	getSubscriptionStatus,
+	getUsageDetails,
 	isFreeTier,
 	hasPaidSubscription,
 	isEnterprise,
@@ -27,7 +28,7 @@ describe("subscriptionClient", () => {
 	afterEach(() => {
 		global.fetch = originalFetch;
 		console.warn = originalConsoleWarn;
-		vi.restoreAllMocks();
+		vi.clearAllMocks();
 	});
 
 	describe("getSubscriptionStatus", () => {
@@ -117,6 +118,52 @@ describe("subscriptionClient", () => {
 				"Error fetching subscription status:",
 				expect.any(Error),
 			);
+		});
+	});
+
+	describe("getUsageDetails", () => {
+		it("returns usage payload when API succeeds", async () => {
+			const payload = {
+				period: { start: "2026-04-01", end: "2026-04-30" },
+				limits: { watchlistQueriesPerMonth: 100 },
+				usage: { watchlistQueries: 5 },
+			};
+			vi.mocked(global.fetch).mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({ success: true, data: payload }),
+			} as Response);
+
+			const result = await getUsageDetails();
+			expect(result).toEqual(payload);
+		});
+
+		it("returns null when response is not ok", async () => {
+			vi.mocked(global.fetch).mockResolvedValueOnce({
+				ok: false,
+				status: 500,
+			} as Response);
+			expect(await getUsageDetails()).toBeNull();
+		});
+
+		it("returns null when API indicates failure", async () => {
+			vi.mocked(global.fetch).mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({ success: false }),
+			} as Response);
+			expect(await getUsageDetails()).toBeNull();
+		});
+
+		it("returns null on fetch error", async () => {
+			vi.mocked(global.fetch).mockRejectedValueOnce(new Error("network"));
+			expect(await getUsageDetails()).toBeNull();
+		});
+
+		it("returns null when success is true but data is absent", async () => {
+			vi.mocked(global.fetch).mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({ success: true }),
+			} as Response);
+			expect(await getUsageDetails()).toBeNull();
 		});
 	});
 
@@ -457,6 +504,44 @@ describe("subscriptionClient", () => {
 				limits: null,
 				isTrialing: false,
 				trialDaysRemaining: null,
+				currentPeriodStart: null,
+				currentPeriodEnd: null,
+				cancelAtPeriodEnd: false,
+				isLicenseBased: false,
+				licenseExpiresAt: null,
+				organizationsOwned: 1,
+				organizationsLimit: 3,
+			};
+			expect(hasAMLAccess(subscription)).toBe(true);
+		});
+
+		it("should return false for watchlist-only plan", () => {
+			const subscription: SubscriptionStatus = {
+				hasSubscription: true,
+				status: "active",
+				plan: "watchlist",
+				limits: null,
+				isTrialing: false,
+				trialDaysRemaining: null,
+				currentPeriodStart: null,
+				currentPeriodEnd: null,
+				cancelAtPeriodEnd: false,
+				isLicenseBased: false,
+				licenseExpiresAt: null,
+				organizationsOwned: 1,
+				organizationsLimit: 3,
+			};
+			expect(hasAMLAccess(subscription)).toBe(false);
+		});
+
+		it("should return true when status is trialing and plan is not watchlist", () => {
+			const subscription: SubscriptionStatus = {
+				hasSubscription: true,
+				status: "trialing",
+				plan: "pro",
+				limits: null,
+				isTrialing: true,
+				trialDaysRemaining: 7,
 				currentPeriodStart: null,
 				currentPeriodEnd: null,
 				cancelAtPeriodEnd: false,

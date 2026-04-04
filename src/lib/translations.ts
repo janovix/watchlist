@@ -156,6 +156,9 @@ export const translations = {
 		"subscription.noWatchlistAccess.upgradeCta": "Ver planes disponibles",
 		"subscription.noWatchlistAccess.backToSettings": "Ir a configuración",
 
+		entitlementFooter:
+			"El acceso sigue el plan de la organización {organization} ({plan}). La suscripción la gestiona el propietario de la organización.",
+
 		// Error pages
 		errorNotFoundTitle: "Página no encontrada",
 		errorNotFoundDescription:
@@ -560,6 +563,9 @@ export const translations = {
 		subscriptionMetricUsers: "users",
 		subscriptionMetricAlerts: "searches",
 		subscriptionMetricTransactions: "transactions",
+
+		entitlementFooter:
+			"Access follows this organization's plan: {organization} ({plan}). Billing is on the organization owner.",
 
 		// Error pages
 		errorNotFoundTitle: "Page not found",

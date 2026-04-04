@@ -76,7 +76,7 @@ describe("SubscriptionProvider and hooks", () => {
 	afterEach(() => {
 		cleanup();
 		global.fetch = originalFetch;
-		vi.restoreAllMocks();
+		vi.clearAllMocks();
 	});
 
 	describe("SubscriptionProvider", () => {
@@ -169,6 +169,20 @@ describe("SubscriptionProvider and hooks", () => {
 			});
 
 			expect(screen.getByTestId("error")).toHaveTextContent("Failed to fetch");
+		});
+
+		it("should wrap non-Error rejection as Unknown error", async () => {
+			vi.mocked(getSubscriptionStatus).mockRejectedValue("not an error");
+
+			render(
+				<SubscriptionProvider>
+					<TestComponent />
+				</SubscriptionProvider>,
+			);
+
+			await waitFor(() => {
+				expect(screen.getByTestId("error")).toHaveTextContent("Unknown error");
+			});
 		});
 
 		it("should handle null subscription", async () => {

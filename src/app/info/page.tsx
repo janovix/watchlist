@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/footer";
 import { useLanguage } from "@/components/language-provider";
-import { LAYOUT_HORIZONTAL_PAD } from "@/lib/layout";
+import { LAYOUT_HORIZONTAL_PAD, LAYOUT_INFO_COLUMN } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 import {
 	Accordion,
@@ -25,7 +25,7 @@ import {
 export function InfoPageSkeleton() {
 	return (
 		<div className={cn("flex-1 py-8", LAYOUT_HORIZONTAL_PAD)}>
-			<div className="mx-auto max-w-4xl">
+			<div className={LAYOUT_INFO_COLUMN}>
 				<Skeleton className="h-10 w-40 mb-6 rounded-md" />
 				<div className="mb-10 space-y-3">
 					<Skeleton className="h-10 w-full max-w-lg" />
@@ -64,7 +64,7 @@ export default function InfoPage() {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col">
 			<main className={cn("flex-1 py-8", LAYOUT_HORIZONTAL_PAD)}>
-				<div className="mx-auto max-w-4xl">
+				<div className={LAYOUT_INFO_COLUMN}>
 					{/* Header */}
 					<Button variant="ghost" onClick={navigateBack} className="mb-6 -ml-2">
 						<ArrowLeft className="h-4 w-4 mr-2" />

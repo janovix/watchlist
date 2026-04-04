@@ -1,4 +1,9 @@
 import { jsPDF } from "jspdf";
+import {
+	extractHostname,
+	ensureProtocol,
+	looksLikeUrl,
+} from "@/lib/pdf/pdf-text-utils";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
 import type {
 	OfacMatch,
@@ -58,24 +63,6 @@ const COLORS = {
 const PAGE_WIDTH = 210;
 const MARGIN = 20;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
-
-function looksLikeUrl(value: string): boolean {
-	return (
-		/^https?:\/\//i.test(value) || /^[\w-]+(\.[\w-]+)+(\/.*)?\s*$/.test(value)
-	);
-}
-
-function ensureProtocol(value: string): string {
-	return /^https?:\/\//i.test(value) ? value : `https://${value.trim()}`;
-}
-
-function extractHostname(value: string): string {
-	try {
-		return new URL(ensureProtocol(value)).hostname;
-	} catch {
-		return value;
-	}
-}
 
 const FAVICON_PDF_MM = 3;
 const FAVICON_PDF_GAP_MM = 1.5;
@@ -282,20 +269,6 @@ async function loadImageAsBase64(url: string): Promise<string | null> {
 	} catch {
 		return null;
 	}
-}
-
-function drawJanovixLogo(doc: jsPDF, x: number, y: number, scale: number) {
-	doc.setFillColor(...COLORS.primary);
-
-	// "J" letter approximation
-	doc.setFontSize(10 * scale);
-	doc.setFont("helvetica", "bold");
-	doc.setTextColor(...COLORS.primary);
-	doc.text("Janovix", x, y + 3 * scale);
-
-	// Accent mark
-	doc.setFillColor(...COLORS.accent);
-	doc.rect(x + 28 * scale, y - 1 * scale, 2 * scale, 2 * scale, "F");
 }
 
 function drawSectionHeader(

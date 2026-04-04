@@ -8,9 +8,21 @@ vi.mock("@/lib/auth/config", () => ({
 	getAuthCoreBaseUrl: () => "https://auth-svc.test",
 }));
 
+const mockUseAuthSession = vi.fn(() => ({
+	data: {
+		user: { id: "user-1" },
+		session: { activeOrganizationId: null as string | null },
+	},
+	isPending: false,
+}));
+
+vi.mock("@/lib/auth/useAuthSession", () => ({
+	useAuthSession: () => mockUseAuthSession(),
+}));
+
 function orgListResponse(
 	orgs: Array<{
-		id?: string;
+		id: string;
 		name: string;
 		logo?: string | null;
 		role?: string;
@@ -26,11 +38,18 @@ describe("useOrganization", () => {
 	beforeEach(async () => {
 		vi.clearAllMocks();
 		vi.resetModules();
+		mockUseAuthSession.mockReturnValue({
+			data: {
+				user: { id: "user-1" },
+				session: { activeOrganizationId: null },
+			},
+			isPending: false,
+		});
 	});
 
 	it("should start with isLoading true and org null", async () => {
 		mockFetch.mockResolvedValue(
-			orgListResponse([{ name: "Acme Corp", logo: null }]),
+			orgListResponse([{ id: "o1", name: "Acme Corp", logo: null }]),
 		);
 
 		const { useOrganization } = await import("./useOrganization");
@@ -44,10 +63,11 @@ describe("useOrganization", () => {
 		});
 	});
 
-	it("should set org from the first organization in the list", async () => {
+	it("should set org from the first organization when no active org in session", async () => {
 		mockFetch.mockResolvedValue(
 			orgListResponse([
 				{
+					id: "o1",
 					name: "Acme Corp",
 					logo: "https://cdn.example.com/logo.png",
 					role: "owner",
@@ -69,8 +89,36 @@ describe("useOrganization", () => {
 		});
 	});
 
+	it("should select organization matching activeOrganizationId", async () => {
+		mockUseAuthSession.mockReturnValue({
+			data: {
+				user: { id: "user-1" },
+				session: { activeOrganizationId: "o2" },
+			},
+			isPending: false,
+		});
+		mockFetch.mockResolvedValue(
+			orgListResponse([
+				{ id: "o1", name: "First Org" },
+				{ id: "o2", name: "Second Org", role: "admin" },
+			]),
+		);
+
+		const { useOrganization } = await import("./useOrganization");
+		const { result } = renderHook(() => useOrganization());
+
+		await waitFor(() => {
+			expect(result.current.isLoading).toBe(false);
+		});
+
+		expect(result.current.org?.name).toBe("Second Org");
+		expect(result.current.org?.role).toBe("admin");
+	});
+
 	it("should set logo to null when org has no logo", async () => {
-		mockFetch.mockResolvedValue(orgListResponse([{ name: "No Logo Inc" }]));
+		mockFetch.mockResolvedValue(
+			orgListResponse([{ id: "o1", name: "No Logo Inc" }]),
+		);
 
 		const { useOrganization } = await import("./useOrganization");
 		const { result } = renderHook(() => useOrganization());
@@ -130,9 +178,11 @@ describe("useOrganization", () => {
 		warnSpy.mockRestore();
 	});
 
-	it("should use cached org and not call fetch again on second render", async () => {
+	it("should call fetch again for a new hook instance", async () => {
 		mockFetch.mockResolvedValue(
-			orgListResponse([{ name: "Cached Corp", logo: null, role: "member" }]),
+			orgListResponse([
+				{ id: "o1", name: "Cached Corp", logo: null, role: "member" },
+			]),
 		);
 
 		const { useOrganization } = await import("./useOrganization");
@@ -144,11 +194,11 @@ describe("useOrganization", () => {
 
 		expect(mockFetch).toHaveBeenCalledOnce();
 
-		// Second render — should use cache
 		const { result: r2 } = renderHook(() => useOrganization());
-		expect(r2.current.isLoading).toBe(false);
+		await waitFor(() => {
+			expect(r2.current.isLoading).toBe(false);
+		});
 		expect(r2.current.org).toMatchObject({ name: "Cached Corp", logo: null });
-		// fetch should NOT have been called again
-		expect(mockFetch).toHaveBeenCalledOnce();
+		expect(mockFetch).toHaveBeenCalledTimes(2);
 	});
 });

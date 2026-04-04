@@ -7,6 +7,7 @@ import {
 	NoWatchlistAccess,
 	ApproachingUsageLimitBanner,
 } from "@/components/subscription";
+import { EntitlementAttributionFooter } from "@/components/EntitlementAttributionFooter";
 
 export function LayoutContent({ children }: { children: ReactNode }) {
 	const subscription = useSubscriptionSafe();
@@ -24,7 +25,8 @@ export function LayoutContent({ children }: { children: ReactNode }) {
 						<div className="px-4 pt-4">
 							<ApproachingUsageLimitBanner />
 						</div>
-						{children}
+						<div className="flex min-h-0 flex-1 flex-col">{children}</div>
+						<EntitlementAttributionFooter />
 					</>
 				)}
 			</div>
