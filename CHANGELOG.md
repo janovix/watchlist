@@ -1,3 +1,10 @@
+# [1.1.0-rc.40](https://github.com/janovix/watchlist/compare/v1.1.0-rc.39...v1.1.0-rc.40) (2026-04-04)
+
+
+### Bug Fixes
+
+* update getSubscriptionStatus to include resolveFromOrg query parameter for organization context ([8e7b282](https://github.com/janovix/watchlist/commit/8e7b2829a868496cf81e259359d1b4469b2d0187))
+
 # [1.1.0-rc.39](https://github.com/janovix/watchlist/compare/v1.1.0-rc.38...v1.1.0-rc.39) (2026-04-04)
 
 
