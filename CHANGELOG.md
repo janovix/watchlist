@@ -1,3 +1,10 @@
+# [1.1.0-rc.39](https://github.com/janovix/watchlist/compare/v1.1.0-rc.38...v1.1.0-rc.39) (2026-04-04)
+
+
+### Bug Fixes
+
+* update @algenium/blocks dependency to version 1.1.2 and adjust OrgPicker component to render null for single organization ([e0cbc82](https://github.com/janovix/watchlist/commit/e0cbc823cbe6b7c357886705b44b38c9a52455ca))
+
 # [1.1.0-rc.38](https://github.com/janovix/watchlist/compare/v1.1.0-rc.37...v1.1.0-rc.38) (2026-04-03)
 
 
