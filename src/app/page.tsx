@@ -42,11 +42,15 @@ export function HomePageSkeleton() {
 							<Skeleton className="mx-auto h-4 w-[80%] max-w-sm rounded-md" />
 						</div>
 					</div>
-					<div className="flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2.5">
-						<Skeleton className="h-10 w-[88px] shrink-0 rounded-full" />
-						<Skeleton className="flex-1 h-9 min-w-0 rounded-md" />
-						<Skeleton className="h-9 w-9 shrink-0 rounded-full" />
-						<Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+					<div className="flex flex-col gap-3 rounded-xl border border-border bg-card px-4 py-3 sm:flex-row sm:items-center sm:gap-3 sm:rounded-full sm:py-2.5">
+						<Skeleton className="h-10 w-full rounded-md sm:order-2 sm:flex-1 sm:min-w-0" />
+						<div className="flex w-full items-center justify-between gap-2 sm:contents">
+							<Skeleton className="h-10 w-[88px] shrink-0 rounded-full sm:order-1" />
+							<div className="flex shrink-0 items-center gap-1.5 sm:order-3">
+								<Skeleton className="h-9 w-9 rounded-full" />
+								<Skeleton className="h-9 w-9 rounded-full" />
+							</div>
+						</div>
 					</div>
 					<div className="overflow-hidden rounded-xl border border-border min-w-0">
 						<div className="flex items-center justify-between gap-2 border-b border-border bg-card px-4 py-4 sm:px-6">
@@ -201,19 +205,8 @@ export default function HomePage() {
 						</p>
 					</div>
 
-					{/* Search bar - pill shaped */}
-					<div className="flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2.5 transition-all duration-300 hover:border-muted-foreground/30">
-						{/* Entity Type Toggle */}
-						<div id="entity-type-switch" className="shrink-0">
-							<TypeSwitch
-								compact
-								checked={searchType === "company"}
-								onCheckedChange={(checked) =>
-									setSearchType(checked ? "company" : "individual")
-								}
-							/>
-						</div>
-
+					{/* Search bar: stacked on narrow mobile (full-width input), single-row pill from sm */}
+					<div className="flex flex-col gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-all duration-300 hover:border-muted-foreground/30 sm:flex-row sm:items-center sm:gap-3 sm:rounded-full sm:py-2.5">
 						<Input
 							id="search-input"
 							value={query}
@@ -227,35 +220,46 @@ export default function HomePage() {
 									? t("searchIndividualPlaceholder")
 									: t("searchCompanyPlaceholder")
 							}
-							className="flex-1 border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 uppercase font-mono min-w-0 px-2 bg-transparent p-0 shadow-none"
+							className="order-1 w-full min-w-0 border-0 bg-transparent p-0 px-2 text-base uppercase shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:order-2 sm:flex-1"
 						/>
 
-						{/* Advanced Search Toggle */}
-						<Button
-							id="advanced-settings-btn"
-							onClick={() => setAdvancedOpen(!advancedOpen)}
-							variant="ghost"
-							size="icon"
-							className={`shrink-0 rounded-full h-9 w-9 p-0 flex items-center justify-center transition-colors ${advancedOpen ? "bg-primary/15 text-primary" : ""}`}
-						>
-							<Settings2 className="h-4 w-4" />
-						</Button>
+						<div className="order-2 flex w-full items-center justify-between gap-2 sm:contents">
+							<div id="entity-type-switch" className="shrink-0 sm:order-1">
+								<TypeSwitch
+									compact
+									checked={searchType === "company"}
+									onCheckedChange={(checked) =>
+										setSearchType(checked ? "company" : "individual")
+									}
+								/>
+							</div>
 
-						{/* Submit Button */}
-						<Button
-							id="submit-search-btn"
-							onClick={() => handleSearch()}
-							disabled={!canSubmit}
-							size="icon"
-							className="shrink-0 rounded-full h-9 w-9 p-0 flex items-center justify-center"
-							aria-busy={isSearching}
-						>
-							{isSearching ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<ChevronRight className="h-4 w-4" />
-							)}
-						</Button>
+							<div className="flex shrink-0 items-center gap-1.5 sm:order-3">
+								<Button
+									id="advanced-settings-btn"
+									onClick={() => setAdvancedOpen(!advancedOpen)}
+									variant="ghost"
+									size="icon"
+									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full p-0 transition-colors ${advancedOpen ? "bg-primary/15 text-primary" : ""}`}
+								>
+									<Settings2 className="h-4 w-4" />
+								</Button>
+								<Button
+									id="submit-search-btn"
+									onClick={() => handleSearch()}
+									disabled={!canSubmit}
+									size="icon"
+									className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full p-0"
+									aria-busy={isSearching}
+								>
+									{isSearching ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<ChevronRight className="h-4 w-4" />
+									)}
+								</Button>
+							</div>
+						</div>
 					</div>
 
 					{/* Advanced Settings - animated expand/collapse */}

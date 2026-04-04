@@ -135,7 +135,7 @@ export function OrgPicker() {
 				if (cancelled) return;
 
 				const orgs = listResult.data;
-				if (!orgs || orgs.length === 0) {
+				if (!orgs || orgs.length < 2) {
 					setLoadState("hidden");
 					return;
 				}
