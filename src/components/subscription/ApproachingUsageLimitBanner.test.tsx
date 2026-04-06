@@ -10,7 +10,15 @@ vi.mock("@/lib/subscription/subscriptionClient", () => ({
 }));
 
 vi.mock("@/lib/auth/config", () => ({
-	getAuthCoreBaseUrl: () => "https://auth.example.com",
+	getAuthAppUrl: () => "https://auth.example.com",
+}));
+
+vi.mock("@/hooks/useFlags", () => ({
+	useFlags: vi.fn(() => ({
+		flags: { "stripe-billing-enabled": true },
+		error: null,
+		isLoading: false,
+	})),
 }));
 
 vi.mock("next/link", () => ({
@@ -28,10 +36,17 @@ vi.mock("next/link", () => ({
 	),
 }));
 
+import { useFlags } from "@/hooks/useFlags";
+
 describe("ApproachingUsageLimitBanner", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		localStorage.clear();
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": true },
+			error: null,
+			isLoading: false,
+		});
 	});
 
 	afterEach(() => {
@@ -131,5 +146,45 @@ describe("ApproachingUsageLimitBanner", () => {
 		expect(
 			screen.queryByText(/Watchlist query usage is at/),
 		).not.toBeInTheDocument();
+	});
+
+	it("hides Usage & billing link when stripe billing is disabled", async () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": false },
+			error: null,
+			isLoading: false,
+		});
+		mockGetUsageDetails.mockResolvedValue(baseDetails());
+
+		render(<ApproachingUsageLimitBanner />);
+
+		await waitFor(() => {
+			expect(
+				screen.getByText(/Watchlist query usage is at 85%/),
+			).toBeInTheDocument();
+		});
+		expect(
+			screen.queryByRole("link", { name: /Usage & billing/i }),
+		).not.toBeInTheDocument();
+	});
+
+	it("shows Usage & billing link when stripe flags fail to load (fail-open)", async () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: {},
+			error: "flags unavailable",
+			isLoading: false,
+		});
+		mockGetUsageDetails.mockResolvedValue(baseDetails());
+
+		render(<ApproachingUsageLimitBanner />);
+
+		await waitFor(() => {
+			expect(
+				screen.getByText(/Watchlist query usage is at 85%/),
+			).toBeInTheDocument();
+		});
+		expect(
+			screen.getByRole("link", { name: /Usage & billing/i }),
+		).toHaveAttribute("href", "https://auth.example.com/settings/billing");
 	});
 });

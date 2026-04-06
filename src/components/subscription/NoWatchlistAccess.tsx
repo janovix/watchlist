@@ -15,6 +15,7 @@ import { getAuthAppUrl } from "@/lib/auth/config";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LAYOUT_HORIZONTAL_PAD, LAYOUT_NARROW } from "@/lib/layout";
 import { cn } from "@/lib/utils";
+import { useFlags } from "@/hooks/useFlags";
 
 interface NoWatchlistAccessProps {
 	/** Whether the subscription is still loading */
@@ -31,6 +32,13 @@ export function NoWatchlistAccess({
 	isLoading = false,
 }: NoWatchlistAccessProps) {
 	const { t } = useTranslation();
+	const { flags: stripeFlags, error: stripeFlagsError } = useFlags([
+		"stripe-billing-enabled",
+	]);
+	const stripeBillingEnabled =
+		stripeFlagsError !== null
+			? true
+			: stripeFlags["stripe-billing-enabled"] !== false;
 
 	const authAppBase = getAuthAppUrl();
 	const authBillingUrl = `${authAppBase}/settings/billing`;
@@ -89,16 +97,22 @@ export function NoWatchlistAccess({
 						{t("subscription.noWatchlistAccess.upgradePrompt")}
 					</p>
 					<div className="flex flex-col gap-3">
-						<Button asChild size="lg" className="w-full">
-							<Link
-								href={authBillingUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{t("subscription.noWatchlistAccess.upgradeCta")}
-								<ArrowRight className="ml-2 h-4 w-4" />
-							</Link>
-						</Button>
+						{stripeBillingEnabled ? (
+							<Button asChild size="lg" className="w-full">
+								<Link
+									href={authBillingUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{t("subscription.noWatchlistAccess.upgradeCta")}
+									<ArrowRight className="ml-2 h-4 w-4" />
+								</Link>
+							</Button>
+						) : (
+							<p className="text-sm text-muted-foreground">
+								{t("subscription.noWatchlistAccess.contactAdmin")}
+							</p>
+						)}
 						<Button
 							variant="ghost"
 							asChild

@@ -24,6 +24,8 @@ vi.mock("@/lib/settings", () => ({
 					"You don't have access to Watchlist",
 				"subscription.noWatchlistAccess.upgradePrompt": "Please upgrade",
 				"subscription.noWatchlistAccess.upgradeCta": "Upgrade Now",
+				"subscription.noWatchlistAccess.contactAdmin":
+					"Contact your administrator to upgrade.",
 				"subscription.noWatchlistAccess.backToSettings": "Back to Settings",
 			};
 			return translations[key] || key;
@@ -31,9 +33,24 @@ vi.mock("@/lib/settings", () => ({
 	}),
 }));
 
+vi.mock("@/hooks/useFlags", () => ({
+	useFlags: vi.fn(() => ({
+		flags: { "stripe-billing-enabled": true },
+		error: null,
+		isLoading: false,
+	})),
+}));
+
+import { useFlags } from "@/hooks/useFlags";
+
 describe("NoWatchlistAccess", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": true },
+			error: null,
+			isLoading: false,
+		});
 	});
 
 	afterEach(() => {
@@ -89,5 +106,40 @@ describe("NoWatchlistAccess", () => {
 		);
 		expect(billing).toBeDefined();
 		expect(settings).toBeDefined();
+	});
+
+	it("shows contact admin message instead of upgrade CTA when stripe billing is disabled", () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": false },
+			error: null,
+			isLoading: false,
+		});
+
+		render(<NoWatchlistAccess isLoading={false} />);
+
+		expect(
+			screen.getByText("Contact your administrator to upgrade."),
+		).toBeInTheDocument();
+		expect(screen.queryByText("Upgrade Now")).not.toBeInTheDocument();
+		const billingLink = screen
+			.queryAllByRole("link")
+			.find(
+				(a) =>
+					a.getAttribute("href") ===
+					"https://auth.example.workers.dev/settings/billing",
+			);
+		expect(billingLink).toBeUndefined();
+	});
+
+	it("shows upgrade CTA when stripe flags fail to load (fail-open)", () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: {},
+			error: "flags unavailable",
+			isLoading: false,
+		});
+
+		render(<NoWatchlistAccess isLoading={false} />);
+
+		expect(screen.getByText("Upgrade Now")).toBeInTheDocument();
 	});
 });

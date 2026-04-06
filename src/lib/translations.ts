@@ -154,6 +154,8 @@ export const translations = {
 		"subscription.noWatchlistAccess.upgradePrompt":
 			"Para acceder a consultas de listas de vigilancia, suscríbete a un plan que incluya Watchlist.",
 		"subscription.noWatchlistAccess.upgradeCta": "Ver planes disponibles",
+		"subscription.noWatchlistAccess.contactAdmin":
+			"El acceso se gestiona por licencia. Contacta a tu administrador.",
 		"subscription.noWatchlistAccess.backToSettings": "Ir a configuración",
 
 		entitlementFooter:
@@ -557,6 +559,8 @@ export const translations = {
 		"subscription.noWatchlistAccess.upgradePrompt":
 			"To access watchlist queries, subscribe to a plan that includes Watchlist.",
 		"subscription.noWatchlistAccess.upgradeCta": "View available plans",
+		"subscription.noWatchlistAccess.contactAdmin":
+			"Access is managed by your organization’s license. Contact your administrator.",
 		"subscription.noWatchlistAccess.backToSettings": "Go to settings",
 		subscriptionUpgrade: "Upgrade plan",
 		subscriptionMetricNotices: "notices",
