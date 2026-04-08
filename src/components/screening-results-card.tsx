@@ -5,7 +5,6 @@ import {
 	AlertTriangle,
 	Loader2,
 	ExternalLink,
-	Link2,
 } from "lucide-react";
 import {
 	Accordion,
@@ -25,6 +24,7 @@ import {
 	ensureProtocol,
 	extractHostname,
 } from "@/components/external-link-dialog";
+import { Favicon } from "@/components/favicon";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
 import type { ProgressMessages } from "@/hooks/useSearchQuery";
 import type { PepRawResult } from "@/hooks/usePepSearch";
@@ -317,10 +317,27 @@ export function ScreeningResultsCard({
 	const { language, t } = useLanguage();
 	const extLink = useExternalLinkRedirect();
 
+	const adverseMediaRiskLevelLabel = (
+		level: AdverseMediaResult["risk_level"],
+	) => {
+		switch (level) {
+			case "none":
+				return t("riskLevelNone");
+			case "low":
+				return t("riskLevelLow");
+			case "medium":
+				return t("riskLevelMedium");
+			case "high":
+				return t("riskLevelHigh");
+		}
+	};
+
 	const showPepSearch = features?.pepSearch ?? true;
 	const showPepGrok = features?.pepGrok ?? true;
 	const showAdverseMedia = features?.adverseMedia ?? true;
-	const showPepSection = showPepSearch || showPepGrok;
+	/** PEP applies to natural persons only, not legal entities */
+	const showPepSection =
+		(showPepSearch || showPepGrok) && data.entityType !== "organization";
 
 	// Synchronous result statuses
 	const ofacStatus = resolveItemStatus(data.ofacStatus, data.ofacCount);
@@ -667,7 +684,10 @@ export function ScreeningResultsCard({
 																						}
 																						className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
 																					>
-																						<Link2 className="h-3 w-3 shrink-0 inline" />
+																						<Favicon
+																							url={src}
+																							className="h-3 w-3 shrink-0 inline"
+																						/>
 																						{extractHostname(src)}
 																						<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
 																					</a>
@@ -740,7 +760,9 @@ export function ScreeningResultsCard({
 													(adverseMediaRaw as AdverseMediaResult).risk_level,
 												)}
 											>
-												{(adverseMediaRaw as AdverseMediaResult).risk_level}
+												{adverseMediaRiskLevelLabel(
+													(adverseMediaRaw as AdverseMediaResult).risk_level,
+												)}
 											</Badge>
 										</div>
 									)}
@@ -776,7 +798,10 @@ export function ScreeningResultsCard({
 																			}
 																			className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
 																		>
-																			<Link2 className="h-3 w-3 shrink-0 inline" />
+																			<Favicon
+																				url={src}
+																				className="h-3 w-3 shrink-0 inline"
+																			/>
 																			{extractHostname(src)}
 																			<ExternalLink className="h-2.5 w-2.5 shrink-0 inline" />
 																		</a>

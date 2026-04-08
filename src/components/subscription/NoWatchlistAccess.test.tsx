@@ -11,7 +11,6 @@ vi.mock("next/link", () => ({
 vi.mock("lucide-react", () => ({
 	ShieldX: () => <div data-testid="shield-x-icon" />,
 	ArrowRight: () => <div data-testid="arrow-right-icon" />,
-	Loader2: () => <div data-testid="loader2-icon" />,
 }));
 
 // Mock useTranslation hook
@@ -25,6 +24,8 @@ vi.mock("@/lib/settings", () => ({
 					"You don't have access to Watchlist",
 				"subscription.noWatchlistAccess.upgradePrompt": "Please upgrade",
 				"subscription.noWatchlistAccess.upgradeCta": "Upgrade Now",
+				"subscription.noWatchlistAccess.contactAdmin":
+					"Contact your administrator to upgrade.",
 				"subscription.noWatchlistAccess.backToSettings": "Back to Settings",
 			};
 			return translations[key] || key;
@@ -32,20 +33,39 @@ vi.mock("@/lib/settings", () => ({
 	}),
 }));
 
+vi.mock("@/hooks/useFlags", () => ({
+	useFlags: vi.fn(() => ({
+		flags: { "stripe-billing-enabled": true },
+		error: null,
+		isLoading: false,
+	})),
+}));
+
+import { useFlags } from "@/hooks/useFlags";
+
 describe("NoWatchlistAccess", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": true },
+			error: null,
+			isLoading: false,
+		});
 	});
 
 	afterEach(() => {
 		cleanup();
 	});
 
-	it("should render spinner when isLoading is true", () => {
-		render(<NoWatchlistAccess isLoading={true} />);
+	it("should render layout skeleton when isLoading is true", () => {
+		const { container } = render(<NoWatchlistAccess isLoading={true} />);
 
-		expect(screen.getByTestId("loader2-icon")).toBeInTheDocument();
-		expect(screen.getByText("Loading")).toBeInTheDocument();
+		expect(
+			screen.getByTestId("no-watchlist-loading-skeleton"),
+		).toBeInTheDocument();
+		expect(
+			container.querySelectorAll('[data-slot="skeleton"]').length,
+		).toBeGreaterThanOrEqual(8);
 	});
 
 	it("should render card with content when isLoading is false", () => {
@@ -66,7 +86,9 @@ describe("NoWatchlistAccess", () => {
 		// Use getAllByText to get the first one in case there are multiple
 		const titles = screen.getAllByText("No Watchlist Access");
 		expect(titles.length).toBeGreaterThan(0);
-		expect(screen.queryByTestId("loader2-icon")).not.toBeInTheDocument();
+		expect(
+			screen.queryByTestId("no-watchlist-loading-skeleton"),
+		).not.toBeInTheDocument();
 	});
 
 	it("should point plan and settings links at NEXT_PUBLIC_AUTH_APP_URL", () => {
@@ -84,5 +106,40 @@ describe("NoWatchlistAccess", () => {
 		);
 		expect(billing).toBeDefined();
 		expect(settings).toBeDefined();
+	});
+
+	it("shows contact admin message instead of upgrade CTA when stripe billing is disabled", () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": false },
+			error: null,
+			isLoading: false,
+		});
+
+		render(<NoWatchlistAccess isLoading={false} />);
+
+		expect(
+			screen.getByText("Contact your administrator to upgrade."),
+		).toBeInTheDocument();
+		expect(screen.queryByText("Upgrade Now")).not.toBeInTheDocument();
+		const billingLink = screen
+			.queryAllByRole("link")
+			.find(
+				(a) =>
+					a.getAttribute("href") ===
+					"https://auth.example.workers.dev/settings/billing",
+			);
+		expect(billingLink).toBeUndefined();
+	});
+
+	it("shows upgrade CTA when stripe flags fail to load (fail-open)", () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: {},
+			error: "flags unavailable",
+			isLoading: false,
+		});
+
+		render(<NoWatchlistAccess isLoading={false} />);
+
+		expect(screen.getByText("Upgrade Now")).toBeInTheDocument();
 	});
 });

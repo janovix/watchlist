@@ -19,6 +19,10 @@ export interface SearchQuery {
 	id: string;
 	organizationId: string;
 	userId: string | null;
+	/** Origin of the query (e.g. watchlist_query, aml) */
+	source: string;
+	/** Resolved user display when userId is an org member */
+	userDisplay?: { name: string; image: string | null } | null;
 	query: string;
 	entityType: string | null;
 	birthDate: string | null;
@@ -74,6 +78,8 @@ export interface QueryListItem {
 	pepOfficialStatus: QueryStatus | null;
 	pepOfficialCount: number | null;
 	pepAiStatus: QueryStatus | null;
+	/** Grok PEP indicates a match (aligns with detail view when official count is zero). */
+	pepAiIndicatesMatch?: boolean;
 	adverseMediaStatus: QueryStatus | null;
 	/** Set when adverse media result has risk_level !== "none" (optional for backward compatibility) */
 	adverseMediaHasRisk?: boolean | null;

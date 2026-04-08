@@ -1,4 +1,9 @@
 import { jsPDF } from "jspdf";
+import {
+	extractHostname,
+	ensureProtocol,
+	looksLikeUrl,
+} from "@/lib/pdf/pdf-text-utils";
 import type { SearchQuery, QueryStatus } from "@/lib/api/queries";
 import type {
 	OfacMatch,
@@ -59,14 +64,124 @@ const PAGE_WIDTH = 210;
 const MARGIN = 20;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
-function looksLikeUrl(value: string): boolean {
-	return (
-		/^https?:\/\//i.test(value) || /^[\w-]+(\.[\w-]+)+(\/.*)?\s*$/.test(value)
-	);
+const FAVICON_PDF_MM = 3;
+const FAVICON_PDF_GAP_MM = 1.5;
+
+/**
+ * Same-origin proxy avoids CORS/tainted-canvas issues when decoding third-party favicons.
+ * Output is always PNG for jsPDF.addImage(..., "PNG").
+ */
+async function fetchFaviconDataUrl(hostname: string): Promise<string | null> {
+	if (typeof document === "undefined") return null;
+
+	const path = `/api/favicon?host=${encodeURIComponent(hostname)}`;
+
+	try {
+		const res = await fetch(path, { signal: AbortSignal.timeout(4000) });
+		if (!res.ok) return null;
+		const blob = await res.blob();
+
+		if (typeof createImageBitmap === "function") {
+			try {
+				const bitmap = await createImageBitmap(blob);
+				const canvas = document.createElement("canvas");
+				canvas.width = bitmap.width || 32;
+				canvas.height = bitmap.height || 32;
+				const ctx = canvas.getContext("2d");
+				if (!ctx) {
+					bitmap.close();
+					return null;
+				}
+				ctx.drawImage(bitmap, 0, 0);
+				bitmap.close();
+				return canvas.toDataURL("image/png");
+			} catch {
+				// fall through to blob-URL + Image
+			}
+		}
+
+		return new Promise((resolve) => {
+			const objectUrl = URL.createObjectURL(blob);
+			const img = new Image();
+			const timeout = setTimeout(() => {
+				URL.revokeObjectURL(objectUrl);
+				img.src = "";
+				resolve(null);
+			}, 3000);
+
+			img.onload = () => {
+				clearTimeout(timeout);
+				try {
+					const canvas = document.createElement("canvas");
+					canvas.width = img.naturalWidth || 32;
+					canvas.height = img.naturalHeight || 32;
+					const ctx = canvas.getContext("2d");
+					if (!ctx) {
+						URL.revokeObjectURL(objectUrl);
+						resolve(null);
+						return;
+					}
+					ctx.drawImage(img, 0, 0);
+					URL.revokeObjectURL(objectUrl);
+					resolve(canvas.toDataURL("image/png"));
+				} catch {
+					URL.revokeObjectURL(objectUrl);
+					resolve(null);
+				}
+			};
+
+			img.onerror = () => {
+				clearTimeout(timeout);
+				URL.revokeObjectURL(objectUrl);
+				resolve(null);
+			};
+
+			img.src = objectUrl;
+		});
+	} catch {
+		return null;
+	}
 }
 
-function ensureProtocol(value: string): string {
-	return /^https?:\/\//i.test(value) ? value : `https://${value.trim()}`;
+async function prefetchSourceFavicons(
+	hostnames: string[],
+): Promise<Map<string, string>> {
+	const map = new Map<string, string>();
+	await Promise.all(
+		hostnames.map(async (host) => {
+			const dataUrl = await fetchFaviconDataUrl(host);
+			if (dataUrl) map.set(host, dataUrl);
+		}),
+	);
+	return map;
+}
+
+function getPdfSourceHostnames(
+	data: SearchQuery,
+	features: WatchlistFeatures,
+): string[] {
+	const set = new Set<string>();
+	if (
+		data.entityType !== "organization" &&
+		features.pepGrok &&
+		data.pepAiStatus !== "skipped"
+	) {
+		const pepAiRaw = data.pepAiResult as GrokPepResult | null;
+		if (pepAiRaw?.sources?.length) {
+			for (const src of pepAiRaw.sources) {
+				if (looksLikeUrl(src)) set.add(extractHostname(src));
+			}
+		}
+	}
+	if (features.adverseMedia) {
+		const adverseRaw = data.adverseMediaResult as AdverseMediaResult | null;
+		if (adverseRaw?.sources?.length) {
+			for (const src of adverseRaw.sources) {
+				if (looksLikeUrl(src)) set.add(extractHostname(src));
+			}
+		}
+	}
+	return [...set];
 }
 
 function getBilingualText(
@@ -90,6 +205,24 @@ function getStatusLabel(
 		running: "Running",
 	};
 	return map[status] ?? status;
+}
+
+function getAdverseMediaRiskLevelLabel(
+	level: AdverseMediaResult["risk_level"],
+	t: TranslationFn,
+): string {
+	switch (level) {
+		case "none":
+			return t("riskLevelNone");
+		case "low":
+			return t("riskLevelLow");
+		case "medium":
+			return t("riskLevelMedium");
+		case "high":
+			return t("riskLevelHigh");
+		default:
+			return level;
+	}
 }
 
 function getMatchName(
@@ -136,20 +269,6 @@ async function loadImageAsBase64(url: string): Promise<string | null> {
 	} catch {
 		return null;
 	}
-}
-
-function drawJanovixLogo(doc: jsPDF, x: number, y: number, scale: number) {
-	doc.setFillColor(...COLORS.primary);
-
-	// "J" letter approximation
-	doc.setFontSize(10 * scale);
-	doc.setFont("helvetica", "bold");
-	doc.setTextColor(...COLORS.primary);
-	doc.text("Janovix", x, y + 3 * scale);
-
-	// Accent mark
-	doc.setFillColor(...COLORS.accent);
-	doc.rect(x + 28 * scale, y - 1 * scale, 2 * scale, 2 * scale, "F");
 }
 
 function drawSectionHeader(
@@ -247,6 +366,7 @@ function drawSources(
 	y: number,
 	sources: string[],
 	t: TranslationFn,
+	favicons: Map<string, string>,
 ): number {
 	if (sources.length === 0) return y;
 
@@ -260,24 +380,60 @@ function drawSources(
 	doc.setFont("helvetica", "normal");
 	doc.setFontSize(7);
 
+	const linkLineHeightMm = 3.8;
+
 	for (const src of sources) {
-		y = ensureSpace(doc, y, 5);
 		const isLink = looksLikeUrl(src);
 		if (isLink) {
 			const href = ensureProtocol(src);
+			const hostname = extractHostname(src);
+			const iconData = favicons.get(hostname);
+			const indent = iconData ? FAVICON_PDF_MM + FAVICON_PDF_GAP_MM : 0;
+			const textWidth = CONTENT_WIDTH - 8 - indent;
+
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(7);
 			doc.setTextColor(37, 99, 235);
-			const displayText = src.length > 90 ? src.substring(0, 90) + "…" : src;
-			const lines = doc.splitTextToSize(displayText, CONTENT_WIDTH - 8);
-			doc.text(lines, MARGIN + 4, y);
-			doc.link(MARGIN + 4, y - 3.5, CONTENT_WIDTH - 8, lines.length * 3.8, {
-				url: href,
-			});
-			y += lines.length * 3.8 + 1;
+			// Full URL for visibility and copy/paste (wraps; no truncation)
+			const displayText = href;
+			const lines = doc.splitTextToSize(displayText, textWidth);
+			const blockHeight = lines.length * linkLineHeightMm + 2;
+			y = ensureSpace(doc, y, blockHeight);
+
+			if (iconData) {
+				try {
+					doc.addImage(
+						iconData,
+						"PNG",
+						MARGIN + 4,
+						y - FAVICON_PDF_MM + 0.5,
+						FAVICON_PDF_MM,
+						FAVICON_PDF_MM,
+					);
+				} catch {
+					// Omit icon if decode fails; text keeps reserved indent
+				}
+			}
+
+			doc.text(lines, MARGIN + 4 + indent, y);
+			doc.link(
+				MARGIN + 4,
+				y - 3.5,
+				CONTENT_WIDTH - 8,
+				lines.length * linkLineHeightMm,
+				{
+					url: href,
+				},
+			);
+			y += lines.length * linkLineHeightMm + 1;
 		} else {
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(7);
 			doc.setTextColor(...COLORS.gray);
 			const lines = doc.splitTextToSize(src, CONTENT_WIDTH - 8);
+			y = ensureSpace(doc, y, lines.length * linkLineHeightMm + 2);
 			doc.text(lines, MARGIN + 4, y);
-			y += lines.length * 3.8 + 1;
+			y += lines.length * linkLineHeightMm + 1;
 		}
 	}
 
@@ -293,6 +449,10 @@ export async function generateScreeningPdf(
 ): Promise<void> {
 	const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 	let y = MARGIN;
+
+	const faviconMapPromise = prefetchSourceFavicons(
+		getPdfSourceHostnames(data, features),
+	);
 
 	// --- Header ---
 	let logoLoaded = false;
@@ -326,12 +486,58 @@ export async function generateScreeningPdf(
 	doc.line(MARGIN, y, MARGIN + CONTENT_WIDTH, y);
 	y += 8;
 
-	// --- Query metadata ---
-	doc.setFontSize(9);
+	const faviconMap = await faviconMapPromise;
+
+	// --- Query metadata (subject full-width; other fields two-column, aligned) ---
+	const META_LABEL_PT = 9;
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(META_LABEL_PT);
 	doc.setTextColor(...COLORS.gray);
 
+	const leftLabelKeys = [
+		t("pdfEntityType"),
+		...(data.birthDate ? [t("pdfBirthDate")] : []),
+		...(data.countries && data.countries.length > 0 ? [t("countries")] : []),
+	];
+	let maxLeftLabelW = 0;
+	for (const lbl of leftLabelKeys) {
+		maxLeftLabelW = Math.max(maxLeftLabelW, doc.getTextWidth(`${lbl}:`));
+	}
+	maxLeftLabelW = Math.max(
+		maxLeftLabelW,
+		doc.getTextWidth(`${t("pdfQueryId")}:`),
+		doc.getTextWidth(`${t("pdfSubject")}:`),
+	);
+
+	const rightLabelKeys = [t("pdfDate"), t("pdfStatus")];
+	let maxRightLabelW = 0;
+	for (const lbl of rightLabelKeys) {
+		maxRightLabelW = Math.max(maxRightLabelW, doc.getTextWidth(`${lbl}:`));
+	}
+
+	const leftValueX = MARGIN + maxLeftLabelW + 4;
+	const rightColLabelX = MARGIN + CONTENT_WIDTH * 0.5;
+	const rightValueX = rightColLabelX + maxRightLabelW + 4;
+	const leftValueMaxW = Math.max(24, rightColLabelX - leftValueX - 4);
+
+	y = ensureSpace(doc, y, 14);
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(META_LABEL_PT);
+	doc.setTextColor(...COLORS.gray);
+	doc.text(`${t("pdfSubject")}:`, MARGIN, y);
+	y += 5;
+
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(12);
+	doc.setTextColor(...COLORS.primary);
+	const subjectLines = doc.splitTextToSize(
+		data.query.toUpperCase(),
+		CONTENT_WIDTH,
+	);
+	doc.text(subjectLines, MARGIN, y);
+	y += subjectLines.length * 4.8 + 6;
+
 	const metaLeft = [
-		[t("pdfSubject"), data.query.toUpperCase()],
 		[
 			t("pdfEntityType"),
 			data.entityType === "organization"
@@ -358,46 +564,82 @@ export async function generateScreeningPdf(
 	];
 	const metaRight = [
 		[t("pdfDate"), new Date(data.createdAt).toLocaleDateString()],
-		[
-			t("pdfStatus"),
-			data.status.charAt(0).toUpperCase() + data.status.slice(1),
-		],
 	];
 
-	// Left column value X: after longest label (e.g. "Fecha de nacimiento:") to avoid overlap
-	const metaLeftValueX = 72;
 	const metaRows = Math.max(metaLeft.length, metaRight.length);
+	doc.setFontSize(META_LABEL_PT);
+
 	for (let i = 0; i < metaRows; i++) {
-		y = ensureSpace(doc, y, 6);
+		const rowStartY = y;
+		let rowHeightMm = 5;
+
 		if (metaLeft[i]) {
 			doc.setFont("helvetica", "bold");
+			doc.setFontSize(META_LABEL_PT);
 			doc.setTextColor(...COLORS.gray);
-			doc.text(`${metaLeft[i][0]}:`, MARGIN, y);
+			doc.text(`${metaLeft[i][0]}:`, MARGIN, rowStartY);
 			doc.setFont("helvetica", "normal");
+			doc.setFontSize(META_LABEL_PT);
 			doc.setTextColor(...COLORS.primary);
-			doc.text(metaLeft[i][1], metaLeftValueX, y);
+			const valLines = doc.splitTextToSize(metaLeft[i][1], leftValueMaxW);
+			doc.text(valLines, leftValueX, rowStartY);
+			rowHeightMm = Math.max(rowHeightMm, valLines.length * 4.2);
 		}
 		if (metaRight[i]) {
 			doc.setFont("helvetica", "bold");
+			doc.setFontSize(META_LABEL_PT);
 			doc.setTextColor(...COLORS.gray);
-			doc.text(`${metaRight[i][0]}:`, MARGIN + 100, y);
+			doc.text(`${metaRight[i][0]}:`, rightColLabelX, rowStartY);
 			doc.setFont("helvetica", "normal");
+			doc.setFontSize(META_LABEL_PT);
 			doc.setTextColor(...COLORS.primary);
-			doc.text(metaRight[i][1], MARGIN + 120, y);
+			const rightValMaxW = MARGIN + CONTENT_WIDTH - rightValueX;
+			const rightLines = doc.splitTextToSize(
+				metaRight[i][1],
+				Math.max(20, rightValMaxW),
+			);
+			doc.text(rightLines, rightValueX, rowStartY);
+			rowHeightMm = Math.max(rowHeightMm, rightLines.length * 4.2);
 		}
-		y += 5;
+
+		y = rowStartY + rowHeightMm + 1;
 	}
 
-	// Full-width ID row so the complete UUID is visible
-	y = ensureSpace(doc, y, 6);
+	// --- ID + Status (same row, aligned with left/right columns) ---
+	y = ensureSpace(doc, y, 8);
+	const idStatusY = y;
+
 	doc.setFont("helvetica", "bold");
-	doc.setFontSize(9);
+	doc.setFontSize(META_LABEL_PT);
 	doc.setTextColor(...COLORS.gray);
-	doc.text(`${t("pdfQueryId")}:`, MARGIN, y);
+	doc.text(`${t("pdfQueryId")}:`, MARGIN, idStatusY);
 	doc.setFont("helvetica", "normal");
+	doc.setFontSize(META_LABEL_PT);
 	doc.setTextColor(...COLORS.primary);
-	doc.text(data.id, MARGIN + 30, y);
-	y += 10;
+	const idLines = doc.splitTextToSize(data.id, leftValueMaxW);
+	doc.text(idLines, leftValueX, idStatusY);
+
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(META_LABEL_PT);
+	doc.setTextColor(...COLORS.gray);
+	doc.text(`${t("pdfStatus")}:`, rightColLabelX, idStatusY);
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(META_LABEL_PT);
+	doc.setTextColor(...COLORS.primary);
+	const statusVal = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+	const rightValMaxW = MARGIN + CONTENT_WIDTH - rightValueX;
+	const statusLines = doc.splitTextToSize(
+		statusVal,
+		Math.max(20, rightValMaxW),
+	);
+	doc.text(statusLines, rightValueX, idStatusY);
+
+	const idStatusRowH = Math.max(
+		idLines.length * 4.2,
+		statusLines.length * 4.2,
+		5,
+	);
+	y = idStatusY + idStatusRowH + 6;
 
 	// --- OFAC ---
 	const ofacMatches: OfacMatch[] =
@@ -474,8 +716,12 @@ export async function generateScreeningPdf(
 		y = drawMatchTable(doc, y, sat69bMatches, t);
 	}
 
-	// --- PEP Official (feature flag + omit when skipped) ---
-	if (features.pepSearch && data.pepOfficialStatus !== "skipped") {
+	// --- PEP Official (persons only; feature flag + omit when skipped) ---
+	if (
+		data.entityType !== "organization" &&
+		features.pepSearch &&
+		data.pepOfficialStatus !== "skipped"
+	) {
 		const pepOfficialRaw = data.pepOfficialResult as PepRawResult[] | null;
 		const pepOfficialHas =
 			Array.isArray(pepOfficialRaw) && pepOfficialRaw.length > 0;
@@ -518,8 +764,12 @@ export async function generateScreeningPdf(
 		}
 	}
 
-	// --- PEP AI (Grok) ---
-	if (features.pepGrok) {
+	// --- PEP AI (Grok) — persons only; omit when skipped (same as PEP Official) ---
+	if (
+		data.entityType !== "organization" &&
+		features.pepGrok &&
+		data.pepAiStatus !== "skipped"
+	) {
 		const pepAiRaw = data.pepAiResult as GrokPepResult | null;
 		const pepAiHas = pepAiRaw && pepAiRaw.probability > 0;
 		const pepAiStatusColor =
@@ -543,19 +793,19 @@ export async function generateScreeningPdf(
 			pepAiStatusColor,
 		);
 
-		if (pepAiHas && pepAiRaw!.summary) {
+		if (pepAiRaw && pepAiRaw.summary) {
 			y = ensureSpace(doc, y, 15);
 			doc.setFont("helvetica", "normal");
 			doc.setFontSize(7.5);
 			doc.setTextColor(...COLORS.primary);
-			const summaryText = getBilingualText(pepAiRaw!.summary, language);
+			const summaryText = getBilingualText(pepAiRaw.summary, language);
 			const lines = doc.splitTextToSize(summaryText, CONTENT_WIDTH - 8);
 			doc.text(lines, MARGIN + 4, y + 4);
 			y += lines.length * 3.5 + 4;
 		}
 
-		if (pepAiHas && pepAiRaw!.sources && pepAiRaw!.sources.length > 0) {
-			y = drawSources(doc, y, pepAiRaw!.sources, t);
+		if (pepAiRaw?.sources && pepAiRaw.sources.length > 0) {
+			y = drawSources(doc, y, pepAiRaw.sources, t, faviconMap);
 		}
 	}
 
@@ -573,7 +823,7 @@ export async function generateScreeningPdf(
 						: COLORS.gray;
 		const adverseStatusText =
 			data.adverseMediaStatus === "completed" && adverseHasRisk
-				? `${t("pdfRiskLevel")}: ${adverseRaw!.risk_level.toUpperCase()}`
+				? `${t("pdfRiskLevel")}: ${getAdverseMediaRiskLevelLabel(adverseRaw!.risk_level, t)}`
 				: getStatusLabel(data.adverseMediaStatus, t);
 
 		y = drawSectionHeader(
@@ -584,25 +834,43 @@ export async function generateScreeningPdf(
 			adverseStatusColor,
 		);
 
-		if (adverseHasRisk && adverseRaw!.findings) {
+		if (adverseRaw && adverseRaw.findings) {
 			y = ensureSpace(doc, y, 15);
 			doc.setFont("helvetica", "normal");
 			doc.setFontSize(7.5);
 			doc.setTextColor(...COLORS.primary);
-			const findingsText = getBilingualText(adverseRaw!.findings, language);
+			const findingsText = getBilingualText(adverseRaw.findings, language);
 			const lines = doc.splitTextToSize(findingsText, CONTENT_WIDTH - 8);
 			doc.text(lines, MARGIN + 4, y + 4);
 			y += lines.length * 3.5 + 4;
 		}
 
-		if (
-			adverseHasRisk &&
-			adverseRaw!.sources &&
-			adverseRaw!.sources.length > 0
-		) {
-			y = drawSources(doc, y, adverseRaw!.sources, t);
+		if (adverseRaw?.sources && adverseRaw.sources.length > 0) {
+			y = drawSources(doc, y, adverseRaw.sources, t, faviconMap);
 		}
 	}
+
+	// --- Legal disclaimer fineprint (same copy as app footer) ---
+	const disclaimerText = t("legalDisclaimerFinePrint");
+	doc.setFont("helvetica", "italic");
+	doc.setFontSize(5.5);
+	doc.setTextColor(...COLORS.gray);
+	const disclaimerLines = doc.splitTextToSize(disclaimerText, CONTENT_WIDTH);
+	const lineStepMm = 2.5;
+
+	y = ensureSpace(doc, y, 8);
+	doc.setDrawColor(...COLORS.border);
+	doc.setLineWidth(0.2);
+	doc.line(MARGIN, y, MARGIN + CONTENT_WIDTH, y);
+	y += 4;
+
+	for (const line of disclaimerLines) {
+		y = ensureSpace(doc, y, lineStepMm + 1);
+		doc.text(line, MARGIN, y);
+		y += lineStepMm;
+	}
+
+	y += 4;
 
 	// --- Footer ---
 	const pageHeight = doc.internal.pageSize.getHeight();
@@ -621,11 +889,32 @@ export async function generateScreeningPdf(
 		footerY + 1,
 	);
 
+	doc.setFontSize(7);
+	const poweredByLabel = `${t("pdfPoweredBy")} `;
+	const brandText = "Janovix";
+
+	doc.setFont("helvetica", "normal");
 	doc.setTextColor(...COLORS.gray);
-	doc.text(`${t("pdfPoweredBy")} `, MARGIN + CONTENT_WIDTH - 28, footerY + 1);
+	const prefixW = doc.getTextWidth(poweredByLabel);
+
 	doc.setFont("helvetica", "bold");
 	doc.setTextColor(...COLORS.primary);
-	doc.text("Janovix", MARGIN + CONTENT_WIDTH - 14, footerY + 1);
+	const brandW = doc.getTextWidth(brandText);
+
+	const footerRightBlockW = prefixW + brandW;
+	const footerRightStartX = MARGIN + CONTENT_WIDTH - footerRightBlockW;
+
+	doc.setFont("helvetica", "normal");
+	doc.setTextColor(...COLORS.gray);
+	doc.text(poweredByLabel, footerRightStartX, footerY + 1);
+
+	doc.setFont("helvetica", "bold");
+	doc.setTextColor(37, 99, 235);
+	const janovixTextX = footerRightStartX + prefixW;
+	doc.text(brandText, janovixTextX, footerY + 1);
+	doc.link(janovixTextX, footerY - 2, brandW, 5, {
+		url: "https://janovix.com",
+	});
 
 	// --- Save ---
 	const safeName = data.query.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);

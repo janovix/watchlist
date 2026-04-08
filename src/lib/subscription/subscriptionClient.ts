@@ -68,14 +68,48 @@ interface ApiResponse<T> {
 	error?: string;
 }
 
+export interface UsageDetailsPayload {
+	usage: {
+		reports: number;
+		notices: number;
+		alerts: number;
+		operations: number;
+		clients: number;
+		users: number;
+		watchlistQueries: number;
+	};
+	limits: {
+		reports: number;
+		notices: number;
+		alerts: number;
+		operations: number;
+		clients: number;
+		users: number;
+		watchlistQueriesPerMonth: number;
+		maxOrganizations: number;
+	} | null;
+	period: { start: string; end: string };
+	overage: {
+		enabled: boolean;
+		spendLimitCents: number | null;
+		periodChargeCents: number;
+		currency: string;
+	};
+}
+
 /**
- * Get subscription status for current user
+ * Get subscription status for the active organization context.
+ * Uses resolveFromOrg so invited members see the org owner's plan (billing entity),
+ * matching AML. Personal org-creation limits still come from the requesting user.
  */
 export async function getSubscriptionStatus(): Promise<SubscriptionStatus | null> {
 	try {
-		const response = await fetch(`${getBaseUrl()}/api/subscription/status`, {
-			credentials: "include",
-		});
+		const response = await fetch(
+			`${getBaseUrl()}/api/subscription/status?resolveFromOrg=true`,
+			{
+				credentials: "include",
+			},
+		);
 
 		if (!response.ok) {
 			console.warn("Failed to fetch subscription status:", response.status);
@@ -86,6 +120,22 @@ export async function getSubscriptionStatus(): Promise<SubscriptionStatus | null
 		return result.success ? (result.data ?? null) : null;
 	} catch (error) {
 		console.warn("Error fetching subscription status:", error);
+		return null;
+	}
+}
+
+export async function getUsageDetails(): Promise<UsageDetailsPayload | null> {
+	try {
+		const response = await fetch(
+			`${getBaseUrl()}/api/subscription/usage-details`,
+			{
+				credentials: "include",
+			},
+		);
+		if (!response.ok) return null;
+		const result = (await response.json()) as ApiResponse<UsageDetailsPayload>;
+		return result.success ? (result.data ?? null) : null;
+	} catch {
 		return null;
 	}
 }

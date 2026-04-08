@@ -73,6 +73,8 @@ function buildSearchQuery(args: PepSectionStoryArgs): SearchQuery {
 		id: "00000000-0000-4000-8000-000000000001",
 		organizationId: "00000000-0000-4000-8000-000000000002",
 		userId: null,
+		source: "watchlist_query",
+		userDisplay: null,
 		query: "STORY SUBJECT",
 		entityType: "individual",
 		birthDate: null,

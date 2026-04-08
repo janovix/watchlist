@@ -64,6 +64,29 @@ describe("OrgPicker", () => {
 		});
 	});
 
+	it("should render null when user has only one organization", async () => {
+		mockOrganizationList.mockResolvedValue({
+			data: [
+				{
+					id: "org-1",
+					name: "Only Org",
+					slug: "only",
+					logo: null,
+					role: "owner",
+				},
+			],
+		});
+		mockGetSession.mockResolvedValue({
+			data: { session: { activeOrganizationId: "org-1" } },
+		});
+
+		const { container } = render(<OrgPicker />);
+
+		await waitFor(() => {
+			expect(container.firstChild).toBeNull();
+		});
+	});
+
 	it("should render null when org list fetch fails", async () => {
 		mockOrganizationList.mockRejectedValue(new Error("fetch failed"));
 		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -86,6 +109,13 @@ describe("OrgPicker", () => {
 					slug: "acme",
 					logo: null,
 					role: "owner",
+				},
+				{
+					id: "org-2",
+					name: "Beta Inc",
+					slug: "beta",
+					logo: null,
+					role: "member",
 				},
 			],
 		});
@@ -110,6 +140,13 @@ describe("OrgPicker", () => {
 					slug: "logo",
 					logo: "https://cdn.example.com/logo.png",
 					role: "owner",
+				},
+				{
+					id: "org-2",
+					name: "Other",
+					slug: "other",
+					logo: null,
+					role: "member",
 				},
 			],
 		});
@@ -225,6 +262,13 @@ describe("OrgPicker", () => {
 					logo: null,
 					role: "owner",
 				},
+				{
+					id: "org-2",
+					name: "Second Org",
+					slug: "second",
+					logo: null,
+					role: "member",
+				},
 			],
 		});
 		mockGetSession.mockResolvedValue({
@@ -260,6 +304,13 @@ describe("OrgPicker", () => {
 					slug: "solo",
 					logo: null,
 					role: "owner",
+				},
+				{
+					id: "org-2",
+					name: "Second Org",
+					slug: "second",
+					logo: null,
+					role: "member",
 				},
 			],
 		});
@@ -301,6 +352,13 @@ describe("OrgPicker", () => {
 					logo: null,
 					role: "owner",
 				},
+				{
+					id: "org-2",
+					name: "Beta Inc",
+					slug: "beta",
+					logo: null,
+					role: "member",
+				},
 			],
 		});
 		mockGetSession.mockResolvedValue({
@@ -324,6 +382,13 @@ describe("OrgPicker", () => {
 					slug: "first",
 					logo: null,
 					role: "owner",
+				},
+				{
+					id: "org-2",
+					name: "Second Org",
+					slug: "second",
+					logo: null,
+					role: "member",
 				},
 			],
 		});
@@ -405,6 +470,13 @@ describe("OrgPicker", () => {
 					logo: null,
 					role: "owner",
 				},
+				{
+					id: "org-2",
+					name: "Beta",
+					slug: "beta",
+					logo: null,
+					role: "member",
+				},
 			],
 		});
 		mockGetSession.mockRejectedValue(new Error("session failed"));
@@ -429,6 +501,13 @@ describe("OrgPicker", () => {
 					slug: "acme-slug",
 					logo: null,
 					role: "owner",
+				},
+				{
+					id: "org-2",
+					name: "Other",
+					slug: "other",
+					logo: null,
+					role: "member",
 				},
 			],
 		});
@@ -482,7 +561,16 @@ describe("OrgPicker - org initials logic", () => {
 		["Three Word Name", "TN"],
 	])("getOrgInitials('%s') should render '%s'", async (name, expected) => {
 		mockOrganizationList.mockResolvedValue({
-			data: [{ id: "org-1", name, slug: "slug", logo: null, role: "owner" }],
+			data: [
+				{ id: "org-1", name, slug: "slug", logo: null, role: "owner" },
+				{
+					id: "org-2",
+					name: "Other Org",
+					slug: "other",
+					logo: null,
+					role: "member",
+				},
+			],
 		});
 		mockGetSession.mockResolvedValue({
 			data: { session: { activeOrganizationId: "org-1" } },

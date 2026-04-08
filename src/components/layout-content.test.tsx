@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { LayoutContent } from "./layout-content";
+import { LanguageProvider } from "@/components/language-provider";
 import type { SubscriptionContextValue } from "@/lib/subscription/useSubscription";
 import type { SubscriptionStatus } from "@/lib/subscription/subscriptionClient";
 
@@ -14,9 +15,23 @@ vi.mock("@/lib/subscription", async (importOriginal) => {
 	};
 });
 
-vi.mock("@/lib/settings", () => ({
-	useTranslation: () => ({
-		t: (key: string) => key,
+vi.mock("@/lib/settings", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@/lib/settings")>();
+	return {
+		...actual,
+		getResolvedSettings: vi.fn().mockResolvedValue({
+			language: "es",
+			timezone: "UTC",
+			clockFormat: "12h",
+		}),
+		updateUserSettings: vi.fn().mockResolvedValue(undefined),
+	};
+});
+
+vi.mock("@/hooks/useOrganization", () => ({
+	useOrganization: () => ({
+		org: { name: "Test Org", logo: null, role: "member" },
+		isLoading: false,
 	}),
 }));
 
@@ -80,9 +95,11 @@ describe("LayoutContent", () => {
 		);
 
 		render(
-			<LayoutContent>
-				<div>Test content</div>
-			</LayoutContent>,
+			<LanguageProvider>
+				<LayoutContent>
+					<div>Test content</div>
+				</LayoutContent>
+			</LanguageProvider>,
 		);
 
 		expect(screen.getByTestId("header")).toBeInTheDocument();
@@ -92,9 +109,11 @@ describe("LayoutContent", () => {
 		mockUseSubscriptionSafe.mockReturnValue(null);
 
 		render(
-			<LayoutContent>
-				<div data-testid="child-content">Test content</div>
-			</LayoutContent>,
+			<LanguageProvider>
+				<LayoutContent>
+					<div data-testid="child-content">Test content</div>
+				</LayoutContent>
+			</LanguageProvider>,
 		);
 
 		expect(screen.getByTestId("child-content")).toBeInTheDocument();
@@ -109,13 +128,17 @@ describe("LayoutContent", () => {
 		);
 
 		render(
-			<LayoutContent>
-				<div data-testid="child-content">Hidden</div>
-			</LayoutContent>,
+			<LanguageProvider>
+				<LayoutContent>
+					<div data-testid="child-content">Hidden</div>
+				</LayoutContent>
+			</LanguageProvider>,
 		);
 
 		expect(screen.queryByTestId("child-content")).not.toBeInTheDocument();
-		expect(screen.getByText("loading")).toBeInTheDocument();
+		expect(
+			screen.getByTestId("no-watchlist-loading-skeleton"),
+		).toBeInTheDocument();
 	});
 
 	it("shows NoWatchlistAccess when user lacks watchlist access", () => {
@@ -130,14 +153,16 @@ describe("LayoutContent", () => {
 		);
 
 		render(
-			<LayoutContent>
-				<div data-testid="child-content">Hidden</div>
-			</LayoutContent>,
+			<LanguageProvider>
+				<LayoutContent>
+					<div data-testid="child-content">Hidden</div>
+				</LayoutContent>
+			</LanguageProvider>,
 		);
 
 		expect(screen.queryByTestId("child-content")).not.toBeInTheDocument();
 		expect(
-			screen.getByText("subscription.noWatchlistAccess.title"),
+			screen.getByText("Acceso Watchlist No Disponible"),
 		).toBeInTheDocument();
 	});
 
@@ -155,9 +180,11 @@ describe("LayoutContent", () => {
 		);
 
 		render(
-			<LayoutContent>
-				<div data-testid="child-content">Visible</div>
-			</LayoutContent>,
+			<LanguageProvider>
+				<LayoutContent>
+					<div data-testid="child-content">Visible</div>
+				</LayoutContent>
+			</LanguageProvider>,
 		);
 
 		expect(screen.getByTestId("child-content")).toBeInTheDocument();
@@ -173,10 +200,12 @@ describe("LayoutContent", () => {
 		);
 
 		render(
-			<LayoutContent>
-				<div data-testid="child-1">Child 1</div>
-				<div data-testid="child-2">Child 2</div>
-			</LayoutContent>,
+			<LanguageProvider>
+				<LayoutContent>
+					<div data-testid="child-1">Child 1</div>
+					<div data-testid="child-2">Child 2</div>
+				</LayoutContent>
+			</LanguageProvider>,
 		);
 
 		expect(screen.getByTestId("child-1")).toBeInTheDocument();

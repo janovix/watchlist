@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAuthCoreBaseUrl } from "@/lib/auth/config";
+import { useAuthSession } from "@/lib/auth/useAuthSession";
 
 interface OrganizationInfo {
 	name: string;
@@ -9,21 +10,30 @@ interface OrganizationInfo {
 	role: string | null;
 }
 
-let cachedOrg: OrganizationInfo | null = null;
-
+/**
+ * Resolves the active organization (session `activeOrganizationId`) from the org list.
+ */
 export function useOrganization(): {
 	org: OrganizationInfo | null;
 	isLoading: boolean;
 } {
-	const [org, setOrg] = useState<OrganizationInfo | null>(cachedOrg);
-	const [isLoading, setIsLoading] = useState(cachedOrg === null);
+	const { data: session, isPending: sessionPending } = useAuthSession();
+	const activeOrgId =
+		(session?.session as { activeOrganizationId?: string | null } | undefined)
+			?.activeOrganizationId ?? null;
+
+	const [org, setOrg] = useState<OrganizationInfo | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		if (cachedOrg) return;
+		if (sessionPending) {
+			return;
+		}
 
 		let cancelled = false;
 
-		(async () => {
+		void (async () => {
+			setIsLoading(true);
 			try {
 				const response = await fetch(
 					`${getAuthCoreBaseUrl()}/api/organization/list-with-role`,
@@ -32,7 +42,7 @@ export function useOrganization(): {
 				if (cancelled) return;
 
 				if (!response.ok) {
-					setIsLoading(false);
+					setOrg(null);
 					return;
 				}
 
@@ -46,34 +56,38 @@ export function useOrganization(): {
 					}>;
 				} | null;
 
-				if (cancelled) return;
-
 				const orgs = payload?.data ?? [];
 				if (orgs.length === 0) {
-					setIsLoading(false);
+					setOrg(null);
 					return;
 				}
 
-				const activeOrg = orgs[0];
+				const picked =
+					activeOrgId != null
+						? (orgs.find((o) => o.id === activeOrgId) ?? orgs[0])
+						: orgs[0];
+
 				const info: OrganizationInfo = {
-					name: activeOrg.name,
-					logo: activeOrg.logo ?? null,
-					role: activeOrg.role ?? null,
+					name: picked.name,
+					logo: picked.logo ?? null,
+					role: picked.role ?? null,
 				};
 
-				cachedOrg = info;
 				setOrg(info);
 			} catch (error) {
 				console.warn("[useOrganization] Failed to fetch organization:", error);
+				setOrg(null);
 			} finally {
-				if (!cancelled) setIsLoading(false);
+				if (!cancelled) {
+					setIsLoading(false);
+				}
 			}
 		})();
 
 		return () => {
 			cancelled = true;
 		};
-	}, []);
+	}, [sessionPending, activeOrgId]);
 
 	return { org, isLoading };
 }

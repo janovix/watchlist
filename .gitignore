@@ -204,3 +204,4 @@ dist
 ### OpenNext ###
 .open-next/
 next-env.d.ts
+screening-PDF_TEST_SUBJECT-*-*.pdf
