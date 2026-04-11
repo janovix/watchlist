@@ -22,7 +22,16 @@ vi.mock("@/components/language-provider", () => ({
 	})),
 }));
 
+vi.mock("@/hooks/useFlags", () => ({
+	useFlags: vi.fn(() => ({
+		flags: { "stripe-billing-enabled": true },
+		error: null,
+		isLoading: false,
+	})),
+}));
+
 import { useSubscriptionSafe } from "@/lib/subscription";
+import { useFlags } from "@/hooks/useFlags";
 import type { SubscriptionContextValue } from "@/lib/subscription/useSubscription";
 
 describe("SubscriptionBanner", () => {
@@ -30,6 +39,11 @@ describe("SubscriptionBanner", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": true },
+			error: null,
+			isLoading: false,
+		});
 		Object.defineProperty(global, "window", {
 			value: {
 				location: {
@@ -92,6 +106,35 @@ describe("SubscriptionBanner", () => {
 			screen.getByText("Upgrade to unlock more features"),
 		).toBeInTheDocument();
 		expect(screen.getByText("Upgrade")).toBeInTheDocument();
+	});
+
+	it("does not render free tier banner when stripe billing is disabled", () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: { "stripe-billing-enabled": false },
+			error: null,
+			isLoading: false,
+		});
+		vi.mocked(useSubscriptionSafe).mockReturnValue(
+			createMockContext({ isFreeTier: true }),
+		);
+
+		const { container } = render(<SubscriptionBanner />);
+		expect(container.firstChild).toBeNull();
+	});
+
+	it("renders free tier banner when stripe flags fail to load (fail-open)", () => {
+		vi.mocked(useFlags).mockReturnValue({
+			flags: {},
+			error: "flags unavailable",
+			isLoading: false,
+		});
+		vi.mocked(useSubscriptionSafe).mockReturnValue(
+			createMockContext({ isFreeTier: true }),
+		);
+
+		render(<SubscriptionBanner />);
+
+		expect(screen.getByText("Free Tier")).toBeInTheDocument();
 	});
 
 	it("should not render free tier banner when showFreeTierBanner is false", () => {

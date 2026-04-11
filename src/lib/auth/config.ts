@@ -1,5 +1,13 @@
 import { requireEnv } from "@/lib/env";
 
+/** flags-svc for server-side flag evaluation (JWT). */
+export const getFlagsServiceUrl = (): string => {
+	return requireEnv(
+		"NEXT_PUBLIC_FLAGS_SERVICE_URL",
+		process.env.NEXT_PUBLIC_FLAGS_SERVICE_URL,
+	);
+};
+
 export const getAuthCoreBaseUrl = (): string => {
 	return requireEnv(
 		"NEXT_PUBLIC_AUTH_SERVICE_URL",

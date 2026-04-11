@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Zap, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useFlags } from "@/hooks/useFlags";
 
 interface SubscriptionBannerProps {
 	/** The billing page URL */
@@ -31,6 +32,13 @@ export function SubscriptionBanner({
 	const subscription = useSubscriptionSafe();
 	const { t } = useLanguage();
 	const [dismissed, setDismissed] = useState(false);
+	const { flags: stripeFlags, error: stripeFlagsError } = useFlags([
+		"stripe-billing-enabled",
+	]);
+	const stripeBillingEnabled =
+		stripeFlagsError !== null
+			? true
+			: stripeFlags["stripe-billing-enabled"] !== false;
 
 	// Build auth billing URL based on current location
 	const authBillingUrl =
@@ -53,6 +61,10 @@ export function SubscriptionBanner({
 
 	// Only show for free tier users
 	if (!isFreeTier || !showFreeTierBanner || hasPaidSubscription) {
+		return null;
+	}
+
+	if (!stripeBillingEnabled) {
 		return null;
 	}
 
