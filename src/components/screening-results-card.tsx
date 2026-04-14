@@ -1,11 +1,6 @@
 "use client";
 
-import {
-	CheckCircle2,
-	AlertTriangle,
-	Loader2,
-	ExternalLink,
-} from "lucide-react";
+import { CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 import {
 	Accordion,
 	AccordionContent,
@@ -13,6 +8,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { MatchResultsList } from "@/components/match-results-list";
@@ -93,7 +89,7 @@ function resolveAsyncItemStatus(
 function getStatusIcon(itemStatus: ItemStatus) {
 	switch (itemStatus) {
 		case "loading":
-			return <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />;
+			return <Spinner className="h-5 w-5 text-muted-foreground" />;
 		case "complete_clear":
 			return <CheckCircle2 className="h-5 w-5 text-green-500" />;
 		case "complete_match":
@@ -268,7 +264,7 @@ function SubsectionBadge({
 	if (!status || status === "pending" || status === "running") {
 		return (
 			<Badge variant="outline" className="gap-1 text-xs">
-				<Loader2 className="h-3 w-3 animate-spin" />
+				<Spinner className="h-3 w-3" />
 				{t("statusSearching")}
 			</Badge>
 		);
