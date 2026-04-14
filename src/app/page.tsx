@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, CalendarDays, Settings2, Loader2 } from "lucide-react";
+import { ChevronRight, CalendarDays, Settings2 } from "lucide-react";
 import { CountryMultiSelect } from "@/components/country-multi-select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -248,15 +248,11 @@ export default function HomePage() {
 									id="submit-search-btn"
 									onClick={() => handleSearch()}
 									disabled={!canSubmit}
+									loading={isSearching}
 									size="icon"
 									className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full p-0"
-									aria-busy={isSearching}
 								>
-									{isSearching ? (
-										<Loader2 className="h-4 w-4 animate-spin" />
-									) : (
-										<ChevronRight className="h-4 w-4" />
-									)}
+									{!isSearching && <ChevronRight className="h-4 w-4" />}
 								</Button>
 							</div>
 						</div>

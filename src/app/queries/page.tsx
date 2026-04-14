@@ -11,7 +11,6 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Download,
-	Loader2,
 	Plus,
 } from "lucide-react";
 import { listQueries, getQuery, type QueryListItem } from "@/lib/api/queries";
@@ -692,16 +691,12 @@ export default function QueriesPage() {
 												variant="ghost"
 												size="icon"
 												className="h-8 w-8"
-												disabled={
-													query.status !== "completed" ||
-													exportingId === query.id
-												}
+												loading={exportingId === query.id}
+												disabled={query.status !== "completed"}
 												onClick={(e) => handleExportPdf(query.id, e)}
 												title={t("exportPdf")}
 											>
-												{exportingId === query.id ? (
-													<Loader2 className="h-4 w-4 animate-spin" />
-												) : (
+												{exportingId !== query.id && (
 													<Download className="h-4 w-4" />
 												)}
 											</Button>
@@ -787,14 +782,11 @@ export default function QueriesPage() {
 										variant="outline"
 										size="sm"
 										className="gap-2"
-										disabled={
-											query.status !== "completed" || exportingId === query.id
-										}
+										loading={exportingId === query.id}
+										disabled={query.status !== "completed"}
 										onClick={(e) => handleExportPdf(query.id, e)}
 									>
-										{exportingId === query.id ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
-										) : (
+										{exportingId !== query.id && (
 											<Download className="h-4 w-4" />
 										)}
 										{t("exportPdf")}

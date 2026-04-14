@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,7 +11,6 @@ import { Footer } from "@/components/footer";
 import {
 	ArrowLeft,
 	AlertCircle,
-	Loader2,
 	User,
 	Building2,
 	Download,
@@ -278,15 +278,12 @@ export default function QueryDetailPage() {
 					<Button
 						variant="outline"
 						size="sm"
-						disabled={!data || data.status !== "completed" || exporting}
+						loading={exporting}
+						disabled={!data || data.status !== "completed"}
 						onClick={handleExportPdf}
 						className="gap-2"
 					>
-						{exporting ? (
-							<Loader2 className="h-4 w-4 animate-spin" />
-						) : (
-							<Download className="h-4 w-4" />
-						)}
+						{!exporting && <Download className="h-4 w-4" />}
 						{exporting ? t("exportingPdf") : t("exportPdf")}
 					</Button>
 					<Button variant="outline" size="sm" onClick={() => router.push("/")}>
@@ -352,7 +349,7 @@ export default function QueryDetailPage() {
 
 					{data.status === "running" && (
 						<div className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card">
-							<Loader2 className="h-5 w-5 animate-spin text-primary" />
+							<Spinner className="h-5 w-5 text-primary" />
 							<span className="text-sm text-muted-foreground">
 								{t("processingAsync")}
 							</span>
