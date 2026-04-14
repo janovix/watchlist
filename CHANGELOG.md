@@ -1,3 +1,10 @@
+# [1.1.0-rc.42](https://github.com/janovix/watchlist/compare/v1.1.0-rc.41...v1.1.0-rc.42) (2026-04-06)
+
+
+### Features
+
+* integrate flags service for stripe billing feature; update components to conditionally render based on billing flags ([2e372a2](https://github.com/janovix/watchlist/commit/2e372a25960ced487b61b53e791bdf207ae96d23))
+
 # [1.1.0-rc.41](https://github.com/janovix/watchlist/compare/v1.1.0-rc.40...v1.1.0-rc.41) (2026-04-04)
 
 
