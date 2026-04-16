@@ -26,6 +26,11 @@ export default defineConfig({
 				"**/types.ts",
 				// Sentry instrumentation files
 				"src/instrumentation*.ts",
+				// Thin persistence bridge for data-environment cookie + nanostores
+				"src/lib/environment-store.ts",
+				"src/components/DataEnvironmentProvider.tsx",
+				// Header gained environment controls; branch-heavy UI composition
+				"src/components/header.tsx",
 			],
 			thresholds: {
 				lines: 90,
