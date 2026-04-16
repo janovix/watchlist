@@ -1,3 +1,10 @@
+# [1.1.0-rc.43](https://github.com/janovix/watchlist/compare/v1.1.0-rc.42...v1.1.0-rc.43) (2026-04-16)
+
+
+### Features
+
+* implement Data Environment Provider and integrate environment management ([2002611](https://github.com/janovix/watchlist/commit/20026115536d0f66187af05b1c7069da6c2449b7))
+
 # [1.1.0-rc.42](https://github.com/janovix/watchlist/compare/v1.1.0-rc.41...v1.1.0-rc.42) (2026-04-06)
 
 
