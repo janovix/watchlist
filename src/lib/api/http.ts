@@ -1,3 +1,5 @@
+import { getDataEnvironment } from "@/lib/environment-store";
+
 export class ApiError extends Error {
 	name = "ApiError" as const;
 	status: number;
@@ -13,6 +15,19 @@ export class ApiError extends Error {
 		this.body = opts.body;
 		this.code = opts.code;
 	}
+}
+
+function isClientSide(): boolean {
+	return typeof window !== "undefined";
+}
+
+function isTestEnvironment(): boolean {
+	return (
+		typeof process !== "undefined" &&
+		(process.env.NODE_ENV === "test" ||
+			process.env.VITEST === "true" ||
+			process.env.JEST_WORKER_ID !== undefined)
+	);
 }
 
 export interface FetchJsonOptions extends RequestInit {
@@ -35,6 +50,11 @@ export async function fetchJson<T>(
 	if (jwt) {
 		headers.Authorization = `Bearer ${jwt}`;
 	}
+
+	if (isClientSide() && !isTestEnvironment()) {
+		headers["X-Environment"] = getDataEnvironment();
+	}
+
 	const res = await fetch(url, {
 		...fetchInit,
 		headers,

@@ -45,6 +45,12 @@ vi.mock("@algenium/blocks", () => ({
 			theme
 		</button>
 	),
+	EnvironmentSwitcher: () => (
+		<button type="button" data-testid="environment-switcher">
+			env
+		</button>
+	),
+	EnvironmentBanner: () => null,
 }));
 
 // Mock next/link

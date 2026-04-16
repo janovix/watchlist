@@ -128,6 +128,19 @@ export const translations = {
 		// Language
 		languageLabel: "Idioma",
 
+		// Data environment
+		envDataPlane: "Entorno de datos",
+		envLive: "Producción",
+		envStaging: "Staging",
+		envDevelopment: "Desarrollo",
+		envBannerStaging:
+			"Estás viendo datos de staging — no afectan a clientes en vivo.",
+		envBannerDevelopment:
+			"Estás viendo datos de desarrollo — solo para pruebas.",
+		envSwitchConfirm: "Entorno de datos actualizado",
+		envSwitchLive: "Modo producción (datos en vivo)",
+		envDismiss: "Cerrar aviso",
+
 		profile: "Mi perfil",
 		settings: "Configuración",
 		help: "Ayuda y soporte",
@@ -537,6 +550,19 @@ export const translations = {
 		themeDark: "Dark",
 		// Language
 		languageLabel: "Language",
+
+		// Data environment
+		envDataPlane: "Data environment",
+		envLive: "Live",
+		envStaging: "Staging",
+		envDevelopment: "Development",
+		envBannerStaging:
+			"You are viewing staging data — changes do not affect live customers.",
+		envBannerDevelopment:
+			"You are viewing development data — for testing only.",
+		envSwitchConfirm: "Data environment updated",
+		envSwitchLive: "Live mode (production data)",
+		envDismiss: "Dismiss notice",
 
 		profile: "My profile",
 		settings: "Settings",
