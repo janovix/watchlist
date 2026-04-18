@@ -11,6 +11,7 @@ import {
 	LAYOUT_OUTER,
 } from "@/lib/layout";
 import { cn } from "@/lib/utils";
+import { DataEnvBadge } from "@/components/data-env-badge";
 
 /**
  * Query list renders `<Footer />` inside `LAYOUT_OUTER` — skip the footer's outer shell
@@ -61,6 +62,7 @@ export function Footer() {
 				</div>
 				<div className="flex items-center gap-4">
 					<span>&copy; {new Date().getFullYear()} Janovix</span>
+					<DataEnvBadge />
 					<a
 						href={getPrivacyUrl()}
 						target="_blank"
