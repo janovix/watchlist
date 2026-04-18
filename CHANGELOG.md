@@ -1,3 +1,10 @@
+# [1.1.0-rc.44](https://github.com/janovix/watchlist/compare/v1.1.0-rc.43...v1.1.0-rc.44) (2026-04-18)
+
+
+### Features
+
+* add DataEnvBadge component and related tests for environment display in footer ([3759983](https://github.com/janovix/watchlist/commit/375998322d8d521a28a9439ace9954737f2720a7))
+
 # [1.1.0-rc.43](https://github.com/janovix/watchlist/compare/v1.1.0-rc.42...v1.1.0-rc.43) (2026-04-16)
 
 
