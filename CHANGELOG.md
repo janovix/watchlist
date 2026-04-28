@@ -1,3 +1,10 @@
+# [1.1.0-rc.46](https://github.com/janovix/watchlist/compare/v1.1.0-rc.45...v1.1.0-rc.46) (2026-04-28)
+
+
+### Bug Fixes
+
+* refactor useOnboardingTour to utilize useSearchParams for query parameter handling ([8ac61c0](https://github.com/janovix/watchlist/commit/8ac61c0a3aa19aa3426120282a630392c6376041))
+
 # [1.1.0-rc.45](https://github.com/janovix/watchlist/compare/v1.1.0-rc.44...v1.1.0-rc.45) (2026-04-28)
 
 
