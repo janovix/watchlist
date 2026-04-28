@@ -5,6 +5,14 @@ import {
 	WATCHLIST_ONBOARDING_DONE_KEY,
 } from "./useOnboardingTour";
 
+const { mockSearchParamsRef } = vi.hoisted(() => ({
+	mockSearchParamsRef: { current: new URLSearchParams() },
+}));
+
+vi.mock("next/navigation", () => ({
+	useSearchParams: () => mockSearchParamsRef.current,
+}));
+
 type DriverConfig = { onDestroyed?: () => void };
 
 const mockDriver = vi.fn((config?: DriverConfig) => {
@@ -30,6 +38,7 @@ vi.mock("@/components/language-provider", () => ({
 
 describe("useOnboardingTour", () => {
 	beforeEach(() => {
+		mockSearchParamsRef.current = new URLSearchParams();
 		vi.useFakeTimers();
 		localStorage.clear();
 		mockDriver.mockClear();
@@ -98,20 +107,11 @@ describe("useOnboardingTour", () => {
 
 	it("starts the tour when navigator.webdriver is true and tour=force is in the URL", () => {
 		vi.stubGlobal("navigator", { ...navigator, webdriver: true });
-		const prev = window.location.href;
-		window.history.replaceState(
-			{},
-			"",
-			`${window.location.pathname}?tour=force`,
-		);
-		try {
-			renderHook(() => useOnboardingTour(true));
-			act(() => {
-				vi.advanceTimersByTime(600);
-			});
-			expect(mockDriver).toHaveBeenCalledTimes(1);
-		} finally {
-			window.history.replaceState({}, "", prev);
-		}
+		mockSearchParamsRef.current = new URLSearchParams("tour=force");
+		renderHook(() => useOnboardingTour(true));
+		act(() => {
+			vi.advanceTimersByTime(600);
+		});
+		expect(mockDriver).toHaveBeenCalledTimes(1);
 	});
 });

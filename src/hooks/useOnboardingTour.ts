@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { driver, type Driver } from "driver.js";
 import { useLanguage } from "@/components/language-provider";
 
@@ -20,6 +21,7 @@ export const WATCHLIST_ONBOARDING_DONE_KEY =
  * `?tour=force` bypasses the above so E2E can walk the tour deliberately.
  */
 export function useOnboardingTour(enabled: boolean) {
+	const searchParams = useSearchParams();
 	const { t, language } = useLanguage();
 	const tRef = useRef(t);
 	const driverRef = useRef<Driver | null>(null);
@@ -32,11 +34,10 @@ export function useOnboardingTour(enabled: boolean) {
 
 		let force = false;
 		try {
-			const params = new URLSearchParams(window.location.search);
-			force = params.get("tour") === "force";
+			force = searchParams.get("tour") === "force";
 			if (
 				!force &&
-				(params.get("e2e") === "1" || params.get("tour") === "skip")
+				(searchParams.get("e2e") === "1" || searchParams.get("tour") === "skip")
 			) {
 				return;
 			}
@@ -139,5 +140,5 @@ export function useOnboardingTour(enabled: boolean) {
 			driverRef.current?.destroy();
 			driverRef.current = null;
 		};
-	}, [enabled, language]);
+	}, [enabled, language, searchParams]);
 }
