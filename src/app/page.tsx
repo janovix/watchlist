@@ -101,7 +101,7 @@ export default function HomePage() {
 	const [isLoadingRecentSearches, setIsLoadingRecentSearches] = useState(true);
 	const { jwt, isLoading: jwtLoading } = useJwt();
 
-	useOnboardingTour(!jwtLoading);
+	useOnboardingTour(Boolean(jwt) && !jwtLoading);
 
 	// Fetch recent searches on mount
 	useEffect(() => {
