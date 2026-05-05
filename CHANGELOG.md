@@ -1,3 +1,17 @@
+# [1.1.0-rc.46](https://github.com/janovix/watchlist/compare/v1.1.0-rc.45...v1.1.0-rc.46) (2026-04-28)
+
+
+### Bug Fixes
+
+* refactor useOnboardingTour to utilize useSearchParams for query parameter handling ([8ac61c0](https://github.com/janovix/watchlist/commit/8ac61c0a3aa19aa3426120282a630392c6376041))
+
+# [1.1.0-rc.45](https://github.com/janovix/watchlist/compare/v1.1.0-rc.44...v1.1.0-rc.45) (2026-04-28)
+
+
+### Bug Fixes
+
+* update useOnboardingTour logic to prevent tour initiation during JWT loading and enhance localStorage handling for onboarding state ([80fa858](https://github.com/janovix/watchlist/commit/80fa858a8b9f7c8cd6b8574a23bf0c4727e727da))
+
 # [1.1.0-rc.44](https://github.com/janovix/watchlist/compare/v1.1.0-rc.43...v1.1.0-rc.44) (2026-04-18)
 
 

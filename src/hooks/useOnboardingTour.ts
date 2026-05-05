@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { driver, type Driver } from "driver.js";
 import { useLanguage } from "@/components/language-provider";
 
@@ -10,28 +11,64 @@ export const WATCHLIST_ONBOARDING_DONE_KEY =
 
 /**
  * Runs a one-time driver.js tour on the watchlist home search UI.
- * Call with `enabled` when the page is ready (e.g. JWT loaded).
+ * Call with `enabled` when the page is ready (e.g. JWT loaded and not loading).
+ *
+ * Skipped when:
+ * - Playwright / automation (`navigator.webdriver === true`), unless `?tour=force`
+ * - `?e2e=1` or `?tour=skip`, unless `?tour=force`
+ * - {@link WATCHLIST_ONBOARDING_DONE_KEY} is set in localStorage, unless `?tour=force`
+ *
+ * `?tour=force` bypasses the above so E2E can walk the tour deliberately.
  */
 export function useOnboardingTour(enabled: boolean) {
+	const searchParams = useSearchParams();
 	const { t, language } = useLanguage();
 	const tRef = useRef(t);
+	const driverRef = useRef<Driver | null>(null);
+	const teardownRef = useRef(false);
 	tRef.current = t;
 
 	useEffect(() => {
+		teardownRef.current = false;
 		if (!enabled) return;
+
+		let force = false;
 		try {
-			if (localStorage.getItem(WATCHLIST_ONBOARDING_DONE_KEY) === "true") {
+			force = searchParams.get("tour") === "force";
+			if (
+				!force &&
+				(searchParams.get("e2e") === "1" || searchParams.get("tour") === "skip")
+			) {
 				return;
 			}
 		} catch {
+			/* ignore */
+		}
+
+		if (
+			!force &&
+			typeof navigator !== "undefined" &&
+			navigator.webdriver === true
+		) {
 			return;
 		}
 
-		let driverInstance: Driver | null = null;
+		if (!force) {
+			try {
+				if (localStorage.getItem(WATCHLIST_ONBOARDING_DONE_KEY) === "true") {
+					return;
+				}
+			} catch {
+				return;
+			}
+		}
 
+		let cancelled = false;
 		const timeoutId = window.setTimeout(() => {
+			if (cancelled) return;
+
 			const tr = tRef.current;
-			driverInstance = driver({
+			const dObj = driver({
 				showProgress: true,
 				animate: true,
 				smoothScroll: true,
@@ -45,11 +82,16 @@ export function useOnboardingTour(enabled: boolean) {
 				doneBtnText: tr("tourDone"),
 				popoverClass: "watchlist-tour-popover",
 				onDestroyed: () => {
+					if (teardownRef.current) {
+						driverRef.current = null;
+						return;
+					}
 					try {
 						localStorage.setItem(WATCHLIST_ONBOARDING_DONE_KEY, "true");
 					} catch {
 						/* ignore */
 					}
+					driverRef.current = null;
 				},
 				steps: [
 					{
@@ -86,12 +128,17 @@ export function useOnboardingTour(enabled: boolean) {
 					},
 				],
 			});
-			driverInstance.drive();
+
+			driverRef.current = dObj;
+			dObj.drive();
 		}, 600);
 
 		return () => {
+			cancelled = true;
 			window.clearTimeout(timeoutId);
-			driverInstance?.destroy();
+			teardownRef.current = true;
+			driverRef.current?.destroy();
+			driverRef.current = null;
 		};
-	}, [enabled, language]);
+	}, [enabled, language, searchParams]);
 }
