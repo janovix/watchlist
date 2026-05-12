@@ -1,3 +1,10 @@
+# [1.1.0-rc.47](https://github.com/janovix/watchlist/compare/v1.1.0-rc.46...v1.1.0-rc.47) (2026-05-12)
+
+
+### Bug Fixes
+
+* update status icons in screening results card to include shrink-0 class for consistent sizing ([68a1265](https://github.com/janovix/watchlist/commit/68a1265a24b91474936c011a4f0fd65acaaddcc6))
+
 # [1.1.0-rc.46](https://github.com/janovix/watchlist/compare/v1.1.0-rc.45...v1.1.0-rc.46) (2026-04-28)
 
 
