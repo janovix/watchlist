@@ -47,7 +47,7 @@ export interface UseSearchQueryResult {
  * query fully complete and close the SSE connection.
  */
 function checkIfComplete(data: SearchQuery): boolean {
-	const done = ["completed", "failed"];
+	const done = ["completed", "failed", "skipped"];
 	return (
 		done.includes(data.pepOfficialStatus ?? "") &&
 		done.includes(data.pepAiStatus ?? "") &&
