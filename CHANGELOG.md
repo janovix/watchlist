@@ -1,3 +1,18 @@
+# [1.2.0-rc.1](https://github.com/janovix/watchlist/compare/v1.1.0...v1.2.0-rc.1) (2026-05-16)
+
+
+### Bug Fixes
+
+* add "skipped" status to completion check in useSearchQuery hook ([e1038d0](https://github.com/janovix/watchlist/commit/e1038d052d9a649265821ec4531f665426005caf))
+* refactor useOnboardingTour to utilize useSearchParams for query parameter handling ([8ac61c0](https://github.com/janovix/watchlist/commit/8ac61c0a3aa19aa3426120282a630392c6376041))
+* update status icons in screening results card to include shrink-0 class for consistent sizing ([68a1265](https://github.com/janovix/watchlist/commit/68a1265a24b91474936c011a4f0fd65acaaddcc6))
+* update useOnboardingTour logic to prevent tour initiation during JWT loading and enhance localStorage handling for onboarding state ([80fa858](https://github.com/janovix/watchlist/commit/80fa858a8b9f7c8cd6b8574a23bf0c4727e727da))
+
+
+### Features
+
+* add DataEnvBadge component and related tests for environment display in footer ([3759983](https://github.com/janovix/watchlist/commit/375998322d8d521a28a9439ace9954737f2720a7))
+
 # [1.1.0-rc.48](https://github.com/janovix/watchlist/compare/v1.1.0-rc.47...v1.1.0-rc.48) (2026-05-12)
 
 
