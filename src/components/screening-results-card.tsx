@@ -89,13 +89,13 @@ function resolveAsyncItemStatus(
 function getStatusIcon(itemStatus: ItemStatus) {
 	switch (itemStatus) {
 		case "loading":
-			return <Spinner className="h-5 w-5 text-muted-foreground" />;
+			return <Spinner className="h-5 w-5 shrink-0 text-muted-foreground" />;
 		case "complete_clear":
-			return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+			return <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />;
 		case "complete_match":
-			return <AlertTriangle className="h-5 w-5 text-red-500" />;
+			return <AlertTriangle className="h-5 w-5 shrink-0 text-red-500" />;
 		case "failed":
-			return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+			return <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-500" />;
 	}
 }
 
@@ -175,13 +175,13 @@ function getStatusBadgeColor(itemStatus: ItemStatus): string {
 function getRiskLevelIcon(risk: RiskLevel) {
 	switch (risk) {
 		case "none":
-			return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+			return <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />;
 		case "low":
-			return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+			return <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-500" />;
 		case "medium":
-			return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+			return <AlertTriangle className="h-5 w-5 shrink-0 text-orange-500" />;
 		case "high":
-			return <AlertTriangle className="h-5 w-5 text-red-500" />;
+			return <AlertTriangle className="h-5 w-5 shrink-0 text-red-500" />;
 	}
 }
 

@@ -15,7 +15,7 @@ export default withSentryConfig(nextConfig, {
 	widenClientFileUpload: true,
 	tunnelRoute: "/monitoring",
 	release: {
-		name: `${process.env.SENTRY_PROJECT}@${sentryEnvironment}`,
+		name: `watchlist@${sentryEnvironment}`,
 	},
 	webpack: {
 		automaticVercelMonitors: true,

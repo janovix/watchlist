@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, screen } from "@testing-library/react";
 import { Footer } from "./footer";
+import { environmentAtom } from "@/lib/environment-store";
 import {
 	LAYOUT_HORIZONTAL_PAD,
 	LAYOUT_INFO_COLUMN,
@@ -42,10 +43,12 @@ function expectClasses(el: Element | null | undefined, classString: string) {
 describe("Footer", () => {
 	beforeEach(() => {
 		mockPathname.mockReturnValue("/");
+		environmentAtom.set("production");
 	});
 
 	afterEach(() => {
 		cleanup();
+		environmentAtom.set("production");
 	});
 
 	it("uses LAYOUT_OUTER + LAYOUT_NARROW for home (/)", () => {
@@ -84,5 +87,11 @@ describe("Footer", () => {
 		expectClasses(outer, `${LAYOUT_OUTER} space-y-4`);
 		const inner = outer?.querySelector(":scope > div");
 		expectClasses(inner, `${LAYOUT_INFO_COLUMN} space-y-4`);
+	});
+
+	it("shows data environment badge when not production", () => {
+		environmentAtom.set("staging");
+		render(<Footer />);
+		expect(screen.getByText("Stg")).toBeInTheDocument();
 	});
 });
