@@ -1,3 +1,10 @@
+# [1.2.0-rc.2](https://github.com/janovix/watchlist/compare/v1.2.0-rc.1...v1.2.0-rc.2) (2026-10-16)
+
+
+### Features
+
+* **brand:** rebrand visible Janovix branding to Yenio ([def1f74](https://github.com/janovix/watchlist/commit/def1f749e38e1b6aa9d1a6554ebb75cfdff98a43))
+
 # [1.2.0-rc.1](https://github.com/janovix/watchlist/compare/v1.1.0...v1.2.0-rc.1) (2026-05-16)
 
 
