@@ -4,7 +4,7 @@ export const translations = {
 	es: {
 		// Header
 		appName: "isPep",
-		byJanovix: "Janovix",
+		byJanovix: "Yenio",
 		appDescription: "Verificación de Personas Políticamente Expuestas",
 
 		// Loading
@@ -392,7 +392,7 @@ export const translations = {
 		disclaimerText1:
 			"Watchlist es una herramienta de verificación que agrega datos disponibles públicamente de fuentes gubernamentales oficiales. La información proporcionada es solo para fines informativos y no debe considerarse como asesoría legal o una determinación definitiva de riesgo.",
 		disclaimerText2:
-			"Los usuarios son responsables de realizar su propia debida diligencia y verificar la información a través de canales oficiales. Janovix no es responsable de las decisiones tomadas con base en la información proporcionada por esta plataforma.",
+			"Los usuarios son responsables de realizar su propia debida diligencia y verificar la información a través de canales oficiales. Yenio no es responsable de las decisiones tomadas con base en la información proporcionada por esta plataforma.",
 
 		// Info page data sources
 		ofacSdnDescription:
@@ -419,7 +419,7 @@ export const translations = {
 		externalLinkTitle: "Redirección a sitio externo",
 		externalLinkDescription: "Serás redirigido a un sitio web de terceros.",
 		externalLinkBody:
-			"Este sitio no está bajo el control de Janovix y puede tener sus propias políticas de privacidad y términos de uso.",
+			"Este sitio no está bajo el control de Yenio y puede tener sus propias políticas de privacidad y términos de uso.",
 		externalLinkVisiting: "Estás a punto de visitar",
 		externalLinkDontShowAgain: "No volver a mostrar este aviso",
 		externalLinkCancel: "Cancelar",
@@ -428,7 +428,7 @@ export const translations = {
 	en: {
 		// Header
 		appName: "isPep",
-		byJanovix: "Janovix",
+		byJanovix: "Yenio",
 		appDescription: "Politically Exposed Persons Verification",
 
 		// Loading
@@ -812,7 +812,7 @@ export const translations = {
 		disclaimerText1:
 			"Watchlist is a screening tool that aggregates publicly available data from official government sources. The information provided is for informational purposes only and should not be considered as legal advice or a definitive determination of risk.",
 		disclaimerText2:
-			"Users are responsible for conducting their own due diligence and verifying information through official channels. Janovix is not liable for decisions made based on the information provided by this platform.",
+			"Users are responsible for conducting their own due diligence and verifying information through official channels. Yenio is not liable for decisions made based on the information provided by this platform.",
 
 		// Info page data sources
 		ofacSdnDescription:
@@ -839,7 +839,7 @@ export const translations = {
 		externalLinkTitle: "Redirect to external site",
 		externalLinkDescription: "You will be redirected to a third-party website.",
 		externalLinkBody:
-			"This site is not under the control of Janovix and may have its own privacy policies and terms of use.",
+			"This site is not under the control of Yenio and may have its own privacy policies and terms of use.",
 		externalLinkVisiting: "You are about to visit",
 		externalLinkDontShowAgain: "Don't show this warning again",
 		externalLinkCancel: "Cancel",

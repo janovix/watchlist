@@ -19,7 +19,7 @@ const _playfair = Playfair_Display({ subsets: ["latin"] });
 
 // Icons, manifest, viewport: keep in sync with aml/src/app/layout.tsx
 export const metadata: Metadata = {
-	title: "Janovix Watchlist",
+	title: "Yenio Watchlist",
 	description:
 		"Sistema de verificación PEP para compliance y debida diligencia",
 	manifest: "/site.webmanifest",
@@ -40,7 +40,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-	themeColor: "#0f766e",
+	themeColor: [
+		{ media: "(prefers-color-scheme: light)", color: "#f7fbfc" },
+		{ media: "(prefers-color-scheme: dark)", color: "#11171d" },
+	],
 	width: "device-width",
 	initialScale: 1,
 	maximumScale: 5,
