@@ -891,7 +891,7 @@ export async function generateScreeningPdf(
 
 	doc.setFontSize(7);
 	const poweredByLabel = `${t("pdfPoweredBy")} `;
-	const brandText = "Yenio";
+	const brandText = "Janovix";
 
 	doc.setFont("helvetica", "normal");
 	doc.setTextColor(...COLORS.gray);

@@ -98,8 +98,8 @@ describe("translations", () => {
 		});
 
 		it("should have byJanovix in all languages", () => {
-			expect(translations.es.byJanovix).toBe("Yenio");
-			expect(translations.en.byJanovix).toBe("Yenio");
+			expect(translations.es.byJanovix).toBe("Janovix");
+			expect(translations.en.byJanovix).toBe("Janovix");
 		});
 	});
 });

@@ -61,7 +61,7 @@ export function Footer() {
 					</a>
 				</div>
 				<div className="flex items-center gap-4">
-					<span>&copy; {new Date().getFullYear()} Yenio</span>
+					<span>&copy; {new Date().getFullYear()} Janovix</span>
 					<DataEnvBadge />
 					<a
 						href={getPrivacyUrl()}
